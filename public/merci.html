@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Merci — Miss & Mister Flash Adjarra</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+<header class="site-header">
+  <h1>Miss &amp; Mister</h1>
+  <p>Flash Adjarra</p>
+</header>
+<main style="text-align:center; padding-top:60px;">
+  <div id="status-box">
+    <p>Vérification de votre paiement...</p>
+  </div>
+  <a class="btn" href="/">Retour au site</a>
+</main>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const txId = params.get("tx");
+const box = document.getElementById("status-box");
+
+async function checkStatus(attempt = 0) {
+  if (!txId) {
+    box.innerHTML = "<p>Référence de transaction manquante.</p>";
+    return;
+  }
+  try {
+    const res = await fetch(`/api/votes/status/${txId}`);
+    const data = await res.json();
+
+    if (data.status === "approved") {
+      box.innerHTML = `<p style="color:#1e7a3d; font-size:18px;">Paiement confirmé ! Merci, vos ${data.votes_bought} vote(s) ont été comptabilisés.</p>`;
+    } else if (data.status === "declined" || data.status === "canceled") {
+      box.innerHTML = `<p style="color:#b3261e;">Le paiement n'a pas abouti. Vous pouvez réessayer depuis la page d'accueil.</p>`;
+    } else if (attempt < 8) {
+      // Le webhook FedaPay peut mettre quelques secondes à arriver : on réessaie.
+      setTimeout(() => checkStatus(attempt + 1), 2000);
+    } else {
+      box.innerHTML = `<p>Paiement en cours de vérification. Si vos votes n'apparaissent pas d'ici quelques minutes, contactez l'organisateur.</p>`;
+    }
+  } catch (e) {
+    box.innerHTML = "<p>Impossible de vérifier le statut du paiement.</p>";
+  }
+}
+checkStatus();
+</script>
+</body>
+</html>

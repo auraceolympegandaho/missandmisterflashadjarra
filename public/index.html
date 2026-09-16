@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Miss & Mister Flash Adjarra — Votez pour votre candidat(e)</title>
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <h1>Miss &amp; Mister</h1>
+  <p>Flash Adjarra</p>
+  <div class="tabs">
+    <button class="tab-btn active" data-cat="">Tous</button>
+    <button class="tab-btn" data-cat="Miss">Miss</button>
+    <button class="tab-btn" data-cat="Mister">Mister</button>
+  </div>
+</header>
+
+<main>
+  <div id="grid" class="grid"></div>
+  <div id="empty" class="empty-state" style="display:none;">
+    Aucun candidat pour le moment. Revenez bientôt !
+  </div>
+</main>
+
+<footer>
+  Un vote = <span id="price-label">...</span> FCFA · Paiement sécurisé par Mobile Money ou carte bancaire.
+</footer>
+
+<a class="admin-link" href="/admin.html">admin</a>
+
+<!-- Modal de vote -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2 id="modal-title">Voter</h2>
+
+    <label for="qty">Nombre de votes</label>
+    <div class="qty-row">
+      <button type="button" id="qty-minus">−</button>
+      <input type="number" id="qty" value="1" min="1" />
+      <button type="button" id="qty-plus">+</button>
+    </div>
+
+    <label for="phone">Numéro de téléphone (Mobile Money)</label>
+    <input type="tel" id="phone" placeholder="ex : 97 00 00 00" />
+
+    <div class="total-row">
+      <span>Total à payer</span>
+      <span class="amount"><span id="total">0</span> FCFA</span>
+    </div>
+
+    <button class="btn gold block" id="pay-btn">Payer et voter</button>
+    <div class="error-msg" id="error-msg"></div>
+    <span class="close-link" id="close-modal">Annuler</span>
+  </div>
+</div>
+
+<script src="/js/app.js"></script>
+</body>
+</html>
