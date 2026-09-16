@@ -34,7 +34,7 @@
   justify-content: space-between;
   align-items: center;
 }
-.admin-header h1 { margin: 0; font-size: 20px; }
+.admin-header h1 { margin: 0; font-size: 20px; font-family: var(--font-display); }
 .admin-header p { margin: 0; color: var(--gold-light); font-size: 12px; }
 .admin-header .btn { background: rgba(255,255,255,0.15); }
 
