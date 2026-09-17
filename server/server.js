@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const db = require("./db");
+const { pool, initSchema } = require("./db");
 
 const candidatesRoutes = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
@@ -30,11 +30,28 @@ app.use("/api/admin", adminRoutes);
 // Prix courant du vote (public, utilise par la page de vote)
 app.get("/api/settings/price", async (req, res) => {
   try {
-    const result = await db.pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
     res.json({ price_per_vote: Number(result.rows[0].value) });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Impossible de lire le prix du vote." });
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// Compte a rebours affiche sur l'accueil (public, lecture seule ; reglable depuis l'admin)
+app.get("/api/settings/countdown", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT key, value FROM settings WHERE key IN ('countdown_target', 'countdown_label')"
+    );
+    const map = Object.fromEntries(result.rows.map((r) => [r.key, r.value]));
+    res.json({
+      countdown_target: map.countdown_target || "",
+      countdown_label: map.countdown_label || "Clôture des votes",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
   }
 });
 
@@ -42,15 +59,13 @@ app.get("/health", (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 4000;
 
-// On attend que la base Postgres soit initialisee (tables creees, compte admin pret)
-// avant d'accepter des requetes.
-db.ready
+initSchema()
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Miss & Mister Flash Adjarra - serveur demarre sur le port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("Impossible de demarrer le serveur (base de donnees indisponible):", err);
+    console.error("Impossible d'initialiser la base de donnees :", err);
     process.exit(1);
   });

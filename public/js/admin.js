@@ -30,6 +30,7 @@ function showDashboard() {
   loadCandidates();
   loadTransactions();
   loadPrice();
+  loadCountdown();
 }
 
 function logout() {
@@ -232,7 +233,7 @@ function statusLabel(s) {
   return map[s] || s;
 }
 
-// --- Réglages ---
+// --- Réglages : prix du vote ---
 async function loadPrice() {
   try {
     const data = await apiFetch("/settings/price");
@@ -252,6 +253,49 @@ document.getElementById("save-price-btn").addEventListener("click", async () => 
     });
     msgEl.style.color = "var(--success)";
     msgEl.textContent = "Prix mis à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// --- Réglages : compte à rebours de l'accueil ---
+function isoToDatetimeLocal(isoString) {
+  if (!isoString) return "";
+  const d = new Date(isoString);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+async function loadCountdown() {
+  try {
+    const data = await apiFetch("/settings/countdown");
+    document.getElementById("countdown-label-input").value = data.countdown_label || "";
+    document.getElementById("countdown-date-input").value = isoToDatetimeLocal(data.countdown_target);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-countdown-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("countdown-msg");
+  msgEl.style.display = "none";
+
+  const label = document.getElementById("countdown-label-input").value.trim();
+  const rawDate = document.getElementById("countdown-date-input").value;
+  const isoDate = rawDate ? new Date(rawDate).toISOString() : "";
+
+  try {
+    await apiFetch("/settings/countdown", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ countdown_target: isoDate, countdown_label: label }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "Compte à rebours mis à jour.";
     msgEl.style.display = "block";
   } catch (e) {
     msgEl.style.color = "var(--danger)";

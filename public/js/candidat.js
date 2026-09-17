@@ -30,7 +30,7 @@ async function loadProfile() {
           <p class="votes"><b>${c.votes_count}</b> votes reçus</p>
           ${c.bio ? `<p class="profile-bio">${escapeHtml(c.bio)}</p>` : ""}
           ${c.project_desc ? `<div class="profile-project"><h2>Son projet</h2><p>${escapeHtml(c.project_desc)}</p></div>` : ""}
-          <a class="btn gold block" href="/index.html?vote=${c.id}">Voter pour ${escapeHtml(c.name.split(" ")[0])}</a>
+          <a class="btn gold block" href="/candidats.html?vote=${c.id}">Voter pour ${escapeHtml(c.name.split(" ")[0])}</a>
         </div>
       </div>
     `;

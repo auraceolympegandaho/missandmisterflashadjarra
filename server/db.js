@@ -2,17 +2,17 @@ const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 
 if (!process.env.DATABASE_URL) {
-  console.warn("[db] ATTENTION: DATABASE_URL n'est pas definie. Ajoutez-la dans les variables d'environnement.");
+  console.warn("[db] ATTENTION: DATABASE_URL n'est pas definie.");
 }
 
-const isLocal = /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL || "");
-
+// Sur Render, la base Postgres geree exige SSL pour les connexions externes.
+// Pour desactiver (ex: Postgres local sans SSL), mettre PGSSL=false dans .env
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: isLocal ? false : { rejectUnauthorized: false },
+  ssl: process.env.PGSSL === "false" ? false : { rejectUnauthorized: false },
 });
 
-async function init() {
+async function initSchema() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS candidates (
       id SERIAL PRIMARY KEY,
@@ -24,11 +24,9 @@ async function init() {
       photo_path TEXT DEFAULT '',
       votes_count INTEGER NOT NULL DEFAULT 0,
       is_active INTEGER NOT NULL DEFAULT 1,
-      created_at TIMESTAMP NOT NULL DEFAULT NOW()
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
-  `);
 
-  await pool.query(`
     CREATE TABLE IF NOT EXISTS transactions (
       id SERIAL PRIMARY KEY,
       candidate_id INTEGER NOT NULL REFERENCES candidates(id),
@@ -37,42 +35,43 @@ async function init() {
       voter_phone TEXT DEFAULT '',
       fedapay_transaction_id TEXT,
       status TEXT NOT NULL DEFAULT 'pending',
-      created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
-  `);
 
-  await pool.query(`
     CREATE TABLE IF NOT EXISTS admin_users (
       id SERIAL PRIMARY KEY,
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL
     );
-  `);
 
-  await pool.query(`
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
       value TEXT
     );
   `);
 
-  // Migration douce si une version anterieure de la table existait deja
-  try { await pool.query("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS candidacy_number TEXT DEFAULT ''"); } catch (e) {}
-  try { await pool.query("ALTER TABLE candidates ADD COLUMN IF NOT EXISTS project_desc TEXT DEFAULT ''"); } catch (e) {}
+  // Filet de securite si la table candidates existait deja sans ces colonnes
+  // (ex: ancienne base) : on les ajoute si besoin sans rien casser.
+  await pool.query(`
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS candidacy_number TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS project_desc TEXT DEFAULT '';
+  `);
 
-  // Prix par defaut du vote
-  const priceRes = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
-  if (priceRes.rowCount === 0) {
+  const priceRow = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
+  if (priceRow.rowCount === 0) {
     await pool.query("INSERT INTO settings (key, value) VALUES ('price_per_vote', $1)", [
       process.env.PRICE_PER_VOTE || "100",
     ]);
   }
 
-  // Compte admin (cree ou resynchronise le mot de passe selon .env)
+  await ensureAdminUser();
+}
+
+async function ensureAdminUser() {
   const username = process.env.ADMIN_USERNAME || "admin";
   const password = process.env.ADMIN_PASSWORD || "changeme123";
-  const existing = await pool.query("SELECT * FROM admin_users WHERE username = $1", [username]);
+  const existing = await pool.query("SELECT id FROM admin_users WHERE username = $1", [username]);
   if (existing.rowCount === 0) {
     const hash = bcrypt.hashSync(password, 10);
     await pool.query("INSERT INTO admin_users (username, password_hash) VALUES ($1, $2)", [
@@ -83,9 +82,4 @@ async function init() {
   }
 }
 
-const ready = init().catch((err) => {
-  console.error("[db] Erreur d'initialisation de la base Postgres:", err);
-  process.exit(1);
-});
-
-module.exports = { pool, ready };
+module.exports = { pool, initSchema };

@@ -202,4 +202,48 @@ router.put("/settings/price", async (req, res) => {
   }
 });
 
+// GET/PUT /api/admin/settings/countdown -> date/libelle du compte a rebours affiche sur l'accueil
+router.get("/settings/countdown", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT key, value FROM settings WHERE key IN ('countdown_target', 'countdown_label')"
+    );
+    const map = Object.fromEntries(result.rows.map((r) => [r.key, r.value]));
+    res.json({
+      countdown_target: map.countdown_target || "",
+      countdown_label: map.countdown_label || "Clôture des votes",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/settings/countdown", async (req, res) => {
+  try {
+    const { countdown_target, countdown_label } = req.body;
+
+    // countdown_target doit etre vide (pas d'echeance affichee) ou une date ISO valide
+    if (countdown_target && isNaN(Date.parse(countdown_target))) {
+      return res.status(400).json({ error: "Date invalide." });
+    }
+
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('countdown_target', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [countdown_target || ""]
+    );
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('countdown_label', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [countdown_label || "Clôture des votes"]
+    );
+
+    res.json({ countdown_target: countdown_target || "", countdown_label: countdown_label || "Clôture des votes" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 module.exports = router;
