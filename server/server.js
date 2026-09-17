@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { pool, ready } = require("./db");
+const db = require("./db");
 
 const candidatesRoutes = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
@@ -29,16 +29,28 @@ app.use("/api/admin", adminRoutes);
 
 // Prix courant du vote (public, utilise par la page de vote)
 app.get("/api/settings/price", async (req, res) => {
-  const row = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
-  res.json({ price_per_vote: Number(row.rows[0].value) });
+  try {
+    const result = await db.pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
+    res.json({ price_per_vote: Number(result.rows[0].value) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de lire le prix du vote." });
+  }
 });
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 4000;
 
-ready.then(() => {
-  app.listen(PORT, () => {
-    console.log(`Miss & Mister Flash Adjarra - serveur demarre sur le port ${PORT}`);
+// On attend que la base Postgres soit initialisee (tables creees, compte admin pret)
+// avant d'accepter des requetes.
+db.ready
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Miss & Mister Flash Adjarra - serveur demarre sur le port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Impossible de demarrer le serveur (base de donnees indisponible):", err);
+    process.exit(1);
   });
-});

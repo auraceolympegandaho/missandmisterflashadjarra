@@ -7,23 +7,23 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const { category } = req.query;
-    const cols =
-      "id, name, category, bio, photo_path, candidacy_number, project_desc, votes_count";
+    const fields =
+      "id, name, category, candidacy_number, bio, project_desc, photo_path, votes_count";
     let result;
     if (category) {
       result = await pool.query(
-        `SELECT ${cols} FROM candidates WHERE is_active = 1 AND category = $1 ORDER BY votes_count DESC`,
+        `SELECT ${fields} FROM candidates WHERE is_active = 1 AND category = $1 ORDER BY votes_count DESC`,
         [category]
       );
     } else {
       result = await pool.query(
-        `SELECT ${cols} FROM candidates WHERE is_active = 1 ORDER BY votes_count DESC`
+        `SELECT ${fields} FROM candidates WHERE is_active = 1 ORDER BY votes_count DESC`
       );
     }
     res.json(result.rows);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erreur serveur." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de charger les candidats." });
   }
 });
 
@@ -31,15 +31,15 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, name, category, bio, photo_path, candidacy_number, project_desc, votes_count
+      `SELECT id, name, category, candidacy_number, bio, project_desc, photo_path, votes_count
        FROM candidates WHERE id = $1 AND is_active = 1`,
       [req.params.id]
     );
     if (result.rowCount === 0) return res.status(404).json({ error: "Candidat introuvable." });
     res.json(result.rows[0]);
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: "Erreur serveur." });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de charger ce candidat." });
   }
 });
 
