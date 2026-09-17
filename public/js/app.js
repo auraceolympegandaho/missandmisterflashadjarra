@@ -40,10 +40,17 @@ function renderGrid(candidates) {
   }
   emptyState.style.display = "none";
 
+  const badgedCategories = new Set();
+
   for (const c of candidates) {
     const card = document.createElement("div");
     card.className = "card";
+
+    const isLeader = c.votes_count > 0 && !badgedCategories.has(c.category);
+    if (isLeader) badgedCategories.add(c.category);
+
     card.innerHTML = `
+      ${isLeader ? '<span class="leader-badge">★ En tête</span>' : ""}
       <img class="photo" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" onerror="this.style.background='#eef1f6'; this.src='';" />
       <div class="info">
         <span class="category">${escapeHtml(c.category)}</span>
