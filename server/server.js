@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const db = require("./db");
+const { pool, ready } = require("./db");
 
 const candidatesRoutes = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
@@ -28,14 +28,17 @@ app.use("/api/votes", votesRoutes);
 app.use("/api/admin", adminRoutes);
 
 // Prix courant du vote (public, utilise par la page de vote)
-app.get("/api/settings/price", (req, res) => {
-  const row = db.prepare("SELECT value FROM settings WHERE key = 'price_per_vote'").get();
-  res.json({ price_per_vote: Number(row.value) });
+app.get("/api/settings/price", async (req, res) => {
+  const row = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
+  res.json({ price_per_vote: Number(row.rows[0].value) });
 });
 
 app.get("/health", (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Miss & Mister Flash Adjarra - serveur demarre sur le port ${PORT}`);
+
+ready.then(() => {
+  app.listen(PORT, () => {
+    console.log(`Miss & Mister Flash Adjarra - serveur demarre sur le port ${PORT}`);
+  });
 });

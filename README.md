@@ -25,7 +25,8 @@ miss-mister-vote/
 
 ## 1. Installation
 
-Prérequis : Node.js 18+ installé sur votre machine ou votre serveur.
+Prérequis : Node.js 18+ et une base **PostgreSQL** (Render en propose une gratuite,
+voir section suivante).
 
 ```bash
 cd server
@@ -34,11 +35,33 @@ cp .env.example .env
 ```
 
 Éditez `.env` et remplissez au minimum :
+- `DATABASE_URL` — l'URL de connexion à votre base Postgres (voir ci-dessous)
 - `ADMIN_USERNAME` / `ADMIN_PASSWORD` — vos identifiants du panel admin
 - `JWT_SECRET` — une longue chaîne aléatoire (ex: générée avec `openssl rand -hex 32`)
 - `PRICE_PER_VOTE` — le prix d'un vote en FCFA
 
-## 2. Configurer le paiement (FedaPay)
+Les tables sont créées automatiquement au démarrage du serveur (`server/db.js`).
+
+## 2. Créer la base PostgreSQL sur Render
+
+**Important** : le système de fichiers d'un service web Render est **éphémère** —
+toute donnée stockée dans un fichier (comme une base SQLite) est perdue à chaque
+redéploiement, redémarrage, ou mise en veille (plan gratuit). C'est pourquoi ce
+projet utilise PostgreSQL, une base gérée séparément du service web.
+
+1. Dashboard Render → **New > PostgreSQL**
+2. Une fois créée, copiez l'**Internal Database URL** (si votre service web est
+   aussi sur Render, c'est plus rapide) ou l'**External Database URL**
+3. Collez-la dans `DATABASE_URL` (variable d'environnement du service web sur
+   Render, ou dans votre `.env` en local)
+
+⚠️ Sur le **plan gratuit**, la base Postgres expire automatiquement au bout de
+30 jours (14 jours de grâce pour passer sur un plan payant avant suppression
+définitive). Pour un concours réel avec de vrais votants, prévoyez de passer
+sur un plan payant avant l'expiration — sans quoi vous perdrez à nouveau
+toutes les données.
+
+## 3. Configurer le paiement (FedaPay)
 
 FedaPay est un agrégateur béninois qui gère Mobile Money (MTN, Moov) et les
 cartes bancaires — idéal pour un concours à Adjarra.
@@ -63,7 +86,7 @@ CinetPay...), seul le fichier `server/payments/fedapay.js` doit être remplacé
 que le nouveau module expose les mêmes fonctions `createPayment`,
 `verifyWebhookSignature`, `getTransaction`.
 
-## 3. Lancer en local
+## 4. Lancer en local
 
 ```bash
 cd server
@@ -73,38 +96,42 @@ npm start
 Le site est accessible sur `http://localhost:4000`
 Le panel admin sur `http://localhost:4000/admin.html`
 
-## 4. Ajouter vos candidats
+## 5. Ajouter vos candidats
 
 1. Allez sur `/admin.html`, connectez-vous
 2. Onglet **Candidats** → **+ Ajouter un(e) candidat(e)**
 3. Renseignez nom, catégorie (Miss/Mister), bio, photo
 
-## 5. Déployer en production
+## 6. Déployer en production
 
 Options simples et abordables :
 - **Render.com** ou **Railway.app** : déploiement direct depuis un dépôt Git,
-  gèrent Node.js nativement (le fichier SQLite persiste sur un disque monté)
+  gèrent Node.js nativement ; créez aussi une base PostgreSQL managée (voir
+  section 2) — ne comptez pas sur le disque du service web, il est éphémère
+  sur le plan gratuit
 - **VPS** (Contabo, Hostinger, OVH...) avec Node.js + PM2 pour garder le
   serveur actif : `pm2 start server.js --name miss-mister`
 - Pensez à activer **HTTPS** (obligatoire pour FedaPay en production, via
   Let's Encrypt/Certbot ou automatique sur Render/Railway)
 - Mettez à jour `PUBLIC_URL` dans `.env` avec votre vrai nom de domaine
 
-## 6. Sécurité — points importants
+## 7. Sécurité — points importants
 
 - Changez `ADMIN_PASSWORD` et `JWT_SECRET` avant toute mise en production
-- Ne partagez jamais votre `FEDAPAY_SECRET_KEY`
+- Ne partagez jamais votre `FEDAPAY_SECRET_KEY` ni votre `DATABASE_URL`
 - Le webhook vérifie la signature FedaPay — ne désactivez pas cette vérification en production
-- Sauvegardez régulièrement le fichier `server/data/vote.db` (contient candidats, votes, transactions)
+- Faites des sauvegardes régulières de la base Postgres (`pg_dump`), surtout avant toute
+  mise à niveau ou changement de plan Render
 
 ## Notes techniques
 
-- La base de données est **SQLite** (fichier unique, pas de serveur séparé
-  à gérer) — largement suffisant pour un concours régional. Si le trafic
-  devient très important, on peut migrer vers PostgreSQL sans réécrire la logique.
+- La base de données est **PostgreSQL**, hébergée séparément du service web —
+  contrairement à un fichier SQLite local, elle survit aux redéploiements,
+  redémarrages et mises en veille du service.
 - Les votes ne sont crédités qu'après confirmation du paiement par le
   **webhook FedaPay** (pas au moment du clic) — évite les votes gratuits en cas d'abandon de paiement.
 - Le code du module `fedapay.js` suit la documentation publique FedaPay au
   moment de la rédaction ; vérifiez les noms de champs exacts dans leur
   documentation à jour (https://docs.fedapay.com) avant la mise en production,
   les API de paiement évoluent parfois.
+

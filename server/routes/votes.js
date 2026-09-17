@@ -1,5 +1,5 @@
 const express = require("express");
-const db = require("../db");
+const { pool } = require("../db");
 const fedapay = require("../payments/fedapay");
 
 const router = express.Router();
@@ -16,22 +16,23 @@ router.post("/init", async (req, res) => {
       return res.status(400).json({ error: "Candidat et nombre de votes requis (minimum 1)." });
     }
 
-    const candidate = db
-      .prepare("SELECT * FROM candidates WHERE id = ? AND is_active = 1")
-      .get(candidateId);
+    const candidateResult = await pool.query(
+      "SELECT * FROM candidates WHERE id = $1 AND is_active = 1",
+      [candidateId]
+    );
+    const candidate = candidateResult.rows[0];
     if (!candidate) return res.status(404).json({ error: "Candidat introuvable." });
 
-    const priceRow = db.prepare("SELECT value FROM settings WHERE key = 'price_per_vote'").get();
-    const pricePerVote = Number(priceRow.value);
+    const priceRow = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
+    const pricePerVote = Number(priceRow.rows[0].value);
     const amount = pricePerVote * nb;
 
-    const insert = db
-      .prepare(
-        `INSERT INTO transactions (candidate_id, votes_bought, amount_fcfa, voter_phone, status)
-         VALUES (?, ?, ?, ?, 'pending')`
-      )
-      .run(candidateId, nb, amount, phone || "");
-    const txId = insert.lastInsertRowid;
+    const insert = await pool.query(
+      `INSERT INTO transactions (candidate_id, votes_bought, amount_fcfa, voter_phone, status)
+       VALUES ($1, $2, $3, $4, 'pending') RETURNING id`,
+      [candidateId, nb, amount, phone || ""]
+    );
+    const txId = insert.rows[0].id;
 
     const { transactionId, paymentUrl } = await fedapay.createPayment({
       amount,
@@ -41,10 +42,10 @@ router.post("/init", async (req, res) => {
       metadata: { local_transaction_id: txId, candidate_id: candidateId },
     });
 
-    db.prepare("UPDATE transactions SET fedapay_transaction_id = ? WHERE id = ?").run(
+    await pool.query("UPDATE transactions SET fedapay_transaction_id = $1 WHERE id = $2", [
       transactionId,
-      txId
-    );
+      txId,
+    ]);
 
     res.json({ paymentUrl, localTransactionId: txId });
   } catch (err) {
@@ -54,10 +55,16 @@ router.post("/init", async (req, res) => {
 });
 
 // GET /api/votes/status/:localTransactionId -> pour que la page "merci" affiche le bon message
-router.get("/status/:id", (req, res) => {
-  const tx = db.prepare("SELECT * FROM transactions WHERE id = ?").get(req.params.id);
-  if (!tx) return res.status(404).json({ error: "Transaction introuvable." });
-  res.json({ status: tx.status, votes_bought: tx.votes_bought, candidate_id: tx.candidate_id });
+router.get("/status/:id", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM transactions WHERE id = $1", [req.params.id]);
+    const tx = result.rows[0];
+    if (!tx) return res.status(404).json({ error: "Transaction introuvable." });
+    res.json({ status: tx.status, votes_bought: tx.votes_bought, candidate_id: tx.candidate_id });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
 });
 
 // POST /api/votes/webhook -> appelee par FedaPay quand le paiement change de statut.
@@ -86,32 +93,49 @@ router.post(
 
     if (!fedapayTxId) return res.status(200).send("ok"); // rien a faire
 
-    const localTx = db
-      .prepare("SELECT * FROM transactions WHERE fedapay_transaction_id = ?")
-      .get(String(fedapayTxId));
+    const client = await pool.connect();
+    try {
+      const localResult = await client.query(
+        "SELECT * FROM transactions WHERE fedapay_transaction_id = $1",
+        [String(fedapayTxId)]
+      );
+      const localTx = localResult.rows[0];
+      if (!localTx) {
+        client.release();
+        return res.status(200).send("ok");
+      }
 
-    if (!localTx) return res.status(200).send("ok");
+      // Idempotence : si deja approuve, ne pas re-crediter les votes
+      if (localTx.status === "approved") {
+        client.release();
+        return res.status(200).send("ok");
+      }
 
-    // Idempotence : si deja approuve, ne pas re-crediter les votes
-    if (localTx.status === "approved") return res.status(200).send("ok");
+      const newStatus = ["approved", "declined", "canceled"].includes(status)
+        ? status
+        : "pending";
 
-    const newStatus = ["approved", "declined", "canceled"].includes(status) ? status : "pending";
-
-    const updateTx = db.transaction(() => {
-      db.prepare("UPDATE transactions SET status = ?, updated_at = datetime('now') WHERE id = ?").run(
-        newStatus,
-        localTx.id
+      await client.query("BEGIN");
+      await client.query(
+        "UPDATE transactions SET status = $1, updated_at = now() WHERE id = $2",
+        [newStatus, localTx.id]
       );
       if (newStatus === "approved") {
-        db.prepare("UPDATE candidates SET votes_count = votes_count + ? WHERE id = ?").run(
-          localTx.votes_bought,
-          localTx.candidate_id
+        await client.query(
+          "UPDATE candidates SET votes_count = votes_count + $1 WHERE id = $2",
+          [localTx.votes_bought, localTx.candidate_id]
         );
       }
-    });
-    updateTx();
+      await client.query("COMMIT");
 
-    res.status(200).send("ok");
+      res.status(200).send("ok");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      console.error(err);
+      res.status(500).send("Erreur serveur.");
+    } finally {
+      client.release();
+    }
   }
 );
 
