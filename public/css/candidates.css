@@ -42,7 +42,8 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
-  font-size: 14px;
+  width: 16px;
+  height: 16px;
   pointer-events: none;
 }
 

@@ -135,7 +135,13 @@
   border: 1px solid var(--border);
   background: #fff;
 }
-.objective-card .icon { font-size: 26px; margin-bottom: 8px; display: block; }
+.objective-card .icon {
+  width: 30px;
+  height: 30px;
+  margin: 0 auto 10px;
+  display: block;
+  color: var(--gold);
+}
 .objective-card h3 {
   font-size: 14px;
   color: var(--blue-dark);
@@ -245,7 +251,7 @@
   font-weight: 700;
   font-size: 13.5px;
 }
-.discover-card .icon { font-size: 26px; }
+.discover-card .icon { width: 28px; height: 28px; color: var(--blue); }
 .discover-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 20px rgba(3, 105, 161, 0.16);
