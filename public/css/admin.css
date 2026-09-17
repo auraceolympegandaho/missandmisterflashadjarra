@@ -3,16 +3,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+  background: linear-gradient(135deg, var(--blue-dark), var(--sky));
   padding: 16px;
 }
 
 .login-box {
-  background: #fff;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(140%);
+  backdrop-filter: var(--glass-blur) saturate(140%);
+  border: 1px solid var(--glass-border);
   border-radius: 16px;
   padding: 32px;
   max-width: 360px;
   width: 100%;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .login-box { background: #fff; }
 }
 
 .login-box h1 { margin: 0 0 2px; font-size: 22px; }
@@ -27,14 +33,17 @@
 }
 
 .admin-header {
-  background: linear-gradient(135deg, var(--blue-dark), var(--blue));
+  background: linear-gradient(135deg, var(--blue-dark), var(--sky));
   color: #fff;
-  padding: 20px 24px;
+  padding: 16px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 30;
 }
-.admin-header h1 { margin: 0; font-size: 20px; font-family: var(--font-display); }
+.admin-header h1 { margin: 0; font-size: 18px; font-family: var(--font-display); }
 .admin-header p { margin: 0; color: var(--gold-light); font-size: 12px; }
 .admin-header .btn { background: rgba(255,255,255,0.15); }
 
@@ -42,8 +51,16 @@
   display: flex;
   gap: 4px;
   padding: 14px 24px 0;
-  background: #fff;
+  background: var(--glass-bg);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 56px;
+  z-index: 29;
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .admin-tabs { background: #fff; }
 }
 .admin-tab-btn {
   padding: 10px 16px;

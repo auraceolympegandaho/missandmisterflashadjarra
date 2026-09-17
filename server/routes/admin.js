@@ -52,14 +52,16 @@ router.get("/candidates", (req, res) => {
 
 // POST /api/admin/candidates -> creer un candidat (avec photo optionnelle)
 router.post("/candidates", upload.single("photo"), (req, res) => {
-  const { name, category, bio } = req.body;
+  const { name, category, bio, candidacy_number, project_desc } = req.body;
   if (!name || !["Miss", "Mister"].includes(category)) {
     return res.status(400).json({ error: "Nom et categorie (Miss/Mister) requis." });
   }
   const photoPath = req.file ? `/img/candidates/${req.file.filename}` : "";
   const result = db
-    .prepare("INSERT INTO candidates (name, category, bio, photo_path) VALUES (?, ?, ?, ?)")
-    .run(name, category, bio || "", photoPath);
+    .prepare(
+      "INSERT INTO candidates (name, category, bio, photo_path, candidacy_number, project_desc) VALUES (?, ?, ?, ?, ?, ?)"
+    )
+    .run(name, category, bio || "", photoPath, candidacy_number || "", project_desc || "");
   const created = db.prepare("SELECT * FROM candidates WHERE id = ?").get(result.lastInsertRowid);
   res.status(201).json(created);
 });
@@ -72,12 +74,14 @@ router.put("/candidates/:id", upload.single("photo"), (req, res) => {
   const name = req.body.name ?? existing.name;
   const category = req.body.category ?? existing.category;
   const bio = req.body.bio ?? existing.bio;
+  const candidacyNumber = req.body.candidacy_number ?? existing.candidacy_number;
+  const projectDesc = req.body.project_desc ?? existing.project_desc;
   const isActive = req.body.is_active !== undefined ? Number(req.body.is_active) : existing.is_active;
   const photoPath = req.file ? `/img/candidates/${req.file.filename}` : existing.photo_path;
 
   db.prepare(
-    "UPDATE candidates SET name = ?, category = ?, bio = ?, photo_path = ?, is_active = ? WHERE id = ?"
-  ).run(name, category, bio, photoPath, isActive, req.params.id);
+    "UPDATE candidates SET name = ?, category = ?, bio = ?, photo_path = ?, candidacy_number = ?, project_desc = ?, is_active = ? WHERE id = ?"
+  ).run(name, category, bio, photoPath, candidacyNumber, projectDesc, isActive, req.params.id);
 
   const updated = db.prepare("SELECT * FROM candidates WHERE id = ?").get(req.params.id);
   res.json(updated);

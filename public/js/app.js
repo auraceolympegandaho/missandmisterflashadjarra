@@ -51,11 +51,15 @@ function renderGrid(candidates) {
 
     card.innerHTML = `
       ${isLeader ? '<span class="leader-badge">★ En tête</span>' : ""}
-      <img class="photo" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" onerror="this.style.background='#eef1f6'; this.src='';" />
+      ${c.candidacy_number ? `<span class="number-badge">N° ${escapeHtml(c.candidacy_number)}</span>` : ""}
+      <a class="photo-wrap" href="/candidat.html?id=${c.id}">
+        <img class="photo" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" onerror="this.style.background='#eef1f6'; this.src='';" />
+      </a>
       <div class="info">
         <span class="category">${escapeHtml(c.category)}</span>
-        <h3>${escapeHtml(c.name)}</h3>
+        <h3><a class="candidate-link" href="/candidat.html?id=${c.id}">${escapeHtml(c.name)}</a></h3>
         <p class="votes"><b>${c.votes_count}</b> votes</p>
+        <a class="profile-link" href="/candidat.html?id=${c.id}">Voir le profil &amp; le projet</a>
         <button class="btn block vote-btn">Voter pour ${escapeHtml(c.name.split(" ")[0])}</button>
       </div>
     `;
@@ -146,5 +150,22 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
   });
 });
 
+// Si on arrive depuis la page de profil avec ?vote=ID, on ouvre directement
+// la fenêtre de vote pour ce/cette candidat(e).
+async function openVoteFromQuery() {
+  const voteId = new URLSearchParams(window.location.search).get("vote");
+  if (!voteId) return;
+  try {
+    const res = await fetch(`/api/candidates/${voteId}`);
+    if (res.ok) {
+      const candidate = await res.json();
+      openVoteModal(candidate);
+    }
+  } catch (e) {
+    console.error("Impossible d'ouvrir le vote depuis le lien", e);
+  }
+}
+
 loadPrice();
 loadCandidates("");
+openVoteFromQuery();

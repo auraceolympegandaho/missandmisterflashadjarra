@@ -103,6 +103,7 @@ async function loadCandidates() {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td><img class="thumb" src="${c.photo_path || ""}" onerror="this.src=''"/></td>
+        <td>${escapeHtml(c.candidacy_number || "—")}</td>
         <td>${escapeHtml(c.name)}</td>
         <td>${escapeHtml(c.category)}</td>
         <td>${c.votes_count}</td>
@@ -146,7 +147,9 @@ function openCandidateModal(candidate) {
     : "Ajouter un(e) candidat(e)";
   document.getElementById("c-name").value = candidate ? candidate.name : "";
   document.getElementById("c-category").value = candidate ? candidate.category : "Miss";
+  document.getElementById("c-number").value = candidate ? candidate.candidacy_number || "" : "";
   document.getElementById("c-bio").value = candidate ? candidate.bio : "";
+  document.getElementById("c-project").value = candidate ? candidate.project_desc || "" : "";
   document.getElementById("c-photo").value = "";
   document.getElementById("candidate-msg").style.display = "none";
   candidateOverlay.classList.add("open");
@@ -162,7 +165,9 @@ document.getElementById("save-candidate-btn").addEventListener("click", async ()
 
   const name = document.getElementById("c-name").value.trim();
   const category = document.getElementById("c-category").value;
+  const candidacyNumber = document.getElementById("c-number").value.trim();
   const bio = document.getElementById("c-bio").value.trim();
+  const projectDesc = document.getElementById("c-project").value.trim();
   const photoFile = document.getElementById("c-photo").files[0];
 
   if (!name) {
@@ -174,7 +179,9 @@ document.getElementById("save-candidate-btn").addEventListener("click", async ()
   const form = new FormData();
   form.append("name", name);
   form.append("category", category);
+  form.append("candidacy_number", candidacyNumber);
   form.append("bio", bio);
+  form.append("project_desc", projectDesc);
   if (photoFile) form.append("photo", photoFile);
 
   try {

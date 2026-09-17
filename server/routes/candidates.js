@@ -10,13 +10,13 @@ router.get("/", (req, res) => {
   if (category) {
     rows = db
       .prepare(
-        "SELECT id, name, category, bio, photo_path, votes_count FROM candidates WHERE is_active = 1 AND category = ? ORDER BY votes_count DESC"
+        "SELECT id, name, category, bio, photo_path, candidacy_number, project_desc, votes_count FROM candidates WHERE is_active = 1 AND category = ? ORDER BY votes_count DESC"
       )
       .all(category);
   } else {
     rows = db
       .prepare(
-        "SELECT id, name, category, bio, photo_path, votes_count FROM candidates WHERE is_active = 1 ORDER BY votes_count DESC"
+        "SELECT id, name, category, bio, photo_path, candidacy_number, project_desc, votes_count FROM candidates WHERE is_active = 1 ORDER BY votes_count DESC"
       )
       .all();
   }
@@ -27,7 +27,7 @@ router.get("/", (req, res) => {
 router.get("/:id", (req, res) => {
   const row = db
     .prepare(
-      "SELECT id, name, category, bio, photo_path, votes_count FROM candidates WHERE id = ? AND is_active = 1"
+      "SELECT id, name, category, bio, photo_path, candidacy_number, project_desc, votes_count FROM candidates WHERE id = ? AND is_active = 1"
     )
     .get(req.params.id);
   if (!row) return res.status(404).json({ error: "Candidat introuvable." });

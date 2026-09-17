@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS candidates (
   category TEXT NOT NULL CHECK(category IN ('Miss','Mister')),
   bio TEXT DEFAULT '',
   photo_path TEXT DEFAULT '',
+  candidacy_number TEXT DEFAULT '',
+  project_desc TEXT DEFAULT '',
   votes_count INTEGER NOT NULL DEFAULT 0,
   is_active INTEGER NOT NULL DEFAULT 1,
   created_at TEXT NOT NULL DEFAULT (datetime('now'))
@@ -47,6 +49,18 @@ CREATE TABLE IF NOT EXISTS settings (
   value TEXT
 );
 `);
+
+// --- Migration douce pour les bases deja existantes (ajout des nouvelles colonnes) ---
+function ensureColumn(table, column, definition) {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all();
+  const exists = cols.some((c) => c.name === column);
+  if (!exists) {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+    console.log(`[db] Colonne ajoutee : ${table}.${column}`);
+  }
+}
+ensureColumn("candidates", "candidacy_number", "TEXT DEFAULT ''");
+ensureColumn("candidates", "project_desc", "TEXT DEFAULT ''");
 
 const priceRow = db.prepare("SELECT value FROM settings WHERE key = 'price_per_vote'").get();
 if (!priceRow) {

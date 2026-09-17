@@ -62,7 +62,7 @@
   <section id="tab-candidates" class="tab-panel" style="display:none;">
     <button class="btn gold" id="new-candidate-btn">+ Ajouter un(e) candidat(e)</button>
     <table class="admin-table" id="candidates-table">
-      <thead><tr><th>Photo</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -95,8 +95,12 @@
       <option value="Miss">Miss</option>
       <option value="Mister">Mister</option>
     </select>
+    <label>Numéro de candidature</label>
+    <input type="text" id="c-number" placeholder="ex : 12" />
     <label>Bio / présentation</label>
     <input type="text" id="c-bio" />
+    <label>Projet / motivation</label>
+    <textarea id="c-project" rows="3" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
     <label>Photo</label>
     <input type="file" id="c-photo" accept="image/*" />
     <div style="margin-top:16px; display:flex; gap:10px;">
