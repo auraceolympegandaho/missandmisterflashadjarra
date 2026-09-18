@@ -19,6 +19,16 @@ function escapeHtml(str) {
   return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
+// Initiales affichees a la place de la photo quand celle-ci manque
+function initials(name) {
+  return (name || "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+}
+
 function formatNumber(n) {
   return Number(n || 0).toLocaleString("fr-FR");
 }
@@ -185,8 +195,13 @@ function render(c) {
   content.innerHTML = `
     <article class="profile-card">
       <div class="profile-photo-wrap">
-        <img class="profile-photo" src="${escapeHtml(c.photo_path || "")}" alt="Photo de ${escapeHtml(c.name)}"
-             onerror="this.classList.add('img-fallback'); this.removeAttribute('src');" />
+        ${
+          c.photo_path
+            ? `<img class="profile-photo" src="${escapeHtml(c.photo_path)}" alt="Photo de ${escapeHtml(c.name)}"
+                 onerror="this.closest('.profile-photo-wrap').classList.add('no-photo'); this.remove();" />`
+            : ""
+        }
+        <span class="photo-placeholder" aria-hidden="true">${escapeHtml(initials(c.name))}</span>
         <div class="profile-photo-badges">
           <span class="badge badge-cat">${escapeHtml(c.category)}</span>
           ${c.candidacy_number ? `<span class="badge badge-num">N° ${escapeHtml(c.candidacy_number)}</span>` : ""}

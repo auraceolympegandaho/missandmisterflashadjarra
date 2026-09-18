@@ -133,6 +133,9 @@ header.site-header .logo {
 .site-menu-link.active { background: var(--sky); color: #fff; }
 
 /* --- Tiroir mobile --- */
+.nav-drawer[hidden],
+.nav-backdrop[hidden] { display: none !important; }
+
 .nav-backdrop {
   position: fixed;
   inset: 0;

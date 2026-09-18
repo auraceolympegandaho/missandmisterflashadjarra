@@ -44,7 +44,23 @@
   object-fit: cover;
   display: block;
 }
-.profile-photo.img-fallback { background: var(--sky-soft); }
+/* Repli quand la photo est absente ou ne charge pas : initiales sur fond clair */
+.photo-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 52px;
+  font-weight: 700;
+  color: var(--sky);
+  background: var(--sky-soft);
+  z-index: 0;
+}
+.profile-photo { position: relative; z-index: 1; }
+.profile-photo-wrap .profile-photo ~ .photo-placeholder { display: none; }
+.profile-photo-wrap.no-photo .photo-placeholder { display: flex; }
 
 .profile-photo-badges {
   position: absolute;
@@ -318,6 +334,11 @@
 body.has-vote-bar footer { padding-bottom: 96px; }
 
 /* --- Visionneuse plein ecran --- */
+/* L'attribut hidden doit l'emporter sur les display: flex/block ci-dessous,
+   sinon la visionneuse et la barre de vote restent affichees. */
+.lightbox[hidden],
+.vote-bar[hidden] { display: none !important; }
+
 .lightbox {
   position: fixed;
   inset: 0;
