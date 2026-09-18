@@ -42,6 +42,7 @@
     <button class="admin-tab-btn" data-tab="transactions">Transactions</button>
     <button class="admin-tab-btn" data-tab="announcements">Actualités</button>
     <button class="admin-tab-btn" data-tab="partners">Partenaires</button>
+    <button class="admin-tab-btn" data-tab="faq-contact">FAQ &amp; Contact</button>
     <button class="admin-tab-btn" data-tab="settings">Réglages</button>
   </nav>
 
@@ -127,6 +128,37 @@
       <thead><tr><th>Logo</th><th>Nom</th><th>Site web</th><th>Ordre</th><th>Statut</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
+  </section>
+
+  <section id="tab-faq-contact" class="tab-panel" style="display:none;">
+    <div class="form-card">
+      <label>Coordonnées de contact</label>
+      <label style="font-weight:400;">Numéro WhatsApp (format international, sans +)</label>
+      <input type="text" id="contact-whatsapp-input" placeholder="ex : 22900000000" />
+      <label style="font-weight:400;">Adresse e-mail</label>
+      <input type="email" id="contact-email-input" placeholder="ex : contact@..." />
+      <label style="font-weight:400;">Adresse / lieu</label>
+      <input type="text" id="contact-address-input" placeholder="ex : Campus d'Adjarra" />
+
+      <label style="font-weight:400; margin-top:14px;">Sujets proposés dans le formulaire</label>
+      <div id="contact-subjects-list"></div>
+      <button type="button" class="btn" id="add-subject-btn" style="margin-top:6px;">+ Ajouter un sujet</button>
+
+      <button class="btn gold" id="save-contact-btn" style="margin-top:16px;">Enregistrer les coordonnées</button>
+      <p class="error-msg" id="contact-settings-msg"></p>
+    </div>
+
+    <div class="form-card" style="margin-top:20px;">
+      <label>FAQ publique</label>
+      <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px;">
+        Organisée en sections (ex. « Les votes », « Le concours »). Chaque section contient
+        des questions/réponses affichées sur la page FAQ du site.
+      </p>
+      <div id="faq-sections-list"></div>
+      <button type="button" class="btn" id="add-faq-section-btn" style="margin-top:10px;">+ Ajouter une section</button>
+      <button class="btn gold" id="save-faq-btn" style="margin-top:16px;">Enregistrer la FAQ</button>
+      <p class="error-msg" id="faq-msg"></p>
+    </div>
   </section>
 
   <section id="tab-settings" class="tab-panel" style="display:none;">

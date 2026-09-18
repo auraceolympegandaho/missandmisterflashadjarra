@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const { pool, DEFAULT_HOMEPAGE } = require("../db");
+const { pool, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT } = require("../db");
 const { requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
@@ -563,6 +563,97 @@ router.delete("/partners/:id", async (req, res) => {
 
 // GET /api/admin/homepage -> contenu actuel (complete avec les valeurs par
 // defaut si des champs manquent, ex: apres une mise a jour du site)
+// GET/PUT /api/admin/faq -> contenu de la page FAQ publique
+router.get("/faq", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'faq_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_FAQ, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/faq", async (req, res) => {
+  try {
+    const { sections } = req.body;
+    if (!Array.isArray(sections)) {
+      return res.status(400).json({ error: "Format invalide : 'sections' doit etre une liste." });
+    }
+    // Validation minimale : chaque section a un titre et une liste de questions/reponses non vides
+    for (const s of sections) {
+      if (!s || typeof s.title !== "string" || !s.title.trim()) {
+        return res.status(400).json({ error: "Chaque section doit avoir un titre." });
+      }
+      if (!Array.isArray(s.items)) {
+        return res.status(400).json({ error: "Chaque section doit avoir une liste de questions." });
+      }
+      for (const it of s.items) {
+        if (!it || !String(it.q || "").trim() || !String(it.a || "").trim()) {
+          return res.status(400).json({ error: "Chaque question doit avoir une reponse non vide." });
+        }
+      }
+    }
+    const value = { sections };
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('faq_content', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(value)]
+    );
+    res.json(value);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// GET/PUT /api/admin/contact -> coordonnees affichees sur la page Contact
+router.get("/contact", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'contact_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_CONTACT, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/contact", async (req, res) => {
+  try {
+    const { whatsapp, email, address, subjects } = req.body;
+
+    // Le numero WhatsApp doit rester au format international sans "+" ni espaces
+    const cleanWhatsapp = String(whatsapp || "").replace(/\D/g, "");
+    if (!cleanWhatsapp || cleanWhatsapp.length < 8) {
+      return res.status(400).json({ error: "Numéro WhatsApp invalide (format international, sans +)." });
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Adresse e-mail invalide." });
+    }
+    if (!Array.isArray(subjects) || !subjects.length) {
+      return res.status(400).json({ error: "Ajoutez au moins un sujet de contact." });
+    }
+
+    const value = {
+      whatsapp: cleanWhatsapp,
+      email: email.trim(),
+      address: (address || "").trim(),
+      subjects: subjects.map((s) => String(s).trim()).filter(Boolean),
+    };
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('contact_content', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(value)]
+    );
+    res.json(value);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 router.get("/homepage", async (req, res) => {
   try {
     const result = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");

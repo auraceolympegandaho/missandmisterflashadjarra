@@ -35,6 +35,8 @@ function showDashboard() {
   loadPrice();
   loadCountdown();
   loadPublicDisplay();
+  loadContactSettings();
+  loadFaqSettings();
 }
 
 function logout() {
@@ -459,6 +461,146 @@ document.getElementById("save-countdown-btn").addEventListener("click", async ()
     });
     msgEl.style.color = "var(--success)";
     msgEl.textContent = "Compte à rebours mis à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// --- FAQ & Contact ---
+
+// Sujets du formulaire de contact : simple liste de champs texte retirables
+function addSubjectRow(value = "") {
+  const container = document.getElementById("contact-subjects-list");
+  makeRemovableRow(
+    container,
+    `<input type="text" class="contact-subject-input" placeholder="ex : Réservation de billets" value="${escapeHtml(value)}" />`
+  );
+}
+document.getElementById("add-subject-btn").addEventListener("click", () => addSubjectRow());
+
+async function loadContactSettings() {
+  try {
+    const data = await apiFetch("/contact");
+    document.getElementById("contact-whatsapp-input").value = data.whatsapp || "";
+    document.getElementById("contact-email-input").value = data.email || "";
+    document.getElementById("contact-address-input").value = data.address || "";
+
+    const list = document.getElementById("contact-subjects-list");
+    list.innerHTML = "";
+    (data.subjects && data.subjects.length ? data.subjects : [""]).forEach((s) => addSubjectRow(s));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-contact-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("contact-settings-msg");
+  msgEl.style.display = "none";
+
+  const subjects = Array.from(document.querySelectorAll(".contact-subject-input"))
+    .map((i) => i.value.trim())
+    .filter(Boolean);
+
+  try {
+    await apiFetch("/contact", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        whatsapp: document.getElementById("contact-whatsapp-input").value.trim(),
+        email: document.getElementById("contact-email-input").value.trim(),
+        address: document.getElementById("contact-address-input").value.trim(),
+        subjects,
+      }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "Coordonnées mises à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// FAQ : sections repliables, chacune avec ses propres questions/reponses
+function addFaqItemRow(itemsContainer, q = "", a = "") {
+  const row = document.createElement("div");
+  row.className = "faq-item-row";
+  row.innerHTML = `
+    <input type="text" class="faq-item-q" placeholder="Question" value="${escapeHtml(q)}" />
+    <textarea class="faq-item-a" placeholder="Réponse">${escapeHtml(a)}</textarea>
+    <button type="button" class="remove-row-btn">Retirer la question</button>`;
+  row.querySelector(".remove-row-btn").addEventListener("click", () => row.remove());
+  itemsContainer.appendChild(row);
+}
+
+function addFaqSectionBlock(title = "", items = []) {
+  const list = document.getElementById("faq-sections-list");
+  const block = document.createElement("div");
+  block.className = "faq-section-block";
+  block.innerHTML = `
+    <div class="faq-section-head">
+      <input type="text" class="faq-section-title" placeholder="Titre de la section (ex : Les votes)" value="${escapeHtml(title)}" />
+      <button type="button" class="remove-row-btn remove-section-btn">Retirer la section</button>
+    </div>
+    <div class="faq-items-container"></div>
+    <button type="button" class="btn add-faq-item-btn" style="margin-top:8px;">+ Ajouter une question</button>`;
+
+  const itemsContainer = block.querySelector(".faq-items-container");
+  (items.length ? items : [{ q: "", a: "" }]).forEach((it) => addFaqItemRow(itemsContainer, it.q, it.a));
+
+  block.querySelector(".remove-section-btn").addEventListener("click", () => block.remove());
+  block.querySelector(".add-faq-item-btn").addEventListener("click", () => addFaqItemRow(itemsContainer));
+
+  list.appendChild(block);
+}
+
+document.getElementById("add-faq-section-btn").addEventListener("click", () => addFaqSectionBlock());
+
+async function loadFaqSettings() {
+  try {
+    const data = await apiFetch("/faq");
+    const list = document.getElementById("faq-sections-list");
+    list.innerHTML = "";
+    const sections = Array.isArray(data.sections) && data.sections.length ? data.sections : [{ title: "", items: [] }];
+    sections.forEach((s) => addFaqSectionBlock(s.title, s.items || []));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-faq-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("faq-msg");
+  msgEl.style.display = "none";
+
+  const sections = Array.from(document.querySelectorAll(".faq-section-block")).map((block) => ({
+    title: block.querySelector(".faq-section-title").value.trim(),
+    items: Array.from(block.querySelectorAll(".faq-item-row"))
+      .map((row) => ({
+        q: row.querySelector(".faq-item-q").value.trim(),
+        a: row.querySelector(".faq-item-a").value.trim(),
+      }))
+      .filter((it) => it.q && it.a),
+  })).filter((s) => s.title && s.items.length);
+
+  if (!sections.length) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "Ajoutez au moins une section avec une question complète (titre, question et réponse).";
+    msgEl.style.display = "block";
+    return;
+  }
+
+  try {
+    await apiFetch("/faq", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sections }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "FAQ mise à jour.";
     msgEl.style.display = "block";
   } catch (e) {
     msgEl.style.color = "var(--danger)";

@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { pool, initSchema, DEFAULT_HOMEPAGE } = require("./db");
+const { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT } = require("./db");
 
 const { router: candidatesRoutes, getPublicDisplay } = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
@@ -98,6 +98,30 @@ app.get("/api/homepage", async (req, res) => {
     const result = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
     const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
     res.json({ ...DEFAULT_HOMEPAGE, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// FAQ publique (lecture seule ; geree depuis l'admin)
+app.get("/api/faq", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'faq_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_FAQ, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// Coordonnees de contact publiques (lecture seule ; gerees depuis l'admin)
+app.get("/api/contact", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'contact_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_CONTACT, ...stored });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur." });
