@@ -96,6 +96,14 @@ async function initSchema() {
     ]);
   }
 
+  // Parametres d'affichage public (votes / classement) : visibles par defaut.
+  const displayRow = await pool.query("SELECT value FROM settings WHERE key = 'public_display'");
+  if (displayRow.rowCount === 0) {
+    await pool.query("INSERT INTO settings (key, value) VALUES ('public_display', $1)", [
+      JSON.stringify({ show_votes: true, show_ranking: true }),
+    ]);
+  }
+
   await ensureAdminUser();
 }
 

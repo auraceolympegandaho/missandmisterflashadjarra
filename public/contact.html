@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Contact — Miss & Mister Flash Adjarra</title>
+<meta name="description" content="Contactez l'organisation du concours Miss & Mister Flash Adjarra." />
+<link rel="icon" href="/img/logo.jpg" />
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="/css/nav.css" />
+<link rel="stylesheet" href="/css/pages.css" />
+</head>
+<body>
+
+<script src="/js/nav.js"></script>
+
+<main class="page-main">
+  <div class="page-head">
+    <h1>Nous contacter</h1>
+    <p>Une question, une réservation, un partenariat ? Écrivez-nous.</p>
+  </div>
+
+  <div class="panel">
+    <h2>Coordonnées</h2>
+    <div class="contact-list">
+      <a class="contact-item" id="contact-whatsapp" href="#" target="_blank" rel="noopener">
+        <div>
+          <b>WhatsApp</b>
+          <span id="contact-whatsapp-label">Écrire à l'organisation</span>
+        </div>
+      </a>
+      <a class="contact-item" id="contact-email" href="#">
+        <div>
+          <b>E-mail</b>
+          <span id="contact-email-label">Envoyer un message</span>
+        </div>
+      </a>
+      <div class="contact-item">
+        <div>
+          <b>Sur place</b>
+          <span>Bureau sectoriel UNEB — FLASH Adjarra, campus d'Adjarra</span>
+        </div>
+      </div>
+    </div>
+    <p class="form-hint">
+      Réponse généralement sous 24 à 48 heures les jours ouvrés.
+    </p>
+  </div>
+
+  <div class="panel">
+    <h2>Formulaire</h2>
+    <p>
+      Renseignez votre message ci-dessous : il sera préparé et ouvert dans WhatsApp ou dans
+      votre messagerie, prêt à être envoyé.
+    </p>
+
+    <div class="form-field">
+      <label for="contact-name">Votre nom</label>
+      <input type="text" id="contact-name" placeholder="Nom et prénom" />
+    </div>
+
+    <div class="form-field">
+      <label for="contact-subject">Sujet</label>
+      <select id="contact-subject">
+        <option>Question générale</option>
+        <option>Problème de vote ou de paiement</option>
+        <option>Réservation de billets</option>
+        <option>Proposition de partenariat</option>
+        <option>Candidature</option>
+        <option>Presse et médias</option>
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="contact-message">Votre message</label>
+      <textarea id="contact-message" placeholder="Décrivez votre demande en quelques lignes..."></textarea>
+    </div>
+
+    <div class="share-row" style="display:flex; gap:8px; flex-wrap:wrap;">
+      <button class="btn gold" id="send-whatsapp" type="button" style="flex:1 1 160px;">Envoyer via WhatsApp</button>
+      <button class="btn" id="send-email" type="button" style="flex:1 1 160px;">Envoyer par e-mail</button>
+    </div>
+    <p class="form-hint" id="contact-feedback" role="status"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Avant d'écrire</h2>
+    <p>
+      La plupart des questions sur les votes, les paiements et les billets trouvent déjà
+      leur réponse sur la page <a href="/faq.html">FAQ</a>. Pour un problème de paiement,
+      indiquez la date, le montant, le numéro utilisé et le nom du/de la candidat(e)
+      concerné(e) : cela accélère beaucoup le traitement.
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
+</footer>
+<script src="/js/contact.js"></script>
+</body>
+</html>

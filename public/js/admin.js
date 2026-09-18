@@ -34,6 +34,7 @@ function showDashboard() {
   loadPartners();
   loadPrice();
   loadCountdown();
+  loadPublicDisplay();
 }
 
 function logout() {
@@ -458,6 +459,39 @@ document.getElementById("save-countdown-btn").addEventListener("click", async ()
     });
     msgEl.style.color = "var(--success)";
     msgEl.textContent = "Compte à rebours mis à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// --- Réglages : ce que le public peut voir (votes / classement) ---
+async function loadPublicDisplay() {
+  try {
+    const data = await apiFetch("/settings/public-display");
+    document.getElementById("show-votes-input").checked = data.show_votes !== false;
+    document.getElementById("show-ranking-input").checked = data.show_ranking !== false;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-display-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("display-msg");
+  msgEl.style.display = "none";
+  try {
+    await apiFetch("/settings/public-display", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        show_votes: document.getElementById("show-votes-input").checked,
+        show_ranking: document.getElementById("show-ranking-input").checked,
+      }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "Affichage public mis à jour.";
     msgEl.style.display = "block";
   } catch (e) {
     msgEl.style.color = "var(--danger)";

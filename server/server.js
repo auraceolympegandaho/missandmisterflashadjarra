@@ -4,7 +4,7 @@ const cors = require("cors");
 const path = require("path");
 const { pool, initSchema, DEFAULT_HOMEPAGE } = require("./db");
 
-const candidatesRoutes = require("./routes/candidates");
+const { router: candidatesRoutes, getPublicDisplay } = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
 const adminRoutes = require("./routes/admin");
 
@@ -32,6 +32,17 @@ app.get("/api/settings/price", async (req, res) => {
   try {
     const result = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
     res.json({ price_per_vote: Number(result.rows[0].value) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// Parametres d'affichage public (votes / classement visibles ou non).
+// Utilise par les pages publiques pour adapter ce qu'elles affichent.
+app.get("/api/settings/public", async (req, res) => {
+  try {
+    res.json(await getPublicDisplay());
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur." });

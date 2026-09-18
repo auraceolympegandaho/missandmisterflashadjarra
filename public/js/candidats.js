@@ -65,7 +65,9 @@ function renderGrid(candidates) {
     const card = document.createElement("div");
     card.className = "card";
 
-    const isLeader = c.votes_count > 0 && !badgedCategories.has(c.category);
+    // Badge "En tete" seulement si le classement est public et le candidat 1er
+    const isLeader =
+      c.rank === 1 && Number(c.votes_count) > 0 && !badgedCategories.has(c.category);
     if (isLeader) badgedCategories.add(c.category);
 
     card.innerHTML = `
@@ -77,7 +79,7 @@ function renderGrid(candidates) {
       <div class="info">
         <span class="category">${escapeHtml(c.category)}</span>
         <h3><a class="candidate-link" href="/candidat.html?id=${c.id}">${escapeHtml(c.name)}</a></h3>
-        <p class="votes"><b>${c.votes_count}</b> votes</p>
+        ${typeof c.votes_count !== "undefined" ? `<p class="votes"><b>${Number(c.votes_count).toLocaleString("fr-FR")}</b> votes</p>` : ""}
         <a class="profile-link" href="/candidat.html?id=${c.id}">Voir le profil &amp; le projet</a>
         <button class="btn block vote-btn">Voter pour ${escapeHtml(c.name.split(" ")[0])}</button>
       </div>

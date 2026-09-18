@@ -1,8 +1,23 @@
+/* ============================================================
+   Fiche publique d'un(e) candidat(e) — pensee mobile d'abord.
+   Sert aussi de base aux pages Projets / Resultats.
+   ============================================================ */
+
 .profile-main {
   max-width: 720px;
   margin: 0 auto;
-  padding: 24px 16px 60px;
+  padding: 18px 14px 40px;
 }
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  text-decoration: none;
+}
+.back-link:hover { text-decoration: underline; }
 
 .profile-card {
   border-radius: 18px;
@@ -12,10 +27,15 @@
   box-shadow: 0 12px 30px rgba(3, 105, 161, 0.12);
 }
 
+/* --- Photo principale --- */
 .profile-photo-wrap {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 4 / 5;
+  max-height: 60vh;
   background: var(--sky-soft);
+}
+@media (min-width: 600px) {
+  .profile-photo-wrap { aspect-ratio: 4 / 3; }
 }
 
 .profile-photo {
@@ -24,52 +44,161 @@
   object-fit: cover;
   display: block;
 }
+.profile-photo.img-fallback { background: var(--sky-soft); }
 
-.profile-photo-wrap .number-badge {
+.profile-photo-badges {
   position: absolute;
-  top: 14px;
-  right: 14px;
-  background: rgba(3, 105, 161, 0.85);
-  color: #fff;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+.badge {
+  font-size: 11.5px;
   font-weight: 700;
-  font-size: 13px;
-  padding: 6px 12px;
+  padding: 5px 11px;
   border-radius: 999px;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
 }
+.badge-cat { background: rgba(255, 255, 255, 0.92); color: var(--blue-dark); text-transform: uppercase; }
+.badge-num { background: rgba(3, 105, 161, 0.88); color: #fff; }
 
-.profile-body { padding: 22px 24px 28px; }
-
-.profile-body .category {
-  display: inline-block;
-  font-size: 11px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--blue);
-  background: var(--sky-soft);
-  padding: 2px 10px;
-  border-radius: 999px;
-  margin-bottom: 8px;
-}
+/* --- Corps de la fiche --- */
+.profile-body { padding: 18px 16px 24px; }
+@media (min-width: 600px) { .profile-body { padding: 24px 26px 30px; } }
 
 .profile-body h1 {
-  margin: 0 0 4px;
+  margin: 0 0 12px;
   font-family: var(--font-display);
   color: var(--blue-dark);
-  font-size: 26px;
+  font-size: 24px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 600px) { .profile-body h1 { font-size: 29px; } }
+
+.profile-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 0 0 14px;
+}
+.profile-fact {
+  background: var(--sky-soft);
+  border-radius: 10px;
+  padding: 8px 12px;
+  min-width: 0;
+}
+.profile-fact dt {
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--blue);
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.profile-fact dd {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text);
+  overflow-wrap: anywhere;
 }
 
-.profile-study {
+/* --- Votes et classement --- */
+.profile-stats {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.stat {
+  flex: 1 1 130px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: center;
+  background: #fff;
+}
+.stat-num {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1.1;
+}
+.stat-num sup { font-size: 11px; }
+.stat-label {
+  display: block;
+  font-size: 11.5px;
   color: var(--text-muted);
-  font-size: 13.5px;
-  margin: 0 0 10px;
+  margin-top: 2px;
+}
+.profile-stats-hidden {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  background: var(--sky-soft);
+  border-radius: 10px;
+  padding: 9px 12px;
+  margin: 0 0 16px;
 }
 
-.profile-body .votes { color: var(--text-muted); margin: 0 0 16px; }
-.profile-body .votes b { color: var(--gold); }
+.profile-vote-btn { font-size: 16px; padding: 13px 16px; margin-top: 0; }
 
-.profile-bio { line-height: 1.6; margin-bottom: 18px; }
+/* --- Partage --- */
+.share-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.share-row .share-btn {
+  flex: 1 1 96px;
+  background: var(--sky-soft);
+  color: var(--blue-dark);
+  box-shadow: none;
+  font-size: 13px;
+  padding: 10px 8px;
+}
+.share-row .share-btn:hover { background: var(--sky-light); transform: none; box-shadow: none; }
+.share-row .share-btn.whatsapp { background: #e7f7ee; color: #1e7a3d; }
+.share-row .share-btn.whatsapp:hover { background: #d3f0e0; }
 
-.profile-video { margin-bottom: 20px; }
+.share-feedback {
+  margin: 8px 0 0;
+  font-size: 12.5px;
+  color: var(--success);
+  min-height: 16px;
+  overflow-wrap: anywhere;
+}
+.share-feedback.is-error { color: var(--danger); }
+
+/* --- Sections (bio, projet, video, galerie) --- */
+.profile-section { margin-top: 22px; }
+.profile-section-title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  color: var(--blue-dark);
+  font-family: var(--font-body);
+  font-weight: 700;
+  border-left: 3px solid var(--gold);
+  padding-left: 8px;
+}
+.profile-text { margin: 0; line-height: 1.65; overflow-wrap: anywhere; }
+.profile-empty { margin: 0; color: var(--text-muted); font-size: 13.5px; }
+
+.profile-project {
+  background: var(--sky-soft);
+  border-radius: 12px;
+  padding: 14px 16px 16px;
+}
+.profile-project .profile-section-title { border-left-color: var(--sky); }
+
 .profile-video-frame {
   position: relative;
   width: 100%;
@@ -85,66 +214,135 @@
   height: 100%;
   border: 0;
 }
-.profile-video-link { margin: 0 0 20px; }
-.profile-video-link a {
-  color: var(--blue-dark);
-  font-weight: 600;
-  text-decoration: none;
-}
+.profile-video-link { margin: 0; }
+.profile-video-link a { color: var(--blue-dark); font-weight: 700; text-decoration: none; }
 .profile-video-link a:hover { text-decoration: underline; }
 
 .profile-gallery {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  margin-bottom: 20px;
 }
-.profile-gallery img {
+.gallery-item {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  border-radius: 10px;
+  overflow: hidden;
+  display: block;
+}
+.gallery-item img {
   width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 10px;
+  display: block;
   background: var(--sky-soft);
+  transition: transform 0.25s ease;
 }
+.gallery-item:hover img { transform: scale(1.05); }
 
-.profile-project {
-  background: var(--sky-soft);
-  border-radius: 12px;
-  padding: 14px 16px;
-  margin-bottom: 20px;
+/* --- Messages (introuvable, desactive, erreur reseau) --- */
+.profile-message {
+  text-align: center;
+  padding: 40px 22px 34px;
 }
-.profile-project h2 {
-  margin: 0 0 6px;
+.profile-message h1 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 21px;
+  color: var(--blue-dark);
+}
+.profile-message p {
+  margin: 0 auto 20px;
+  max-width: 420px;
+  color: var(--text-muted);
   font-size: 14px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--blue-dark);
+  line-height: 1.6;
 }
-.profile-project p { margin: 0; line-height: 1.6; }
-
-.share-row {
-  display: flex;
-  gap: 8px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-.share-row .share-btn {
-  flex: 1;
-  min-width: 140px;
-  background: var(--sky-soft);
-  color: var(--blue-dark);
-  box-shadow: none;
+.profile-message .btn.block { max-width: 320px; margin: 0 auto; }
+.profile-message-link {
+  display: inline-block;
+  margin-top: 14px;
   font-size: 13px;
-  padding: 9px 12px;
+  color: var(--text-muted);
 }
-.share-row .share-btn:hover { background: var(--sky-light); transform: none; box-shadow: none; }
-.share-row .share-btn.whatsapp { background: #e7f7ee; color: #1e7a3d; }
-.share-row .share-btn.whatsapp:hover { background: #d3f0e0; }
 
-.share-feedback {
-  margin: 8px 0 0;
-  font-size: 12px;
-  color: var(--success);
-  min-height: 14px;
-  word-break: break-all;
+/* --- Squelette de chargement --- */
+.sk { background: #e8f2fa; border-radius: 8px; animation: sk-pulse 1.2s ease-in-out infinite; }
+.sk-photo { width: 100%; aspect-ratio: 4 / 5; border-radius: 0; }
+.sk-line { height: 14px; margin-bottom: 10px; }
+@keyframes sk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+@media (min-width: 600px) { .sk-photo { aspect-ratio: 4 / 3; } }
+
+/* --- Barre de vote collante --- */
+.vote-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 18px rgba(3, 105, 161, 0.12);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  z-index: 50;
+}
+.vote-bar-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.vote-bar-info { min-width: 0; flex: 1; }
+.vote-bar-name {
+  display: block;
+  font-weight: 700;
+  color: var(--blue-dark);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vote-bar-sub {
+  display: block;
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vote-bar .btn { flex-shrink: 0; padding: 11px 18px; }
+
+/* Espace en bas pour que la barre ne recouvre pas le pied de page */
+body.has-vote-bar footer { padding-bottom: 96px; }
+
+/* --- Visionneuse plein ecran --- */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 20, 33, 0.92);
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.lightbox img {
+  max-width: 100%;
+  max-height: 88vh;
+  border-radius: 10px;
+  display: block;
+}
+.lightbox-close {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 38px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 10px;
 }

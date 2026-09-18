@@ -148,6 +148,24 @@
       <button class="btn gold" id="save-countdown-btn" style="margin-top:12px;">Enregistrer</button>
       <p class="error-msg" id="countdown-msg"></p>
     </div>
+
+    <div class="form-card" style="margin-top:20px;">
+      <label>Affichage public des votes et du classement</label>
+      <p style="font-size:12px; color:var(--text-muted); margin:0 0 10px;">
+        Décochez pour masquer ces informations sur les fiches candidats, la liste et la page
+        Résultats. Les votes continuent d'être enregistrés normalement.
+      </p>
+      <label style="display:flex; align-items:center; gap:8px; font-weight:400;">
+        <input type="checkbox" id="show-votes-input" style="width:auto;" />
+        Afficher le nombre de votes
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-weight:400;">
+        <input type="checkbox" id="show-ranking-input" style="width:auto;" />
+        Afficher le classement (rang et page Résultats)
+      </label>
+      <button class="btn gold" id="save-display-btn" style="margin-top:12px;">Enregistrer</button>
+      <p class="error-msg" id="display-msg"></p>
+    </div>
   </section>
 </div>
 

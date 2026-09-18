@@ -4,37 +4,55 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Profil du candidat — Miss & Mister Flash Adjarra</title>
+<meta name="description" content="Fiche publique d'un(e) candidat(e) du concours Miss & Mister Flash Adjarra : profil, projet d'impact et vote en ligne." />
 <link rel="icon" href="/img/logo.jpg" />
 <link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="/css/nav.css" />
 <link rel="stylesheet" href="/css/profile.css" />
 </head>
 <body>
 
-<header class="site-header glass">
-  <div class="header-top">
-    <a href="/index.html"><img class="logo" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" /></a>
-    <div class="header-titles">
-      <h1>Miss &amp; Mister</h1>
-      <p>Flash Adjarra</p>
-    </div>
-  </div>
-  <nav class="site-menu">
-    <a href="/index.html" class="site-menu-link">Accueil</a>
-    <a href="/candidats.html" class="site-menu-link active">Les Candidats</a>
-    <a href="/projets.html" class="site-menu-link">Leurs Projets</a>
-    <a href="/galerie.html" class="site-menu-link">Galerie</a>
-    <a href="/resultats.html" class="site-menu-link">Résultats</a>
-  </nav>
-</header>
+<script src="/js/nav.js"></script>
 
 <main class="profile-main">
+  <a class="back-link" href="/candidats.html">&larr; Tous les candidats</a>
+
   <div id="profile-content">
-    <p style="text-align:center; color:var(--text-muted);">Chargement du profil...</p>
+    <!-- Squelette de chargement : evite un ecran vide sur connexion lente -->
+    <div class="profile-card skeleton-card">
+      <div class="sk sk-photo"></div>
+      <div class="profile-body">
+        <div class="sk sk-line" style="width:35%;"></div>
+        <div class="sk sk-line" style="width:70%; height:24px;"></div>
+        <div class="sk sk-line" style="width:50%;"></div>
+        <div class="sk sk-line" style="width:100%;"></div>
+        <div class="sk sk-line" style="width:90%;"></div>
+      </div>
+    </div>
   </div>
 </main>
 
+<!-- Barre de vote collante : le bouton reste accessible pendant le defilement -->
+<div class="vote-bar" id="vote-bar" hidden>
+  <div class="vote-bar-inner">
+    <div class="vote-bar-info">
+      <span class="vote-bar-name" id="vote-bar-name"></span>
+      <span class="vote-bar-sub" id="vote-bar-sub"></span>
+    </div>
+    <a class="btn gold" id="vote-bar-btn" href="#">Voter</a>
+  </div>
+</div>
+
+<!-- Visionneuse plein ecran pour la galerie -->
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Fermer l'image">&times;</button>
+  <img id="lightbox-img" src="" alt="" />
+</div>
+
 <footer>
-  <a href="/candidats.html" style="color:var(--blue-dark); text-decoration:none; font-weight:700;">&larr; Retour à tous les candidats</a>
+  <p style="margin:0 0 8px;">
+    <a href="/candidats.html" style="color:var(--blue-dark); text-decoration:none; font-weight:700;">&larr; Retour à tous les candidats</a>
+  </p>
   <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
 </footer>
 

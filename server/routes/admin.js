@@ -390,6 +390,37 @@ router.put("/settings/countdown", async (req, res) => {
   }
 });
 
+// GET/PUT /api/admin/settings/public-display
+// Controle ce que le public voit sur les fiches candidats et le classement.
+router.get("/settings/public-display", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'public_display'");
+    const stored = result.rowCount ? JSON.parse(result.rows[0].value) : {};
+    res.json({ show_votes: true, show_ranking: true, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/settings/public-display", async (req, res) => {
+  try {
+    const value = {
+      show_votes: req.body.show_votes !== false,
+      show_ranking: req.body.show_ranking !== false,
+    };
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('public_display', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(value)]
+    );
+    res.json(value);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 // GET /api/admin/announcements -> liste complete (y compris masquees)
 router.get("/announcements", async (req, res) => {
   try {
