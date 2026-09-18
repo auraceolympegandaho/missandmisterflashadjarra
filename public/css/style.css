@@ -439,6 +439,13 @@ footer {
 
 footer b { color: var(--blue-dark); }
 
+.rights-line {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.85;
+}
+
 .admin-link {
   position: fixed;
   bottom: 14px;

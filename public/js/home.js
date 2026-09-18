@@ -71,5 +71,40 @@ function tickCountdown() {
   }
 }
 
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
+}
+
+async function loadAnnouncements() {
+  const grid = document.getElementById("news-grid");
+  try {
+    const res = await fetch("/api/announcements");
+    const items = await res.json();
+
+    if (!items.length) {
+      grid.innerHTML =
+        "<p style='text-align:center; color:var(--text-muted); grid-column:1/-1; font-size:13px;'>Aucune actualité pour le moment.</p>";
+      return;
+    }
+
+    grid.innerHTML = items
+      .map(
+        (a) => `
+      <div class="news-card">
+        ${a.tag ? `<span class="news-tag">${escapeHtml(a.tag)}</span>` : ""}
+        <p>${escapeHtml(a.content)}</p>
+      </div>`
+      )
+      .join("");
+  } catch (e) {
+    console.error("Impossible de charger les actualités", e);
+    grid.innerHTML =
+      "<p style='text-align:center; color:var(--text-muted); grid-column:1/-1; font-size:13px;'>Impossible de charger les actualités.</p>";
+  }
+}
+
 loadPrice();
 loadCountdown();
+loadAnnouncements();

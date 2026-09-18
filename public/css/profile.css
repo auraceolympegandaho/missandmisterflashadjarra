@@ -77,3 +77,30 @@
   color: var(--blue-dark);
 }
 .profile-project p { margin: 0; line-height: 1.6; }
+
+.share-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.share-row .share-btn {
+  flex: 1;
+  min-width: 140px;
+  background: var(--sky-soft);
+  color: var(--blue-dark);
+  box-shadow: none;
+  font-size: 13px;
+  padding: 9px 12px;
+}
+.share-row .share-btn:hover { background: var(--sky-light); transform: none; box-shadow: none; }
+.share-row .share-btn.whatsapp { background: #e7f7ee; color: #1e7a3d; }
+.share-row .share-btn.whatsapp:hover { background: #d3f0e0; }
+
+.share-feedback {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--success);
+  min-height: 14px;
+  word-break: break-all;
+}

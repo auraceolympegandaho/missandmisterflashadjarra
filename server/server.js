@@ -55,6 +55,19 @@ app.get("/api/settings/countdown", async (req, res) => {
   }
 });
 
+// Actualites publiees (public, lecture seule ; gerees depuis l'admin)
+app.get("/api/announcements", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, tag, content, created_at FROM announcements WHERE is_active = 1 ORDER BY created_at DESC LIMIT 12"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 app.get("/health", (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 4000;

@@ -29,6 +29,7 @@ function showDashboard() {
   loadResults();
   loadCandidates();
   loadTransactions();
+  loadAnnouncements();
   loadPrice();
   loadCountdown();
 }
@@ -102,6 +103,7 @@ async function loadCandidates() {
     tbody.innerHTML = "";
     candidates.forEach((c) => {
       const tr = document.createElement("tr");
+      const link = `${window.location.origin}/candidat.html?id=${c.id}`;
       tr.innerHTML = `
         <td><img class="thumb" src="${c.photo_path || ""}" onerror="this.src=''"/></td>
         <td>${escapeHtml(c.candidacy_number || "—")}</td>
@@ -109,6 +111,7 @@ async function loadCandidates() {
         <td>${escapeHtml(c.category)}</td>
         <td>${c.votes_count}</td>
         <td>${c.is_active ? "Actif" : "Masqué"}</td>
+        <td><button class="copy-link-btn" data-link="${escapeHtml(link)}">Copier le lien</button></td>
         <td class="row-actions">
           <button data-id="${c.id}" class="edit-btn">Modifier</button>
           <button data-id="${c.id}" class="toggle-btn">${c.is_active ? "Masquer" : "Activer"}</button>
@@ -117,6 +120,8 @@ async function loadCandidates() {
       `;
       tbody.appendChild(tr);
 
+      tr.querySelector(".copy-link-btn").addEventListener("click", (e) => copyCandidateLink(e.target, link));
+
       tr.querySelector(".edit-btn").addEventListener("click", () => openCandidateModal(c));
       tr.querySelector(".toggle-btn").addEventListener("click", () => toggleActive(c));
       tr.querySelector(".delete-btn").addEventListener("click", () => deleteCandidate(c.id));
@@ -124,6 +129,29 @@ async function loadCandidates() {
   } catch (e) {
     console.error(e);
   }
+}
+
+async function copyCandidateLink(btn, link) {
+  const original = btn.textContent;
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(link);
+    } else {
+      const textarea = document.createElement("textarea");
+      textarea.value = link;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+    }
+    btn.textContent = "Copié !";
+  } catch (e) {
+    btn.textContent = "Échec";
+  }
+  setTimeout(() => (btn.textContent = original), 1800);
 }
 
 async function toggleActive(c) {
@@ -299,6 +327,104 @@ document.getElementById("save-countdown-btn").addEventListener("click", async ()
     msgEl.style.display = "block";
   } catch (e) {
     msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// --- Actualités ---
+let editingAnnouncementId = null;
+const announcementOverlay = document.getElementById("announcement-overlay");
+
+async function loadAnnouncements() {
+  try {
+    const rows = await apiFetch("/announcements");
+    const tbody = document.querySelector("#announcements-table tbody");
+    tbody.innerHTML = "";
+    rows.forEach((a) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${new Date(a.created_at).toLocaleDateString("fr-FR")}</td>
+        <td>${escapeHtml(a.tag || "—")}</td>
+        <td style="max-width:320px;">${escapeHtml(a.content)}</td>
+        <td>${a.is_active ? "Publiée" : "Masquée"}</td>
+        <td class="row-actions">
+          <button data-id="${a.id}" class="edit-announcement-btn">Modifier</button>
+          <button data-id="${a.id}" class="toggle-announcement-btn">${a.is_active ? "Masquer" : "Publier"}</button>
+          <button data-id="${a.id}" class="danger delete-announcement-btn">Supprimer</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      tr.querySelector(".edit-announcement-btn").addEventListener("click", () => openAnnouncementModal(a));
+      tr.querySelector(".toggle-announcement-btn").addEventListener("click", () => toggleAnnouncementActive(a));
+      tr.querySelector(".delete-announcement-btn").addEventListener("click", () => deleteAnnouncement(a.id));
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function toggleAnnouncementActive(a) {
+  await apiFetch(`/announcements/${a.id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ is_active: a.is_active ? 0 : 1 }),
+  });
+  loadAnnouncements();
+}
+
+async function deleteAnnouncement(id) {
+  if (!confirm("Supprimer définitivement cette actualité ?")) return;
+  await apiFetch(`/announcements/${id}`, { method: "DELETE" });
+  loadAnnouncements();
+}
+
+function openAnnouncementModal(announcement) {
+  editingAnnouncementId = announcement ? announcement.id : null;
+  document.getElementById("announcement-modal-title").textContent = announcement
+    ? "Modifier l'actualité"
+    : "Ajouter une actualité";
+  document.getElementById("a-tag").value = announcement ? announcement.tag || "" : "";
+  document.getElementById("a-content").value = announcement ? announcement.content : "";
+  document.getElementById("announcement-msg").style.display = "none";
+  announcementOverlay.classList.add("open");
+}
+document.getElementById("new-announcement-btn").addEventListener("click", () => openAnnouncementModal(null));
+document.getElementById("close-announcement-modal").addEventListener("click", () =>
+  announcementOverlay.classList.remove("open")
+);
+
+document.getElementById("save-announcement-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("announcement-msg");
+  msgEl.style.display = "none";
+
+  const tag = document.getElementById("a-tag").value.trim();
+  const content = document.getElementById("a-content").value.trim();
+
+  if (!content) {
+    msgEl.textContent = "Le contenu est requis.";
+    msgEl.style.display = "block";
+    return;
+  }
+
+  try {
+    if (editingAnnouncementId) {
+      await apiFetch(`/announcements/${editingAnnouncementId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag, content }),
+      });
+    } else {
+      await apiFetch("/announcements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tag, content }),
+      });
+    }
+    announcementOverlay.classList.remove("open");
+    loadAnnouncements();
+  } catch (e) {
     msgEl.textContent = e.message;
     msgEl.style.display = "block";
   }

@@ -39,6 +39,7 @@
     <button class="admin-tab-btn active" data-tab="results">Résultats</button>
     <button class="admin-tab-btn" data-tab="candidates">Candidats</button>
     <button class="admin-tab-btn" data-tab="transactions">Transactions</button>
+    <button class="admin-tab-btn" data-tab="announcements">Actualités</button>
     <button class="admin-tab-btn" data-tab="settings">Réglages</button>
   </nav>
 
@@ -62,7 +63,7 @@
   <section id="tab-candidates" class="tab-panel" style="display:none;">
     <button class="btn gold" id="new-candidate-btn">+ Ajouter un(e) candidat(e)</button>
     <table class="admin-table" id="candidates-table">
-      <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Lien de vote</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -70,6 +71,14 @@
   <section id="tab-transactions" class="tab-panel" style="display:none;">
     <table class="admin-table" id="transactions-table">
       <thead><tr><th>Date</th><th>Candidat</th><th>Votes</th><th>Montant</th><th>Téléphone</th><th>Statut</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section id="tab-announcements" class="tab-panel" style="display:none;">
+    <button class="btn gold" id="new-announcement-btn">+ Ajouter une actualité</button>
+    <table class="admin-table" id="announcements-table">
+      <thead><tr><th>Date</th><th>Étiquette</th><th>Contenu</th><th>Statut</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -120,6 +129,22 @@
     </div>
     <p class="error-msg" id="candidate-msg"></p>
     <span class="close-link" id="close-candidate-modal">Annuler</span>
+  </div>
+</div>
+
+<!-- Modal creation/edition actualite -->
+<div class="overlay" id="announcement-overlay">
+  <div class="modal">
+    <h2 id="announcement-modal-title">Ajouter une actualité</h2>
+    <label>Étiquette</label>
+    <input type="text" id="a-tag" placeholder="ex : À venir, Info, Important" />
+    <label>Contenu</label>
+    <textarea id="a-content" rows="4" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
+    <div style="margin-top:16px; display:flex; gap:10px;">
+      <button class="btn gold block" id="save-announcement-btn">Enregistrer</button>
+    </div>
+    <p class="error-msg" id="announcement-msg"></p>
+    <span class="close-link" id="close-announcement-modal">Annuler</span>
   </div>
 </div>
 

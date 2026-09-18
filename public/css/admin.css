@@ -102,6 +102,19 @@
 .admin-table th { background: #f4f6f9; font-size: 12px; text-transform: uppercase; color: var(--text-muted); }
 .admin-table img.thumb { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; background: #eef1f6; }
 
+.copy-link-btn {
+  border: 1px solid var(--border);
+  background: var(--sky-soft);
+  color: var(--blue-dark);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.copy-link-btn:hover { background: var(--sky-light); }
+
 .row-actions { display: flex; gap: 6px; }
 .row-actions button {
   border: 1px solid var(--border);

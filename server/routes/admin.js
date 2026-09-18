@@ -246,4 +246,69 @@ router.put("/settings/countdown", async (req, res) => {
   }
 });
 
+// GET /api/admin/announcements -> liste complete (y compris masquees)
+router.get("/announcements", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM announcements ORDER BY created_at DESC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// POST /api/admin/announcements -> creer une actualite
+router.post("/announcements", async (req, res) => {
+  try {
+    const { tag, content } = req.body;
+    if (!content || !content.trim()) {
+      return res.status(400).json({ error: "Le contenu de l'actualité est requis." });
+    }
+    const result = await pool.query(
+      `INSERT INTO announcements (tag, content) VALUES ($1, $2) RETURNING *`,
+      [tag || "", content.trim()]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de créer l'actualité." });
+  }
+});
+
+// PUT /api/admin/announcements/:id -> modifier une actualite (contenu, tag, visibilite)
+router.put("/announcements/:id", async (req, res) => {
+  try {
+    const existingRes = await pool.query("SELECT * FROM announcements WHERE id = $1", [
+      req.params.id,
+    ]);
+    const existing = existingRes.rows[0];
+    if (!existing) return res.status(404).json({ error: "Actualité introuvable." });
+
+    const tag = req.body.tag ?? existing.tag;
+    const content = req.body.content !== undefined ? req.body.content : existing.content;
+    const isActive =
+      req.body.is_active !== undefined ? Number(req.body.is_active) : existing.is_active;
+
+    const updated = await pool.query(
+      `UPDATE announcements SET tag = $1, content = $2, is_active = $3 WHERE id = $4 RETURNING *`,
+      [tag, content, isActive, req.params.id]
+    );
+    res.json(updated.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de modifier l'actualité." });
+  }
+});
+
+// DELETE /api/admin/announcements/:id
+router.delete("/announcements/:id", async (req, res) => {
+  try {
+    await pool.query("DELETE FROM announcements WHERE id = $1", [req.params.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de supprimer l'actualité." });
+  }
+});
+
 module.exports = router;
