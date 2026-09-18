@@ -135,3 +135,45 @@
 }
 .form-card label { display: block; font-size: 13px; color: var(--text-muted); margin: 10px 0 6px; }
 .form-card input { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 15px; margin-bottom: 12px; }
+.form-card h3 { margin: 22px 0 4px; font-size: 15px; color: var(--blue-dark); }
+.form-card h3:first-child { margin-top: 0; }
+
+#tab-home .form-card { max-width: 640px; }
+
+.repeat-row {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.repeat-row input, .repeat-row textarea {
+  flex: 1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 14px;
+  font-family: inherit;
+}
+.repeat-row textarea { resize: vertical; min-height: 40px; }
+.repeat-row .remove-row-btn {
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gallery-thumb-wrap { position: relative; display: inline-block; }
+.gallery-thumb-wrap img {
+  width: 56px; height: 56px; object-fit: cover; border-radius: 8px; background: #eef1f6;
+  border: 1px solid var(--border);
+}
+.gallery-thumb-wrap .remove-photo-btn {
+  position: absolute; top: -6px; right: -6px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--danger); color: #fff; border: none;
+  font-size: 12px; line-height: 20px; text-align: center; padding: 0; cursor: pointer;
+}

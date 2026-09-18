@@ -1,3 +1,56 @@
+// Icones tournantes utilisees pour illustrer chaque objectif (le contenu
+// texte, editable depuis l'admin, ne porte pas d'icone propre).
+const OBJECTIVE_ICONS = [
+  '<path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6L12 3z" stroke-linejoin="round"/>',
+  '<circle cx="12" cy="7.5" r="3.25"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" stroke-linecap="round"/>',
+  '<path d="M9 18h6M10 21h4M8 13a4 4 0 116.5 3.1c-.6.5-1 1.1-1 1.9H10.5c0-.8-.4-1.4-1-1.9A4 4 0 018 13z" stroke-linecap="round" stroke-linejoin="round"/>',
+  '<circle cx="9" cy="9" r="3.5"/><circle cx="16" cy="12" r="2.75"/><path d="M3.5 19c.4-3 2.7-5 5.5-5s5 1.9 5.6 4.6M14 15.3c2.2.1 3.9 1.7 4.5 4" stroke-linecap="round"/>',
+];
+
+async function loadHomepage() {
+  try {
+    const res = await fetch("/api/homepage");
+    const data = await res.json();
+
+    document.getElementById("hero-edition").textContent = data.hero_edition || "";
+    document.getElementById("hero-title").textContent = data.hero_title || "";
+    document.getElementById("hero-slogan").textContent = data.hero_slogan || "";
+    document.getElementById("hero-description").textContent = data.hero_description || "";
+    document.title = `${data.hero_title || "Miss & Mister Flash Adjarra"} — ${data.hero_edition || ""}`;
+
+    const poster = document.getElementById("hero-poster");
+    if (data.poster_path) poster.src = data.poster_path;
+
+    // organizer_text contient volontairement une petite mise en forme (ex: <b>),
+    // saisie par l'admin dans un champ dedie de la page d'accueil.
+    document.getElementById("organizer-text").innerHTML = data.organizer_text || "";
+
+    const objectivesGrid = document.getElementById("objectives-grid");
+    const objectives = Array.isArray(data.objectives) ? data.objectives : [];
+    objectivesGrid.innerHTML = objectives
+      .map(
+        (o, i) => `
+      <div class="objective-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">${OBJECTIVE_ICONS[i % OBJECTIVE_ICONS.length]}</svg>
+        <h3>${escapeHtml(o.title)}</h3>
+        <p>${escapeHtml(o.text)}</p>
+      </div>`
+      )
+      .join("");
+
+    const ctaEl = document.getElementById("hero-cta");
+    const buttons = Array.isArray(data.buttons) ? data.buttons : [];
+    ctaEl.innerHTML = buttons
+      .map(
+        (b, i) =>
+          `<a href="${escapeHtml(b.url)}" class="btn ${i === 0 ? "gold" : "outline"}">${escapeHtml(b.label)}</a>`
+      )
+      .join("");
+  } catch (e) {
+    console.error("Impossible de charger le contenu de l'accueil", e);
+  }
+}
+
 async function loadPrice() {
   try {
     const res = await fetch("/api/settings/price");
@@ -129,6 +182,7 @@ async function loadAnnouncements() {
   }
 }
 
+loadHomepage();
 loadPrice();
 loadCountdown();
 loadAnnouncements();

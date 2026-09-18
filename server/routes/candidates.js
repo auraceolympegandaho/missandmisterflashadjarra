@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
   try {
     const { category } = req.query;
     const fields =
-      "id, name, category, candidacy_number, bio, project_desc, photo_path, votes_count";
+      "id, name, category, candidacy_number, bio, project_desc, photo_path, photos, study_year, field_of_study, video_url, votes_count";
     let result;
     if (category) {
       result = await pool.query(
@@ -31,7 +31,8 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id, name, category, candidacy_number, bio, project_desc, photo_path, votes_count
+      `SELECT id, name, category, candidacy_number, bio, project_desc, photo_path, photos,
+              study_year, field_of_study, video_url, votes_count
        FROM candidates WHERE id = $1 AND is_active = 1`,
       [req.params.id]
     );

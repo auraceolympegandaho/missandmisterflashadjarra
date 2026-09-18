@@ -37,6 +37,7 @@
 
   <nav class="admin-tabs">
     <button class="admin-tab-btn active" data-tab="results">Résultats</button>
+    <button class="admin-tab-btn" data-tab="home">Accueil</button>
     <button class="admin-tab-btn" data-tab="candidates">Candidats</button>
     <button class="admin-tab-btn" data-tab="transactions">Transactions</button>
     <button class="admin-tab-btn" data-tab="announcements">Actualités</button>
@@ -61,10 +62,46 @@
     </table>
   </section>
 
+  <section id="tab-home" class="tab-panel" style="display:none;">
+    <div class="form-card">
+      <h3 style="margin-top:0;">Présentation</h3>
+      <label>Édition (ex : Édition 2027)</label>
+      <input type="text" id="h-edition" />
+      <label>Titre principal</label>
+      <input type="text" id="h-title" />
+      <label>Slogan</label>
+      <input type="text" id="h-slogan" />
+      <label>Texte de présentation</label>
+      <textarea id="h-description" rows="4" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
+      <label>Affiche / visuel principal</label>
+      <img id="h-poster-preview" style="display:block; max-width:160px; border-radius:10px; margin:6px 0 10px;" />
+      <input type="file" id="h-poster" accept="image/*" />
+
+      <h3>Organisateur</h3>
+      <label>Texte de la bannière organisateur (le gras <code>&lt;b&gt;</code> est autorisé)</label>
+      <textarea id="h-organizer" rows="2" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
+
+      <h3>Objectifs du concours</h3>
+      <div id="h-objectives-list"></div>
+      <button class="btn" type="button" id="h-add-objective">+ Ajouter un objectif</button>
+
+      <h3>Boutons de l'accueil</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin:-4px 0 8px;">
+        Le premier bouton est mis en avant (doré). Les destinations acceptent une page du site
+        (ex : <code>/candidats.html</code>), une ancre (ex : <code>#objectifs</code>) ou un lien complet.
+      </p>
+      <div id="h-buttons-list"></div>
+      <button class="btn" type="button" id="h-add-button">+ Ajouter un bouton</button>
+
+      <button class="btn gold" id="save-homepage-btn" style="margin-top:20px;">Enregistrer l'accueil</button>
+      <p class="error-msg" id="homepage-msg"></p>
+    </div>
+  </section>
+
   <section id="tab-candidates" class="tab-panel" style="display:none;">
     <button class="btn gold" id="new-candidate-btn">+ Ajouter un(e) candidat(e)</button>
     <table class="admin-table" id="candidates-table">
-      <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Lien de vote</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Lien de vote</th><th>Fiche</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -127,12 +164,24 @@
     </select>
     <label>Numéro de candidature</label>
     <input type="text" id="c-number" placeholder="ex : 12" />
+    <label>Année d'étude</label>
+    <input type="text" id="c-study-year" placeholder="ex : Licence 2" />
+    <label>Filière</label>
+    <input type="text" id="c-field" placeholder="ex : Sciences de l'Éducation" />
     <label>Bio / présentation</label>
     <input type="text" id="c-bio" />
-    <label>Projet / motivation</label>
+    <label>Projet / motivation (projet d'impact)</label>
     <textarea id="c-project" rows="3" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
-    <label>Photo</label>
+    <label>Lien vidéo (YouTube, optionnel)</label>
+    <input type="text" id="c-video" placeholder="https://youtube.com/..." />
+    <label>Photo principale</label>
     <input type="file" id="c-photo" accept="image/*" />
+    <label>Photos supplémentaires (galerie)</label>
+    <div id="c-existing-photos" style="display:flex; flex-wrap:wrap; gap:8px; margin:6px 0;"></div>
+    <input type="file" id="c-photos" accept="image/*" multiple />
+    <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0;">
+      Les nouvelles photos s'ajoutent à la galerie existante (jusqu'à 6 à la fois).
+    </p>
     <div style="margin-top:16px; display:flex; gap:10px;">
       <button class="btn gold block" id="save-candidate-btn">Enregistrer</button>
     </div>

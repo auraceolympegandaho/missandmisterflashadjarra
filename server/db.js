@@ -74,6 +74,10 @@ async function initSchema() {
   await pool.query(`
     ALTER TABLE candidates ADD COLUMN IF NOT EXISTS candidacy_number TEXT DEFAULT '';
     ALTER TABLE candidates ADD COLUMN IF NOT EXISTS project_desc TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS study_year TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS field_of_study TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS video_url TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS photos JSONB NOT NULL DEFAULT '[]';
   `);
 
   const priceRow = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
@@ -83,8 +87,40 @@ async function initSchema() {
     ]);
   }
 
+  // Contenu de la page d'accueil, editable depuis l'admin, stocke en JSON
+  // dans la table settings (cle unique 'homepage_content').
+  const homepageRow = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
+  if (homepageRow.rowCount === 0) {
+    await pool.query("INSERT INTO settings (key, value) VALUES ('homepage_content', $1)", [
+      JSON.stringify(DEFAULT_HOMEPAGE),
+    ]);
+  }
+
   await ensureAdminUser();
 }
+
+// Contenu par defaut de l'accueil (correspond au design d'origine du site).
+// Sert de base au premier demarrage et de filet si des champs manquent.
+const DEFAULT_HOMEPAGE = {
+  hero_edition: "Édition 2027",
+  hero_title: "MISS & MISTER FLASH ADJARRA",
+  hero_slogan: "« Là où le talent devient couronne »",
+  hero_description:
+    "Un concours étudiant qui célèbre l'élégance, la confiance en soi et l'engagement de la jeunesse universitaire de la FLASH Adjarra. Candidat(e)s, votes en ligne, projets porteurs de sens : découvrez celles et ceux qui incarnent cette édition.",
+  poster_path: "",
+  organizer_text:
+    "Organisé par le <b>Bureau Sectoriel de l'Union Nationale des Étudiants du Bénin (UNEB) – FLASH Adjarra</b>",
+  objectives: [
+    { title: "Valoriser les talents", text: "Mettre en lumière les talents et qualités des étudiant(e)s de la FLASH Adjarra." },
+    { title: "Expression personnelle", text: "Offrir un espace où chaque candidat(e) peut exprimer sa personnalité avec fierté." },
+    { title: "Créativité", text: "Encourager l'originalité et la créativité à travers les prestations et les projets." },
+    { title: "Engagement des jeunes", text: "Fédérer les étudiant(e)s autour de projets porteurs de sens pour leur communauté." },
+  ],
+  buttons: [
+    { label: "Découvrir les candidats", url: "/candidats.html" },
+    { label: "Découvrir le concours", url: "#objectifs" },
+  ],
+};
 
 async function ensureAdminUser() {
   const username = process.env.ADMIN_USERNAME || "admin";
@@ -100,4 +136,4 @@ async function ensureAdminUser() {
   }
 }
 
-module.exports = { pool, initSchema };
+module.exports = { pool, initSchema, DEFAULT_HOMEPAGE };

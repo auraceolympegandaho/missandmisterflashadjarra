@@ -29,58 +29,28 @@
 
 <main class="home-main">
 
-  <!-- A. Presentation officielle -->
+  <!-- A. Presentation officielle (contenu charge depuis /api/homepage) -->
   <section class="hero">
     <div class="hero-content">
-      <img class="hero-logo" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" />
-      <span class="hero-edition">Édition 2027</span>
-      <h1>MISS &amp; MISTER FLASH ADJARRA</h1>
-      <p class="slogan">« Là où le talent devient couronne »</p>
-      <p class="description">
-        Un concours étudiant qui célèbre l'élégance, la confiance en soi et l'engagement
-        de la jeunesse universitaire de la FLASH Adjarra. Candidat(e)s, votes en ligne,
-        projets porteurs de sens : découvrez celles et ceux qui incarnent cette édition.
-      </p>
-      <div class="hero-cta">
-        <a href="/candidats.html" class="btn gold">Découvrir les candidats</a>
-        <a href="#objectifs" class="btn outline">Découvrir le concours</a>
-      </div>
+      <img class="hero-logo" id="hero-poster" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" />
+      <span class="hero-edition" id="hero-edition">Édition 2027</span>
+      <h1 id="hero-title">MISS &amp; MISTER FLASH ADJARRA</h1>
+      <p class="slogan" id="hero-slogan"></p>
+      <p class="description" id="hero-description"></p>
+      <div class="hero-cta" id="hero-cta"></div>
     </div>
   </section>
 
   <!-- B. Organisateur -->
   <div class="organizer-banner">
-    <div class="organizer-card glass">
-      Organisé par le <b>Bureau Sectoriel de l'Union Nationale des Étudiants du Bénin (UNEB) – FLASH Adjarra</b>
-    </div>
+    <div class="organizer-card glass" id="organizer-text"></div>
   </div>
 
   <!-- C. Objectifs -->
   <section class="home-section" id="objectifs">
     <h2>Les objectifs du concours</h2>
     <p class="section-sub">Un tremplin pour la jeunesse estudiantine de la FLASH Adjarra</p>
-    <div class="objectives-grid">
-      <div class="objective-card">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6L12 3z" stroke-linejoin="round"/></svg>
-        <h3>Valoriser les talents</h3>
-        <p>Mettre en lumière les talents et qualités des étudiant(e)s de la FLASH Adjarra.</p>
-      </div>
-      <div class="objective-card">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="7.5" r="3.25"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" stroke-linecap="round"/></svg>
-        <h3>Expression personnelle</h3>
-        <p>Offrir un espace où chaque candidat(e) peut exprimer sa personnalité avec fierté.</p>
-      </div>
-      <div class="objective-card">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 18h6M10 21h4M8 13a4 4 0 116.5 3.1c-.6.5-1 1.1-1 1.9H10.5c0-.8-.4-1.4-1-1.9A4 4 0 018 13z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <h3>Créativité</h3>
-        <p>Encourager l'originalité et la créativité à travers les prestations et les projets.</p>
-      </div>
-      <div class="objective-card">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="9" cy="9" r="3.5"/><circle cx="16" cy="12" r="2.75"/><path d="M3.5 19c.4-3 2.7-5 5.5-5s5 1.9 5.6 4.6M14 15.3c2.2.1 3.9 1.7 4.5 4" stroke-linecap="round"/></svg>
-        <h3>Engagement des jeunes</h3>
-        <p>Fédérer les étudiant(e)s autour de projets porteurs de sens pour leur communauté.</p>
-      </div>
-    </div>
+    <div class="objectives-grid" id="objectives-grid"></div>
   </section>
 
   <!-- D. Compte a rebours -->

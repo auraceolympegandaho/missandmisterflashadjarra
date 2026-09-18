@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const { pool } = require("../db");
+const { pool, DEFAULT_HOMEPAGE } = require("../db");
 const { requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
@@ -43,6 +43,38 @@ const upload = multer({
     cb(null, true);
   },
 });
+
+// Upload combine pour un candidat : une photo principale + jusqu'a 6 photos
+// supplementaires pour sa galerie.
+const uploadCandidate = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) return cb(new Error("Fichier non-image refuse."));
+    cb(null, true);
+  },
+}).fields([
+  { name: "photo", maxCount: 1 },
+  { name: "photos", maxCount: 6 },
+]);
+
+// Dossier Cloudinary separe pour l'affiche/le visuel principal de l'accueil
+const posterStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "miss-mister-flash-adjarra/homepage",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 1600, height: 1600, crop: "limit" }],
+  },
+});
+const uploadPoster = multer({
+  storage: posterStorage,
+  limits: { fileSize: 6 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) return cb(new Error("Fichier non-image refuse."));
+    cb(null, true);
+  },
+}).single("poster");
 
 // Dossier Cloudinary separe pour les logos partenaires (organisation propre)
 const partnerStorage = new CloudinaryStorage({
@@ -96,18 +128,44 @@ router.get("/candidates", async (req, res) => {
   }
 });
 
-// POST /api/admin/candidates -> creer un candidat (avec photo optionnelle)
-router.post("/candidates", upload.single("photo"), async (req, res) => {
+// POST /api/admin/candidates -> creer un candidat (photo principale + galerie optionnelles)
+router.post("/candidates", uploadCandidate, async (req, res) => {
   try {
-    const { name, category, bio, candidacy_number, project_desc } = req.body;
+    const {
+      name,
+      category,
+      bio,
+      candidacy_number,
+      project_desc,
+      study_year,
+      field_of_study,
+      video_url,
+    } = req.body;
     if (!name || !["Miss", "Mister"].includes(category)) {
       return res.status(400).json({ error: "Nom et categorie (Miss/Mister) requis." });
     }
-    const photoPath = req.file ? req.file.path : "";
+    const photoFile = req.files && req.files.photo ? req.files.photo[0] : null;
+    const galleryFiles = req.files && req.files.photos ? req.files.photos : [];
+    const photoPath = photoFile ? photoFile.path : "";
+    const photos = galleryFiles.map((f) => f.path);
+
     const result = await pool.query(
-      `INSERT INTO candidates (name, category, candidacy_number, bio, project_desc, photo_path)
-       VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-      [name, category, candidacy_number || "", bio || "", project_desc || "", photoPath]
+      `INSERT INTO candidates
+         (name, category, candidacy_number, bio, project_desc, photo_path, photos,
+          study_year, field_of_study, video_url)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+      [
+        name,
+        category,
+        candidacy_number || "",
+        bio || "",
+        project_desc || "",
+        photoPath,
+        JSON.stringify(photos),
+        study_year || "",
+        field_of_study || "",
+        video_url || "",
+      ]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -117,7 +175,9 @@ router.post("/candidates", upload.single("photo"), async (req, res) => {
 });
 
 // PUT /api/admin/candidates/:id -> modifier un candidat
-router.put("/candidates/:id", upload.single("photo"), async (req, res) => {
+// La ou les nouvelles photos de galerie envoyees s'ajoutent aux photos existantes
+// (pour retirer une photo precise, voir DELETE /candidates/:id/photos).
+router.put("/candidates/:id", uploadCandidate, async (req, res) => {
   try {
     const existingRes = await pool.query("SELECT * FROM candidates WHERE id = $1", [
       req.params.id,
@@ -130,21 +190,70 @@ router.put("/candidates/:id", upload.single("photo"), async (req, res) => {
     const candidacyNumber = req.body.candidacy_number ?? existing.candidacy_number;
     const bio = req.body.bio ?? existing.bio;
     const projectDesc = req.body.project_desc ?? existing.project_desc;
+    const studyYear = req.body.study_year ?? existing.study_year;
+    const fieldOfStudy = req.body.field_of_study ?? existing.field_of_study;
+    const videoUrl = req.body.video_url ?? existing.video_url;
     const isActive =
       req.body.is_active !== undefined ? Number(req.body.is_active) : existing.is_active;
-    const photoPath = req.file ? req.file.path : existing.photo_path;
+
+    const photoFile = req.files && req.files.photo ? req.files.photo[0] : null;
+    const galleryFiles = req.files && req.files.photos ? req.files.photos : [];
+    const photoPath = photoFile ? photoFile.path : existing.photo_path;
+    const existingPhotos = Array.isArray(existing.photos) ? existing.photos : [];
+    const photos = galleryFiles.length
+      ? [...existingPhotos, ...galleryFiles.map((f) => f.path)]
+      : existingPhotos;
 
     const updated = await pool.query(
       `UPDATE candidates
        SET name = $1, category = $2, candidacy_number = $3, bio = $4, project_desc = $5,
-           photo_path = $6, is_active = $7
-       WHERE id = $8 RETURNING *`,
-      [name, category, candidacyNumber, bio, projectDesc, photoPath, isActive, req.params.id]
+           photo_path = $6, photos = $7, study_year = $8, field_of_study = $9,
+           video_url = $10, is_active = $11
+       WHERE id = $12 RETURNING *`,
+      [
+        name,
+        category,
+        candidacyNumber,
+        bio,
+        projectDesc,
+        photoPath,
+        JSON.stringify(photos),
+        studyYear,
+        fieldOfStudy,
+        videoUrl,
+        isActive,
+        req.params.id,
+      ]
     );
     res.json(updated.rows[0]);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Impossible de modifier le candidat." });
+  }
+});
+
+// DELETE /api/admin/candidates/:id/photos -> retirer une photo precise de la galerie
+// Corps attendu : { "url": "https://.../photo.jpg" }
+router.delete("/candidates/:id/photos", async (req, res) => {
+  try {
+    const { url } = req.body;
+    const existingRes = await pool.query("SELECT * FROM candidates WHERE id = $1", [
+      req.params.id,
+    ]);
+    const existing = existingRes.rows[0];
+    if (!existing) return res.status(404).json({ error: "Candidat introuvable." });
+
+    const remaining = (Array.isArray(existing.photos) ? existing.photos : []).filter(
+      (p) => p !== url
+    );
+    const updated = await pool.query(
+      "UPDATE candidates SET photos = $1 WHERE id = $2 RETURNING *",
+      [JSON.stringify(remaining), req.params.id]
+    );
+    res.json(updated.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de retirer cette photo." });
   }
 });
 
@@ -416,6 +525,62 @@ router.delete("/partners/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Impossible de supprimer le partenaire." });
+  }
+});
+
+// --- Accueil (contenu editable) ---
+
+// GET /api/admin/homepage -> contenu actuel (complete avec les valeurs par
+// defaut si des champs manquent, ex: apres une mise a jour du site)
+router.get("/homepage", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_HOMEPAGE, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// PUT /api/admin/homepage -> mettre a jour le contenu de l'accueil
+// Envoye en multipart/form-data : champs texte simples + objectives/buttons
+// en JSON (chaine), + fichier "poster" optionnel (nouvelle affiche/visuel).
+router.put("/homepage", uploadPoster, async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
+    const current = { ...DEFAULT_HOMEPAGE, ...(result.rows[0] ? JSON.parse(result.rows[0].value) : {}) };
+
+    const b = req.body;
+    let objectives = current.objectives;
+    let buttons = current.buttons;
+    try {
+      if (b.objectives !== undefined) objectives = JSON.parse(b.objectives);
+      if (b.buttons !== undefined) buttons = JSON.parse(b.buttons);
+    } catch (e) {
+      return res.status(400).json({ error: "Format invalide pour les objectifs ou les boutons." });
+    }
+
+    const updated = {
+      hero_edition: b.hero_edition ?? current.hero_edition,
+      hero_title: b.hero_title ?? current.hero_title,
+      hero_slogan: b.hero_slogan ?? current.hero_slogan,
+      hero_description: b.hero_description ?? current.hero_description,
+      organizer_text: b.organizer_text ?? current.organizer_text,
+      poster_path: req.file ? req.file.path : current.poster_path,
+      objectives,
+      buttons,
+    };
+
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('homepage_content', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(updated)]
+    );
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de mettre à jour l'accueil." });
   }
 });
 

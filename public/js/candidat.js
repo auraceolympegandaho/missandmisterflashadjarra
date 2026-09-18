@@ -14,6 +14,24 @@ function getShareLink(id) {
   return `${window.location.origin}/candidat.html?id=${id}`;
 }
 
+// Construit un lecteur video integre pour les liens YouTube ; sinon un simple
+// lien externe (couvre Facebook, TikTok, ou tout autre lien video fourni).
+function buildVideoEmbed(url) {
+  const ytMatch = url.match(
+    /(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/
+  );
+  if (ytMatch) {
+    return `
+      <div class="profile-video">
+        <div class="profile-video-frame">
+          <iframe src="https://www.youtube.com/embed/${ytMatch[1]}" title="Vidéo de présentation"
+            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>`;
+  }
+  return `<p class="profile-video-link"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">▶ Voir la vidéo de présentation</a></p>`;
+}
+
 function showNotFound() {
   content.innerHTML = `
     <div class="profile-card glass" style="text-align:center; padding:40px 24px;">
@@ -39,6 +57,16 @@ async function loadProfile() {
     const link = getShareLink(c.id);
     const waMessage = `Votez pour ${c.name} au concours Miss & Mister Flash Adjarra 2027 : ${link}`;
 
+    const studyLine = [c.study_year, c.field_of_study].filter(Boolean).map(escapeHtml).join(" · ");
+
+    const gallery = Array.isArray(c.photos) && c.photos.length
+      ? `<div class="profile-gallery">${c.photos
+          .map((p) => `<img src="${escapeHtml(p)}" alt="${escapeHtml(c.name)}" loading="lazy" />`)
+          .join("")}</div>`
+      : "";
+
+    const video = c.video_url ? buildVideoEmbed(c.video_url) : "";
+
     content.innerHTML = `
       <div class="profile-card glass">
         <div class="profile-photo-wrap">
@@ -48,9 +76,12 @@ async function loadProfile() {
         <div class="profile-body">
           <span class="category">${escapeHtml(c.category)}</span>
           <h1>${escapeHtml(c.name)}</h1>
+          ${studyLine ? `<p class="profile-study">${studyLine}</p>` : ""}
           <p class="votes"><b>${c.votes_count}</b> votes reçus</p>
           ${c.bio ? `<p class="profile-bio">${escapeHtml(c.bio)}</p>` : ""}
           ${c.project_desc ? `<div class="profile-project"><h2>Son projet</h2><p>${escapeHtml(c.project_desc)}</p></div>` : ""}
+          ${video}
+          ${gallery}
           <a class="btn gold block" href="/candidats.html?vote=${c.id}">Voter pour ${escapeHtml(c.name.split(" ")[0])}</a>
 
           <div class="share-row">

@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { pool, initSchema } = require("./db");
+const { pool, initSchema, DEFAULT_HOMEPAGE } = require("./db");
 
 const candidatesRoutes = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
@@ -75,6 +75,18 @@ app.get("/api/partners", async (req, res) => {
       "SELECT id, name, logo_path, website_url FROM partners WHERE is_active = 1 ORDER BY display_order ASC, created_at ASC"
     );
     res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// Contenu editable de l'accueil (public, lecture seule ; gere depuis l'admin)
+app.get("/api/homepage", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_HOMEPAGE, ...stored });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur." });

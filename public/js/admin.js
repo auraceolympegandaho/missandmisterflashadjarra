@@ -27,6 +27,7 @@ function showDashboard() {
   loginScreen.style.display = "none";
   dashboard.style.display = "block";
   loadResults();
+  loadHomepage();
   loadCandidates();
   loadTransactions();
   loadAnnouncements();
@@ -96,6 +97,99 @@ async function loadResults() {
   }
 }
 
+// --- Accueil (contenu editable) ---
+function makeRemovableRow(container, html) {
+  const row = document.createElement("div");
+  row.className = "repeat-row";
+  row.innerHTML = html + `<button type="button" class="remove-row-btn">Retirer</button>`;
+  row.querySelector(".remove-row-btn").addEventListener("click", () => row.remove());
+  container.appendChild(row);
+  return row;
+}
+
+function addObjectiveRow(title = "", text = "") {
+  const container = document.getElementById("h-objectives-list");
+  makeRemovableRow(
+    container,
+    `<input type="text" class="h-obj-title" placeholder="Titre" value="${escapeHtml(title)}" />
+     <textarea class="h-obj-text" placeholder="Texte">${escapeHtml(text)}</textarea>`
+  );
+}
+
+function addButtonRow(label = "", url = "") {
+  const container = document.getElementById("h-buttons-list");
+  makeRemovableRow(
+    container,
+    `<input type="text" class="h-btn-label" placeholder="Libellé du bouton" value="${escapeHtml(label)}" />
+     <input type="text" class="h-btn-url" placeholder="Destination (/page.html ou #ancre)" value="${escapeHtml(url)}" />`
+  );
+}
+
+document.getElementById("h-add-objective").addEventListener("click", () => addObjectiveRow());
+document.getElementById("h-add-button").addEventListener("click", () => addButtonRow());
+
+async function loadHomepage() {
+  try {
+    const data = await apiFetch("/homepage");
+    document.getElementById("h-edition").value = data.hero_edition || "";
+    document.getElementById("h-title").value = data.hero_title || "";
+    document.getElementById("h-slogan").value = data.hero_slogan || "";
+    document.getElementById("h-description").value = data.hero_description || "";
+    document.getElementById("h-organizer").value = data.organizer_text || "";
+
+    const posterPreview = document.getElementById("h-poster-preview");
+    posterPreview.src = data.poster_path || "/img/logo.jpg";
+    document.getElementById("h-poster").value = "";
+
+    const objectivesList = document.getElementById("h-objectives-list");
+    objectivesList.innerHTML = "";
+    (data.objectives || []).forEach((o) => addObjectiveRow(o.title, o.text));
+
+    const buttonsList = document.getElementById("h-buttons-list");
+    buttonsList.innerHTML = "";
+    (data.buttons || []).forEach((b) => addButtonRow(b.label, b.url));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-homepage-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("homepage-msg");
+  msgEl.style.display = "none";
+
+  const objectives = Array.from(document.querySelectorAll("#h-objectives-list .repeat-row")).map((row) => ({
+    title: row.querySelector(".h-obj-title").value.trim(),
+    text: row.querySelector(".h-obj-text").value.trim(),
+  }));
+  const buttons = Array.from(document.querySelectorAll("#h-buttons-list .repeat-row")).map((row) => ({
+    label: row.querySelector(".h-btn-label").value.trim(),
+    url: row.querySelector(".h-btn-url").value.trim(),
+  }));
+
+  const form = new FormData();
+  form.append("hero_edition", document.getElementById("h-edition").value.trim());
+  form.append("hero_title", document.getElementById("h-title").value.trim());
+  form.append("hero_slogan", document.getElementById("h-slogan").value.trim());
+  form.append("hero_description", document.getElementById("h-description").value.trim());
+  form.append("organizer_text", document.getElementById("h-organizer").value.trim());
+  form.append("objectives", JSON.stringify(objectives));
+  form.append("buttons", JSON.stringify(buttons));
+  const posterFile = document.getElementById("h-poster").files[0];
+  if (posterFile) form.append("poster", posterFile);
+
+  try {
+    await apiFetch("/homepage", { method: "PUT", body: form });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "Accueil mis à jour.";
+    msgEl.style.display = "block";
+    loadHomepage();
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
 // --- Candidats ---
 async function loadCandidates() {
   try {
@@ -113,6 +207,7 @@ async function loadCandidates() {
         <td>${c.votes_count}</td>
         <td>${c.is_active ? "Actif" : "Masqué"}</td>
         <td><button class="copy-link-btn" data-link="${escapeHtml(link)}">Copier le lien</button></td>
+        <td><a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Voir</a></td>
         <td class="row-actions">
           <button data-id="${c.id}" class="edit-btn">Modifier</button>
           <button data-id="${c.id}" class="toggle-btn">${c.is_active ? "Masquer" : "Activer"}</button>
@@ -170,6 +265,31 @@ async function deleteCandidate(id) {
 }
 
 const candidateOverlay = document.getElementById("candidate-overlay");
+function renderExistingPhotos(candidateId, photos) {
+  const wrap = document.getElementById("c-existing-photos");
+  wrap.innerHTML = "";
+  (photos || []).forEach((url) => {
+    const item = document.createElement("div");
+    item.className = "gallery-thumb-wrap";
+    item.innerHTML = `<img src="${escapeHtml(url)}" /><button type="button" class="remove-photo-btn" title="Retirer">×</button>`;
+    item.querySelector(".remove-photo-btn").addEventListener("click", async () => {
+      if (!confirm("Retirer cette photo de la galerie ?")) return;
+      try {
+        await apiFetch(`/candidates/${candidateId}/photos`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url }),
+        });
+        item.remove();
+        loadCandidates();
+      } catch (e) {
+        alert(e.message);
+      }
+    });
+    wrap.appendChild(item);
+  });
+}
+
 function openCandidateModal(candidate) {
   editingCandidateId = candidate ? candidate.id : null;
   document.getElementById("candidate-modal-title").textContent = candidate
@@ -178,9 +298,14 @@ function openCandidateModal(candidate) {
   document.getElementById("c-name").value = candidate ? candidate.name : "";
   document.getElementById("c-category").value = candidate ? candidate.category : "Miss";
   document.getElementById("c-number").value = candidate ? candidate.candidacy_number || "" : "";
+  document.getElementById("c-study-year").value = candidate ? candidate.study_year || "" : "";
+  document.getElementById("c-field").value = candidate ? candidate.field_of_study || "" : "";
   document.getElementById("c-bio").value = candidate ? candidate.bio : "";
   document.getElementById("c-project").value = candidate ? candidate.project_desc || "" : "";
+  document.getElementById("c-video").value = candidate ? candidate.video_url || "" : "";
   document.getElementById("c-photo").value = "";
+  document.getElementById("c-photos").value = "";
+  renderExistingPhotos(candidate ? candidate.id : null, candidate ? candidate.photos : []);
   document.getElementById("candidate-msg").style.display = "none";
   candidateOverlay.classList.add("open");
 }
@@ -196,9 +321,13 @@ document.getElementById("save-candidate-btn").addEventListener("click", async ()
   const name = document.getElementById("c-name").value.trim();
   const category = document.getElementById("c-category").value;
   const candidacyNumber = document.getElementById("c-number").value.trim();
+  const studyYear = document.getElementById("c-study-year").value.trim();
+  const fieldOfStudy = document.getElementById("c-field").value.trim();
   const bio = document.getElementById("c-bio").value.trim();
   const projectDesc = document.getElementById("c-project").value.trim();
+  const videoUrl = document.getElementById("c-video").value.trim();
   const photoFile = document.getElementById("c-photo").files[0];
+  const galleryFiles = document.getElementById("c-photos").files;
 
   if (!name) {
     msgEl.textContent = "Le nom est requis.";
@@ -210,9 +339,13 @@ document.getElementById("save-candidate-btn").addEventListener("click", async ()
   form.append("name", name);
   form.append("category", category);
   form.append("candidacy_number", candidacyNumber);
+  form.append("study_year", studyYear);
+  form.append("field_of_study", fieldOfStudy);
   form.append("bio", bio);
   form.append("project_desc", projectDesc);
+  form.append("video_url", videoUrl);
   if (photoFile) form.append("photo", photoFile);
+  Array.from(galleryFiles).forEach((f) => form.append("photos", f));
 
   try {
     if (editingCandidateId) {
