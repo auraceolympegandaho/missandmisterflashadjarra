@@ -257,3 +257,43 @@
   box-shadow: 0 10px 20px rgba(3, 105, 161, 0.16);
   background: var(--sky-soft);
 }
+
+/* --- Partenaires --- */
+.partners-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 22px;
+  padding: 10px 0;
+}
+.partner-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 76px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px;
+  text-decoration: none;
+  filter: grayscale(15%);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+.partner-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(3, 105, 161, 0.14);
+  filter: grayscale(0%);
+}
+.partner-card img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.partner-fallback {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue-dark);
+  text-align: center;
+}

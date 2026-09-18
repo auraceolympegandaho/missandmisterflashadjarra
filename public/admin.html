@@ -40,6 +40,7 @@
     <button class="admin-tab-btn" data-tab="candidates">Candidats</button>
     <button class="admin-tab-btn" data-tab="transactions">Transactions</button>
     <button class="admin-tab-btn" data-tab="announcements">Actualités</button>
+    <button class="admin-tab-btn" data-tab="partners">Partenaires</button>
     <button class="admin-tab-btn" data-tab="settings">Réglages</button>
   </nav>
 
@@ -79,6 +80,14 @@
     <button class="btn gold" id="new-announcement-btn">+ Ajouter une actualité</button>
     <table class="admin-table" id="announcements-table">
       <thead><tr><th>Date</th><th>Étiquette</th><th>Contenu</th><th>Statut</th><th>Actions</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section id="tab-partners" class="tab-panel" style="display:none;">
+    <button class="btn gold" id="new-partner-btn">+ Ajouter un partenaire</button>
+    <table class="admin-table" id="partners-table">
+      <thead><tr><th>Logo</th><th>Nom</th><th>Site web</th><th>Ordre</th><th>Statut</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -145,6 +154,25 @@
     </div>
     <p class="error-msg" id="announcement-msg"></p>
     <span class="close-link" id="close-announcement-modal">Annuler</span>
+  </div>
+</div>
+
+<div class="overlay" id="partner-overlay">
+  <div class="modal">
+    <h2 id="partner-modal-title">Ajouter un partenaire</h2>
+    <label>Nom du partenaire</label>
+    <input type="text" id="p-name" />
+    <label>Site web (optionnel)</label>
+    <input type="text" id="p-website" placeholder="https://..." />
+    <label>Ordre d'affichage (optionnel, 0 = premier)</label>
+    <input type="number" id="p-order" value="0" min="0" />
+    <label>Logo</label>
+    <input type="file" id="p-logo" accept="image/*" />
+    <div style="margin-top:16px; display:flex; gap:10px;">
+      <button class="btn gold block" id="save-partner-btn">Enregistrer</button>
+    </div>
+    <p class="error-msg" id="partner-msg"></p>
+    <span class="close-link" id="close-partner-modal">Annuler</span>
   </div>
 </div>
 

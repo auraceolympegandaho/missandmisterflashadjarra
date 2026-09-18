@@ -44,6 +44,24 @@ const upload = multer({
   },
 });
 
+// Dossier Cloudinary separe pour les logos partenaires (organisation propre)
+const partnerStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "miss-mister-flash-adjarra/partners",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 600, height: 600, crop: "limit" }],
+  },
+});
+const uploadPartnerLogo = multer({
+  storage: partnerStorage,
+  limits: { fileSize: 3 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) return cb(new Error("Fichier non-image refuse."));
+    cb(null, true);
+  },
+});
+
 
 // POST /api/admin/login
 router.post("/login", async (req, res) => {
@@ -325,6 +343,79 @@ router.delete("/announcements/:id", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Impossible de supprimer l'actualité." });
+  }
+});
+
+// --- Partenaires ---
+
+// GET /api/admin/partners -> liste complete (y compris masques), triee par ordre d'affichage
+router.get("/partners", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT * FROM partners ORDER BY display_order ASC, created_at ASC"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// POST /api/admin/partners -> creer un partenaire (logo optionnel a la creation)
+router.post("/partners", uploadPartnerLogo.single("logo"), async (req, res) => {
+  try {
+    const { name, website_url, display_order } = req.body;
+    if (!name || !name.trim()) {
+      return res.status(400).json({ error: "Le nom du partenaire est requis." });
+    }
+    const logoPath = req.file ? req.file.path : "";
+    const result = await pool.query(
+      `INSERT INTO partners (name, logo_path, website_url, display_order)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [name.trim(), logoPath, website_url || "", Number(display_order) || 0]
+    );
+    res.status(201).json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de créer le partenaire." });
+  }
+});
+
+// PUT /api/admin/partners/:id -> modifier un partenaire (logo optionnel = on garde l'ancien)
+router.put("/partners/:id", uploadPartnerLogo.single("logo"), async (req, res) => {
+  try {
+    const existingRes = await pool.query("SELECT * FROM partners WHERE id = $1", [req.params.id]);
+    const existing = existingRes.rows[0];
+    if (!existing) return res.status(404).json({ error: "Partenaire introuvable." });
+
+    const name = req.body.name !== undefined && req.body.name.trim() ? req.body.name.trim() : existing.name;
+    const websiteUrl = req.body.website_url ?? existing.website_url;
+    const displayOrder =
+      req.body.display_order !== undefined ? Number(req.body.display_order) : existing.display_order;
+    const isActive =
+      req.body.is_active !== undefined ? Number(req.body.is_active) : existing.is_active;
+    const logoPath = req.file ? req.file.path : existing.logo_path;
+
+    const updated = await pool.query(
+      `UPDATE partners SET name = $1, logo_path = $2, website_url = $3, display_order = $4, is_active = $5
+       WHERE id = $6 RETURNING *`,
+      [name, logoPath, websiteUrl, displayOrder, isActive, req.params.id]
+    );
+    res.json(updated.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de modifier le partenaire." });
+  }
+});
+
+// DELETE /api/admin/partners/:id
+router.delete("/partners/:id", async (req, res) => {
+  try {
+    await pool.query("DELETE FROM partners WHERE id = $1", [req.params.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Impossible de supprimer le partenaire." });
   }
 });
 

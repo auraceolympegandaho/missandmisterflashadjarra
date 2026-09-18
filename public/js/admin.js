@@ -30,6 +30,7 @@ function showDashboard() {
   loadCandidates();
   loadTransactions();
   loadAnnouncements();
+  loadPartners();
   loadPrice();
   loadCountdown();
 }
@@ -332,7 +333,106 @@ document.getElementById("save-countdown-btn").addEventListener("click", async ()
   }
 });
 
-// --- Actualités ---
+// --- Partenaires ---
+let editingPartnerId = null;
+const partnerOverlay = document.getElementById("partner-overlay");
+
+async function loadPartners() {
+  try {
+    const rows = await apiFetch("/partners");
+    const tbody = document.querySelector("#partners-table tbody");
+    tbody.innerHTML = "";
+    rows.forEach((p) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><img class="thumb" src="${p.logo_path || ""}" onerror="this.src=''"/></td>
+        <td>${escapeHtml(p.name)}</td>
+        <td>${p.website_url ? `<a href="${escapeHtml(p.website_url)}" target="_blank" rel="noopener noreferrer">Lien</a>` : "—"}</td>
+        <td>${p.display_order}</td>
+        <td>${p.is_active ? "Visible" : "Masqué"}</td>
+        <td class="row-actions">
+          <button data-id="${p.id}" class="edit-partner-btn">Modifier</button>
+          <button data-id="${p.id}" class="toggle-partner-btn">${p.is_active ? "Masquer" : "Afficher"}</button>
+          <button data-id="${p.id}" class="danger delete-partner-btn">Supprimer</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+
+      tr.querySelector(".edit-partner-btn").addEventListener("click", () => openPartnerModal(p));
+      tr.querySelector(".toggle-partner-btn").addEventListener("click", () => togglePartnerActive(p));
+      tr.querySelector(".delete-partner-btn").addEventListener("click", () => deletePartner(p.id));
+    });
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+async function togglePartnerActive(p) {
+  const form = new FormData();
+  form.append("is_active", p.is_active ? "0" : "1");
+  await apiFetch(`/partners/${p.id}`, { method: "PUT", body: form });
+  loadPartners();
+}
+
+async function deletePartner(id) {
+  if (!confirm("Supprimer définitivement ce partenaire ?")) return;
+  await apiFetch(`/partners/${id}`, { method: "DELETE" });
+  loadPartners();
+}
+
+function openPartnerModal(partner) {
+  editingPartnerId = partner ? partner.id : null;
+  document.getElementById("partner-modal-title").textContent = partner
+    ? "Modifier le partenaire"
+    : "Ajouter un partenaire";
+  document.getElementById("p-name").value = partner ? partner.name : "";
+  document.getElementById("p-website").value = partner ? partner.website_url || "" : "";
+  document.getElementById("p-order").value = partner ? partner.display_order : 0;
+  document.getElementById("p-logo").value = "";
+  document.getElementById("partner-msg").style.display = "none";
+  partnerOverlay.classList.add("open");
+}
+document.getElementById("new-partner-btn").addEventListener("click", () => openPartnerModal(null));
+document.getElementById("close-partner-modal").addEventListener("click", () =>
+  partnerOverlay.classList.remove("open")
+);
+
+document.getElementById("save-partner-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("partner-msg");
+  msgEl.style.display = "none";
+
+  const name = document.getElementById("p-name").value.trim();
+  const websiteUrl = document.getElementById("p-website").value.trim();
+  const displayOrder = document.getElementById("p-order").value;
+  const logoFile = document.getElementById("p-logo").files[0];
+
+  if (!name) {
+    msgEl.textContent = "Le nom du partenaire est requis.";
+    msgEl.style.display = "block";
+    return;
+  }
+
+  const form = new FormData();
+  form.append("name", name);
+  form.append("website_url", websiteUrl);
+  form.append("display_order", displayOrder);
+  if (logoFile) form.append("logo", logoFile);
+
+  try {
+    if (editingPartnerId) {
+      await apiFetch(`/partners/${editingPartnerId}`, { method: "PUT", body: form });
+    } else {
+      await apiFetch("/partners", { method: "POST", body: form });
+    }
+    partnerOverlay.classList.remove("open");
+    loadPartners();
+  } catch (e) {
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+
 let editingAnnouncementId = null;
 const announcementOverlay = document.getElementById("announcement-overlay");
 

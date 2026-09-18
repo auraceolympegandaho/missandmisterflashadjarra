@@ -68,6 +68,19 @@ app.get("/api/announcements", async (req, res) => {
   }
 });
 
+// Partenaires actifs (public, lecture seule ; geres depuis l'admin)
+app.get("/api/partners", async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT id, name, logo_path, website_url FROM partners WHERE is_active = 1 ORDER BY display_order ASC, created_at ASC"
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 app.get("/health", (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 4000;

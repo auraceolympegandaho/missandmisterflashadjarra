@@ -77,6 +77,30 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
+async function loadPartners() {
+  const section = document.getElementById("partenaires");
+  const grid = document.getElementById("partners-grid");
+  try {
+    const res = await fetch("/api/partners");
+    const partners = await res.json();
+    if (!partners.length) return; // section reste masquee
+
+    grid.innerHTML = partners
+      .map((p) => {
+        const logo = p.logo_path
+          ? `<img src="${p.logo_path}" alt="${escapeHtml(p.name)}" loading="lazy" />`
+          : `<span class="partner-fallback">${escapeHtml(p.name)}</span>`;
+        return p.website_url
+          ? `<a class="partner-card" href="${escapeHtml(p.website_url)}" target="_blank" rel="noopener noreferrer">${logo}</a>`
+          : `<div class="partner-card">${logo}</div>`;
+      })
+      .join("");
+    section.style.display = "block";
+  } catch (e) {
+    console.error("Impossible de charger les partenaires", e);
+  }
+}
+
 async function loadAnnouncements() {
   const grid = document.getElementById("news-grid");
   try {
@@ -108,3 +132,4 @@ async function loadAnnouncements() {
 loadPrice();
 loadCountdown();
 loadAnnouncements();
+loadPartners();
