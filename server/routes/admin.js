@@ -2,21 +2,37 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const cloudinary = require("cloudinary").v2;
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { pool } = require("../db");
 const { requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
 
-// --- Upload des photos de candidats ---
-const uploadDir = path.join(__dirname, "..", "..", "public", "img", "candidates");
-fs.mkdirSync(uploadDir, { recursive: true });
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname) || ".jpg";
-    cb(null, `${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+// --- Stockage des photos de candidats sur Cloudinary ---
+// IMPORTANT : le disque du service web Render (plan gratuit) est ephemere
+// (efface a chaque redeploiement). Les photos sont donc hebergees sur
+// Cloudinary (offre gratuite), qui renvoie une URL stable et permanente.
+// Necessite les variables d'environnement CLOUDINARY_CLOUD_NAME,
+// CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET (voir .env.example).
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+  console.warn(
+    "[admin] ATTENTION: variables Cloudinary manquantes. L'upload de photos echouera tant qu'elles ne sont pas definies."
+  );
+}
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "miss-mister-flash-adjarra/candidates",
+    allowed_formats: ["jpg", "jpeg", "png", "webp"],
+    transformation: [{ width: 1200, height: 1200, crop: "limit" }],
   },
 });
 const upload = multer({
@@ -27,6 +43,7 @@ const upload = multer({
     cb(null, true);
   },
 });
+
 
 // POST /api/admin/login
 router.post("/login", async (req, res) => {
@@ -68,7 +85,7 @@ router.post("/candidates", upload.single("photo"), async (req, res) => {
     if (!name || !["Miss", "Mister"].includes(category)) {
       return res.status(400).json({ error: "Nom et categorie (Miss/Mister) requis." });
     }
-    const photoPath = req.file ? `/img/candidates/${req.file.filename}` : "";
+    const photoPath = req.file ? req.file.path : "";
     const result = await pool.query(
       `INSERT INTO candidates (name, category, candidacy_number, bio, project_desc, photo_path)
        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
@@ -97,7 +114,7 @@ router.put("/candidates/:id", upload.single("photo"), async (req, res) => {
     const projectDesc = req.body.project_desc ?? existing.project_desc;
     const isActive =
       req.body.is_active !== undefined ? Number(req.body.is_active) : existing.is_active;
-    const photoPath = req.file ? `/img/candidates/${req.file.filename}` : existing.photo_path;
+    const photoPath = req.file ? req.file.path : existing.photo_path;
 
     const updated = await pool.query(
       `UPDATE candidates
