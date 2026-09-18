@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const { pool, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT } = require("../db");
+const { pool, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT, DEFAULT_ABOUT } = require("../db");
 const { requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
@@ -563,6 +563,54 @@ router.delete("/partners/:id", async (req, res) => {
 
 // GET /api/admin/homepage -> contenu actuel (complete avec les valeurs par
 // defaut si des champs manquent, ex: apres une mise a jour du site)
+// GET/PUT /api/admin/about -> contenu propre a la page A propos
+// (steps du deroulement, texte du projet d'impact, texte de transparence).
+router.get("/about", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'about_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_ABOUT, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/about", async (req, res) => {
+  try {
+    const { steps, project_text, transparency_text } = req.body;
+    if (!Array.isArray(steps) || !steps.length) {
+      return res.status(400).json({ error: "Ajoutez au moins une étape au déroulement." });
+    }
+    for (const s of steps) {
+      if (!s || !String(s.title || "").trim() || !String(s.text || "").trim()) {
+        return res.status(400).json({ error: "Chaque étape doit avoir un titre et un texte." });
+      }
+    }
+    if (!String(project_text || "").trim()) {
+      return res.status(400).json({ error: "Le texte du projet d'impact ne peut pas être vide." });
+    }
+    if (!String(transparency_text || "").trim()) {
+      return res.status(400).json({ error: "Le texte de transparence ne peut pas être vide." });
+    }
+
+    const value = {
+      steps: steps.map((s) => ({ title: s.title.trim(), text: s.text.trim() })),
+      project_text: project_text.trim(),
+      transparency_text: transparency_text.trim(),
+    };
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('about_content', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(value)]
+    );
+    res.json(value);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 // GET/PUT /api/admin/faq -> contenu de la page FAQ publique
 router.get("/faq", async (req, res) => {
   try {

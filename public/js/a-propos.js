@@ -30,4 +30,28 @@ async function loadAbout() {
   }
 }
 
+// Contenu propre a la page A propos (deroulement, projet, transparence)
+async function loadAboutContent() {
+  try {
+    const res = await fetch("/api/about");
+    if (!res.ok) return;
+    const data = await res.json();
+
+    if (Array.isArray(data.steps) && data.steps.length) {
+      document.getElementById("about-steps").innerHTML = data.steps
+        .map((s) => `<li><b>${escapeHtml(s.title)}.</b> ${escapeHtml(s.text)}</li>`)
+        .join("");
+    }
+    if (data.project_text) {
+      document.getElementById("about-project-text").textContent = data.project_text;
+    }
+    if (data.transparency_text) {
+      document.getElementById("about-transparency-text").textContent = data.transparency_text;
+    }
+  } catch (e) {
+    console.error("Contenu 'A propos' (deroulement/projet/transparence) indisponible", e);
+  }
+}
+
 loadAbout();
+loadAboutContent();

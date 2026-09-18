@@ -42,6 +42,7 @@
     <button class="admin-tab-btn" data-tab="transactions">Transactions</button>
     <button class="admin-tab-btn" data-tab="announcements">Actualités</button>
     <button class="admin-tab-btn" data-tab="partners">Partenaires</button>
+    <button class="admin-tab-btn" data-tab="about">À propos</button>
     <button class="admin-tab-btn" data-tab="faq-contact">FAQ &amp; Contact</button>
     <button class="admin-tab-btn" data-tab="settings">Réglages</button>
   </nav>
@@ -128,6 +129,31 @@
       <thead><tr><th>Logo</th><th>Nom</th><th>Site web</th><th>Ordre</th><th>Statut</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
+  </section>
+
+  <section id="tab-about" class="tab-panel" style="display:none;">
+    <div class="note" style="margin-bottom:16px;">
+      La description du concours, le texte de l'organisateur et les objectifs affichés en
+      haut de la page « À propos » sont les mêmes que sur l'accueil : modifiez-les depuis
+      l'onglet <b>Accueil</b>. Cet onglet gère uniquement ce qui est propre à la page À propos.
+    </div>
+
+    <div class="form-card">
+      <label>Le déroulement du concours</label>
+      <div id="about-steps-list"></div>
+      <button type="button" class="btn" id="add-about-step-btn" style="margin-top:6px;">+ Ajouter une étape</button>
+    </div>
+
+    <div class="form-card" style="margin-top:20px;">
+      <label>Texte « Le projet d'impact »</label>
+      <textarea id="about-project-input" rows="4" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-family:inherit; font-size:14px;"></textarea>
+
+      <label style="margin-top:16px;">Texte « Transparence des votes »</label>
+      <textarea id="about-transparency-input" rows="4" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-family:inherit; font-size:14px;"></textarea>
+
+      <button class="btn gold" id="save-about-btn" style="margin-top:16px;">Enregistrer</button>
+      <p class="error-msg" id="about-msg"></p>
+    </div>
   </section>
 
   <section id="tab-faq-contact" class="tab-panel" style="display:none;">

@@ -37,6 +37,7 @@ function showDashboard() {
   loadPublicDisplay();
   loadContactSettings();
   loadFaqSettings();
+  loadAboutSettings();
 }
 
 function logout() {
@@ -461,6 +462,70 @@ document.getElementById("save-countdown-btn").addEventListener("click", async ()
     });
     msgEl.style.color = "var(--success)";
     msgEl.textContent = "Compte à rebours mis à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// --- A propos (deroulement, projet, transparence) ---
+function addAboutStepRow(title = "", text = "") {
+  const container = document.getElementById("about-steps-list");
+  makeRemovableRow(
+    container,
+    `<input type="text" class="about-step-title" placeholder="Titre de l'étape (ex : Candidatures)" value="${escapeHtml(title)}" />
+     <textarea class="about-step-text" placeholder="Texte de l'étape">${escapeHtml(text)}</textarea>`
+  );
+}
+document.getElementById("add-about-step-btn").addEventListener("click", () => addAboutStepRow());
+
+async function loadAboutSettings() {
+  try {
+    const data = await apiFetch("/about");
+    const list = document.getElementById("about-steps-list");
+    list.innerHTML = "";
+    (data.steps && data.steps.length ? data.steps : [{ title: "", text: "" }]).forEach((s) =>
+      addAboutStepRow(s.title, s.text)
+    );
+    document.getElementById("about-project-input").value = data.project_text || "";
+    document.getElementById("about-transparency-input").value = data.transparency_text || "";
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-about-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("about-msg");
+  msgEl.style.display = "none";
+
+  const steps = Array.from(document.querySelectorAll("#about-steps-list .repeat-row"))
+    .map((row) => ({
+      title: row.querySelector(".about-step-title").value.trim(),
+      text: row.querySelector(".about-step-text").value.trim(),
+    }))
+    .filter((s) => s.title && s.text);
+
+  if (!steps.length) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "Ajoutez au moins une étape complète (titre et texte).";
+    msgEl.style.display = "block";
+    return;
+  }
+
+  try {
+    await apiFetch("/about", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        steps,
+        project_text: document.getElementById("about-project-input").value.trim(),
+        transparency_text: document.getElementById("about-transparency-input").value.trim(),
+      }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "Page À propos mise à jour.";
     msgEl.style.display = "block";
   } catch (e) {
     msgEl.style.color = "var(--danger)";

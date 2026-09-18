@@ -120,6 +120,14 @@ async function initSchema() {
     ]);
   }
 
+  // Contenu propre a la page A propos (etapes du deroulement, projet, transparence).
+  const aboutRow = await pool.query("SELECT value FROM settings WHERE key = 'about_content'");
+  if (aboutRow.rowCount === 0) {
+    await pool.query("INSERT INTO settings (key, value) VALUES ('about_content', $1)", [
+      JSON.stringify(DEFAULT_ABOUT),
+    ]);
+  }
+
   await ensureAdminUser();
 }
 
@@ -194,6 +202,21 @@ const DEFAULT_CONTACT = {
   ],
 };
 
+// Contenu par defaut propre a la page A propos (le reste de la page reprend
+// hero_description / organizer_text / objectives de l'accueil).
+const DEFAULT_ABOUT = {
+  steps: [
+    { title: "Candidatures", text: "Les etudiant(e)s interesse(e)s deposent leur dossier aupres de l'organisation." },
+    { title: "Selection", text: "Les candidat(e)s retenu(e)s sont publie(e)s sur la page Candidats avec leur projet d'impact." },
+    { title: "Votes en ligne", text: "Le public soutient ses favori(te)s par des votes payants, a partir de la plateforme." },
+    { title: "Soiree de gala", text: "Prestations sur scene, deliberation du jury et couronnement." },
+  ],
+  project_text:
+    "Chaque candidat(e) porte un projet au service de la communaute etudiante ou locale : education, sante, environnement, entrepreneuriat, culture. Ce projet est presente publiquement et compte dans l'appreciation du jury.",
+  transparency_text:
+    "Chaque vote est payant et valide uniquement apres confirmation du paiement par l'operateur. Le compteur d'un(e) candidat(e) n'augmente jamais avant cette confirmation. L'organisation peut choisir de rendre publics ou non les compteurs de votes et le classement pendant certaines phases du concours.",
+};
+
 async function ensureAdminUser() {
   const username = process.env.ADMIN_USERNAME || "admin";
   const password = process.env.ADMIN_PASSWORD || "changeme123";
@@ -208,4 +231,4 @@ async function ensureAdminUser() {
   }
 }
 
-module.exports = { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT };
+module.exports = { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT, DEFAULT_ABOUT };
