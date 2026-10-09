@@ -7,6 +7,7 @@
 <link rel="icon" href="/img/logo.jpg" />
 <link rel="stylesheet" href="/css/style.css" />
 <link rel="stylesheet" href="/css/admin.css" />
+<link rel="stylesheet" href="/css/admin-registrations.css" />
 </head>
 <body>
 
@@ -39,6 +40,7 @@
     <button class="admin-tab-btn active" data-tab="results">Résultats</button>
     <button class="admin-tab-btn" data-tab="home">Accueil</button>
     <button class="admin-tab-btn" data-tab="candidates">Candidats</button>
+    <button class="admin-tab-btn" data-tab="registrations">Gestion des candidatures</button>
     <button class="admin-tab-btn" data-tab="transactions">Transactions</button>
     <button class="admin-tab-btn" data-tab="announcements">Actualités</button>
     <button class="admin-tab-btn" data-tab="partners">Partenaires</button>
@@ -106,6 +108,62 @@
       <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Lien de vote</th><th>Fiche</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
+  </section>
+
+  <section id="tab-registrations" class="tab-panel" style="display:none;">
+    <h2 class="rg-h">Gestion des candidatures</h2>
+    <div class="rg-stats" id="rg-stats"></div>
+
+    <details class="form-card" id="rg-settings-card">
+      <summary class="rg-summary">Paramètres des inscriptions</summary>
+      <div id="rg-phase" class="rg-phase"></div>
+      <ul id="rg-warnings" class="rg-warnings"></ul>
+      <label class="rg-inline"><input type="checkbox" id="rg-open" /> Inscriptions ouvertes (interrupteur principal)</label>
+      <div class="rg-grid">
+        <div><label>Début (heure locale)</label><input type="datetime-local" id="rg-starts" /></div>
+        <div><label>Clôture (heure locale)</label><input type="datetime-local" id="rg-ends" /></div>
+        <div><label>Âge minimum (vide = aucune limite)</label><input type="number" id="rg-minage" min="0" max="120" /></div>
+        <div><label>Âge maximum (vide = aucune limite)</label><input type="number" id="rg-maxage" min="0" max="120" /></div>
+        <div><label>Édition</label><input type="text" id="rg-edition" maxlength="4" /></div>
+      </div>
+      <label>Message personnalisé quand les inscriptions sont fermées (facultatif)</label>
+      <textarea id="rg-closedmsg" rows="2"></textarea>
+      <div class="rg-grid">
+        <div><label>Filières autorisées (une par ligne — vide = saisie libre)</label><textarea id="rg-fields" rows="4"></textarea></div>
+        <div><label>Niveaux autorisés (une par ligne — vide = saisie libre)</label><textarea id="rg-levels" rows="4"></textarea></div>
+        <div><label>Carte d'étudiant</label><select id="rg-doc-student_card"><option value="off">Non demandée</option><option value="optional">Facultative</option><option value="required">Obligatoire</option></select></div>
+        <div><label>Pièce d'identité</label><select id="rg-doc-id_document"><option value="off">Non demandée</option><option value="optional">Facultative</option><option value="required">Obligatoire</option></select></div>
+      </div>
+      <p class="rg-note">La photo du candidat est toujours obligatoire.</p>
+      <label>Conditions particulières</label>
+      <textarea id="rg-special" rows="3"></textarea>
+      <label>Règlement applicable (texte affiché au public)</label>
+      <textarea id="rg-rules" rows="6"></textarea>
+      <label>Politique de confidentialité (texte affiché au public)</label>
+      <textarea id="rg-privacy" rows="6"></textarea>
+      <button class="btn gold" id="rg-save-settings">Enregistrer les paramètres</button>
+      <p class="error-msg" id="rg-settings-msg"></p>
+    </details>
+
+    <div class="form-card rg-filters">
+      <input type="search" id="rg-q" placeholder="Rechercher (nom, référence, téléphone)" />
+      <select id="rg-cat"><option value="">Toutes catégories</option><option value="Miss">Miss</option><option value="Mister">Mister</option></select>
+      <select id="rg-status"><option value="">Tous statuts</option></select>
+      <select id="rg-field"><option value="">Toutes filières</option></select>
+      <select id="rg-complete"><option value="">Complet ou non</option><option value="1">Dossiers complets</option><option value="0">Dossiers non complets</option></select>
+      <button class="btn" id="rg-export">Exporter CSV</button>
+      <button class="btn" id="rg-export-contacts" title="Inclut téléphone, WhatsApp et email">CSV + coordonnées</button>
+    </div>
+
+    <div class="rg-table-wrap">
+      <table class="admin-table" id="rg-table">
+        <thead><tr><th>Référence</th><th>Candidat(e)</th><th>Catégorie</th><th>Filière</th><th>Statut</th><th>Soumise le</th><th></th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="rg-pager"><button class="btn" id="rg-prev">← Précédent</button><span id="rg-page"></span><button class="btn" id="rg-next">Suivant →</button></div>
+
+    <div id="rg-detail" class="form-card rg-detail" hidden></div>
   </section>
 
   <section id="tab-transactions" class="tab-panel" style="display:none;">
@@ -302,5 +360,6 @@
 </div>
 
 <script src="/js/admin.js"></script>
+<script src="/js/admin-registrations.js"></script>
 </body>
 </html>

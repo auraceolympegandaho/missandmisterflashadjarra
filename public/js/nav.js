@@ -10,6 +10,11 @@
   var MENU = [
     { label: "Accueil", href: "/index.html", match: ["/", "/index.html"] },
     { label: "Candidats", href: "/candidats.html", match: ["/candidats.html", "/candidat.html"] },
+    {
+      label: "Inscriptions",
+      href: "/inscriptions.html",
+      match: ["/inscriptions.html", "/inscription-formulaire.html", "/inscription-conditions.html", "/inscription-suivi.html"],
+    },
     { label: "Billetterie", href: "/billetterie.html" },
     { label: "Projets d'impact", href: "/projets.html", short: "Projets" },
     { label: "Galerie", href: "/galerie.html" },

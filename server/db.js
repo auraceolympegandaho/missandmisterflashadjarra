@@ -128,6 +128,9 @@ async function initSchema() {
     ]);
   }
 
+  // Module d'inscription en ligne : nouvelles tables uniquement (voir registration/schema.js).
+  await require("./registration/schema").initRegistrationSchema(pool);
+
   await ensureAdminUser();
 }
 

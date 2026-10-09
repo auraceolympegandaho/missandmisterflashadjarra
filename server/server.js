@@ -7,8 +7,23 @@ const { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT, DEFAUL
 const { router: candidatesRoutes, getPublicDisplay } = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
 const adminRoutes = require("./routes/admin");
+const { router: registrationRoutes } = require("./routes/registration");
+const { createLimiter } = require("./registration/security");
 
 const app = express();
+
+// Derriere le proxy de Render : necessaire pour que req.ip soit la vraie IP
+// du visiteur (limitation de debit, anti-abus).
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+
+// En-tetes de securite de base
+app.use((req, res, next) => {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("X-Frame-Options", "SAMEORIGIN");
+  res.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  next();
+});
 
 app.use(cors());
 
@@ -25,7 +40,13 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 // API
 app.use("/api/candidates", candidatesRoutes);
 app.use("/api/votes", votesRoutes);
+// Limite les tentatives de connexion admin (force brute)
+app.use(
+  "/api/admin/login",
+  createLimiter({ windowMs: 15 * 60 * 1000, max: 15, message: "Trop de tentatives de connexion. Réessayez plus tard." })
+);
 app.use("/api/admin", adminRoutes);
+app.use("/api/registration", registrationRoutes);
 
 // Prix courant du vote (public, utilise par la page de vote)
 app.get("/api/settings/price", async (req, res) => {
@@ -138,6 +159,13 @@ app.get("/api/about", async (req, res) => {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur." });
   }
+});
+
+// Gestionnaire d'erreurs final : aucun detail interne n'est renvoye au client
+app.use((err, req, res, next) => {
+  console.error(err);
+  if (res.headersSent) return next(err);
+  res.status(err.status && err.status < 500 ? err.status : 500).json({ error: "Requête invalide ou erreur serveur." });
 });
 
 app.get("/health", (req, res) => res.json({ ok: true }));

@@ -117,6 +117,9 @@ router.post("/login", async (req, res) => {
 // Tout ce qui suit necessite d'etre connecte en tant qu'admin
 router.use(requireAdmin);
 
+// Module d'inscription : gestion des candidatures (protege par requireAdmin ci-dessus)
+router.use("/registrations", require("./admin-registrations"));
+
 // GET /api/admin/candidates -> liste complete (y compris inactifs)
 router.get("/candidates", async (req, res) => {
   try {

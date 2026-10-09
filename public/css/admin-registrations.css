@@ -1,0 +1,33 @@
+/* Admin — Gestion des candidatures (styles propres a l'onglet) */
+.rg-h { margin: 0 0 14px; }
+.rg-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px; }
+.rg-stat { background: #fff; border: 1px solid var(--border, #ddd); border-radius: 10px; padding: 12px; text-align: center; }
+.rg-stat b { display: block; font-size: 26px; }
+.rg-stat span { font-size: 12px; color: #666; }
+.rg-summary { cursor: pointer; font-weight: 700; font-size: 16px; }
+.rg-phase { margin: 10px 0; padding: 8px 12px; border-radius: 8px; background: #f3f3f3; font-size: 14px; }
+.rg-warnings { margin: 6px 0 10px 18px; color: #b45309; font-size: 13px; }
+.rg-inline { display: flex; gap: 8px; align-items: center; margin: 10px 0; font-weight: 700; }
+.rg-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 14px; }
+#tab-registrations textarea, #tab-registrations input[type=text], #tab-registrations input[type=number], #tab-registrations input[type=datetime-local], #tab-registrations input[type=search], #tab-registrations select {
+  width: 100%; box-sizing: border-box; padding: 9px 10px; border: 1px solid var(--border, #ccc); border-radius: 8px; font: inherit; margin-bottom: 8px;
+}
+#tab-registrations .rg-inline input { width: auto; margin: 0; }
+.rg-note { font-size: 12px; color: #666; }
+.rg-filters { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; align-items: center; margin-top: 14px; }
+.rg-filters input, .rg-filters select { margin: 0 !important; }
+.rg-table-wrap { overflow-x: auto; }
+.rg-pager { display: flex; justify-content: space-between; align-items: center; margin: 12px 0; gap: 8px; }
+.rg-badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; background: #eee; white-space: nowrap; }
+.rg-badge.incomplete { background: #fde4e1; } .rg-badge.validated, .rg-badge.shortlisted { background: #dcf5e4; }
+.rg-detail h3 { margin: 18px 0 6px; font-size: 15px; }
+.rg-kv { display: grid; grid-template-columns: 150px 1fr; gap: 4px 12px; font-size: 14px; }
+.rg-kv dt { color: #666; } .rg-kv dd { margin: 0; word-break: break-word; }
+.rg-ans { white-space: pre-wrap; background: #fafafa; border: 1px solid #eee; border-radius: 8px; padding: 8px 10px; font-size: 14px; }
+.rg-docs { display: flex; gap: 12px; flex-wrap: wrap; }
+.rg-docs figure { margin: 0; text-align: center; font-size: 12px; }
+.rg-docs img { max-width: 200px; max-height: 240px; border-radius: 8px; border: 1px solid #ddd; display: block; }
+.rg-hist { font-size: 13px; list-style: none; padding: 0; }
+.rg-hist li { padding: 6px 0; border-bottom: 1px solid #eee; }
+.rg-hist small { color: #777; }
+@media (max-width: 560px) { .rg-kv { grid-template-columns: 1fr; } }

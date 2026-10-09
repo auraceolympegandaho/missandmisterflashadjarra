@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Suivre ma candidature — Miss & Mister Flash Adjarra</title>
+<link rel="icon" href="/img/logo.jpg" />
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="/css/nav.css" />
+<link rel="stylesheet" href="/css/pages.css" />
+<link rel="stylesheet" href="/css/theme.css" />
+<link rel="stylesheet" href="/css/registration.css" />
+</head>
+<body>
+
+<script src="/js/nav.js"></script>
+<main class="reg-main" data-page="track">
+  <section class="reg-hero">
+    <p class="reg-eyebrow">Espace candidat(e)</p>
+    <h1>Suivre ma <span>candidature</span></h1>
+    <hr class="reg-rule" />
+    <p class="reg-lead">Saisis ta référence et le code de suivi qui t'ont été remis lors du dépôt de ton dossier.</p>
+  </section>
+
+  <div class="reg-card">
+    <div class="reg-field">
+      <label for="t-ref">Numéro de référence <span class="req">*</span></label>
+      <input type="text" id="t-ref" placeholder="MMFA-2027-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="20" />
+    </div>
+    <div class="reg-field">
+      <label for="t-code">Code de suivi <span class="req">*</span></label>
+      <input type="text" id="t-code" placeholder="XXXX-XXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="9" />
+      <p class="reg-hint">Ce code personnel t'a été affiché une seule fois, sur la page de confirmation. Il protège ton dossier : ne le partage pas.</p>
+    </div>
+    <div id="t-alert" class="reg-alert" role="alert"></div>
+    <button class="reg-btn" id="t-btn" type="button" style="width:100%">Consulter mon dossier</button>
+  </div>
+
+  <div id="t-result" class="reg-card" hidden></div>
+</main>
+
+<footer>
+  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
+</footer>
+<script src="/js/inscriptions.js"></script>
+</body>
+</html>
