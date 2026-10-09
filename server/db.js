@@ -189,9 +189,9 @@ const DEFAULT_FAQ = {
 
 // Coordonnees de contact par defaut.
 const DEFAULT_CONTACT = {
-  whatsapp: "22997998177",
-  email: "missmisterflashadjarra@gmail.com",
-  address: "Bureau sectoriel UNEB—FLASH Adjarra, campus d'Adjarra",
+  whatsapp: "22900000000",
+  email: "contact@missmisterflashadjarra.bj",
+  address: "Bureau sectoriel UNEB — FLASH Adjarra, campus d'Adjarra",
   subjects: [
     "Question generale",
     "Probleme de vote ou de paiement",
