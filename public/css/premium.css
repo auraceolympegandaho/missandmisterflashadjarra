@@ -1,0 +1,136 @@
+/* ============================================================
+   PREMIUM — hiérarchie des couleurs, effet verre, échelle typographique.
+   A charger APRES theme.css (et avant registration.css) sur toutes les pages
+   publiques. Pour revenir en arrière : retirer la ligne <link> de cette feuille.
+   Les polices ne changent pas : seules les tailles, couleurs et surfaces.
+   ============================================================ */
+:root {
+  --text: #f7f3ea;
+  --text-muted: #d4cbb3;
+  --glass-bg: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+  --glass-border: rgba(212,175,55,.32);
+  --glass-blur: blur(14px);
+  --glass-shadow: 0 10px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10);
+  --radius: 18px;
+}
+
+/* ---------- Fond : lueurs dorées derrière le verre (sinon l'effet est invisible) ---------- */
+body {
+  font-size: 17px; line-height: 1.65; color: var(--text); background: #050505;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60% 45% at 50% -5%, rgba(212,175,55,.20), transparent 70%),
+    radial-gradient(45% 40% at 105% 55%, rgba(156,118,21,.16), transparent 70%),
+    radial-gradient(45% 40% at -5% 85%, rgba(245,215,110,.09), transparent 70%),
+    linear-gradient(180deg, #050505 0%, #0a0907 100%);
+}
+
+/* ---------- Verre ---------- */
+.glass, .organizer-card, .objective-card, .news-card, .discover-card, .countdown-section, .countdown-unit,
+.partner-card, .panel, .faq-item, .ticket, .profile-card, .stat, .reg-card, .reg-banner, .hero-visual, .hero-pills li, .hero-reg-chip {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  -webkit-backdrop-filter: var(--glass-blur) saturate(150%);
+  backdrop-filter: var(--glass-blur) saturate(150%);
+  box-shadow: var(--glass-shadow);
+  color: var(--text);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass, .organizer-card, .objective-card, .news-card, .discover-card, .countdown-section, .countdown-unit,
+  .partner-card, .panel, .faq-item, .ticket, .profile-card, .stat, .reg-card, .reg-banner, .hero-visual, .hero-pills li, .hero-reg-chip {
+    background: rgba(16,15,12,.96);
+  }
+}
+.objective-card, .news-card, .discover-card, .countdown-section, .panel, .reg-card, .organizer-card { border-radius: var(--radius); }
+.objective-card, .discover-card, .news-card { transition: transform .2s, border-color .2s, box-shadow .2s; }
+.objective-card:hover, .discover-card:hover, .news-card:hover {
+  transform: translateY(-3px); border-color: var(--gold);
+  box-shadow: 0 14px 40px rgba(0,0,0,.5), 0 0 24px rgba(212,175,55,.18), inset 0 1px 0 rgba(255,255,255,.14);
+}
+header.site-header, .site-header.glass {
+  background: rgba(5,5,5,.72) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%); backdrop-filter: blur(16px) saturate(150%);
+  border-bottom: 1px solid rgba(212,175,55,.55);
+}
+
+/* ---------- Échelle typographique ---------- */
+.brand-name { font-size: 20px; }
+.brand-sub { font-size: 10.5px; letter-spacing: 2.4px; }
+.site-menu-link { font-size: clamp(12.5px, 1.05vw, 15px); font-weight: 600; letter-spacing: .3px; }
+.nav-drawer-link { font-size: 17px; }
+h2 { letter-spacing: .4px; }
+.home-section { padding-top: clamp(48px, 8vw, 80px); }
+.home-section h2 {
+  font-size: clamp(28px, 5vw, 40px); line-height: 1.15; color: #fff; text-align: center;
+}
+.home-section h2::after { content: ""; display: block; width: 64px; height: 2px; margin: 12px auto 0; background: var(--gold-grad); }
+.home-section .section-sub { font-size: 17px; color: var(--text-muted); margin-bottom: 26px; }
+.organizer-card { font-size: 16px; line-height: 1.6; padding: 18px 22px; }
+.objective-card { padding: 24px 20px; }
+.objective-card h3 { font-size: 20px; color: #fff; margin-bottom: 8px; }
+.objective-card p { font-size: 16px; line-height: 1.6; color: var(--text-muted); }
+.objective-card .icon { width: 36px; height: 36px; color: var(--gold-light); }
+.countdown-label { font-size: 14px; letter-spacing: 3px; color: var(--gold-light); }
+.countdown-unit { padding: 14px 18px; border-radius: 14px; min-width: 76px; }
+.countdown-unit .num { font-size: clamp(32px, 7vw, 48px); color: #fff; }
+.countdown-unit .unit { font-size: 12px; letter-spacing: 2px; color: var(--gold); }
+.countdown-empty { font-size: 17px; }
+.news-card .news-tag { font-size: 12px; color: var(--gold-light); }
+.news-card p { font-size: 16px; line-height: 1.6; }
+.discover-card { font-size: 16px; font-weight: 700; padding: 26px 16px; color: #fff; }
+.discover-card .icon { width: 34px; height: 34px; color: var(--gold-light); }
+.partner-fallback { font-size: 15px; }
+.btn { font-size: 15px; min-height: 48px; display: inline-flex; align-items: center; justify-content: center; text-align: center; }
+footer { font-size: 15px; color: var(--text-muted); }
+footer .rights-line { font-size: 14px; }
+label { font-size: 15px; }
+input, select, textarea { font-size: 16px; } /* 16px minimum : pas de zoom automatique sur iPhone */
+
+/* ---------- Hero ---------- */
+.hero.hero-pro {
+  background: none; text-align: left; border-bottom: 0;
+  padding: clamp(40px, 7vw, 92px) 18px clamp(56px, 8vw, 96px);
+}
+.hero.hero-pro::before { display: none; }
+.hero-inner { max-width: 1120px; margin: 0 auto; display: grid; gap: 40px; align-items: center; position: relative; }
+@media (min-width: 900px) { .hero-inner { grid-template-columns: 1.15fr .85fr; gap: 56px; } }
+.hero-pro .hero-content { max-width: none; margin: 0; }
+.hero-pro .hero-edition { font-size: 13px; padding: 6px 16px; margin: 0 10px 14px 0; }
+.hero-reg-chip { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: 999px; font-size: 14px; margin: 0 0 14px; color: #d4f5df; border-color: rgba(95,208,138,.5); }
+.hero-reg-chip[hidden] { display: none; }
+.hero-reg-chip::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: #5fd08a; box-shadow: 0 0 8px #5fd08a; }
+.hero-pro h1 {
+  font-size: clamp(34px, 7vw, 58px); line-height: 1.06; margin: 0 0 14px; letter-spacing: 1px;
+  background: none; color: #fff; -webkit-text-fill-color: #fff;
+}
+.hero-pro h1 .l1 { display: block; }
+.hero-pro h1 .l2 {
+  display: block; white-space: nowrap; background: linear-gradient(90deg, #d4af37 0%, #f5d76e 50%, #d4af37 100%); -webkit-background-clip: text; background-clip: text;
+  color: transparent; -webkit-text-fill-color: transparent;
+}
+.hero-pro .slogan { font-size: clamp(19px, 3.6vw, 26px); margin: 0 0 16px; color: var(--gold-light); }
+.hero-pro .description { font-size: 18px; line-height: 1.7; max-width: 56ch; margin: 0 0 26px; color: var(--text); }
+.hero-pro .hero-cta { justify-content: flex-start; gap: 12px; }
+.hero-pro .hero-cta .btn { min-height: 52px; padding: 0 20px; font-size: 14px; letter-spacing: .5px; }
+.hero-pro .hero-cta .btn.hero-primary { flex: 1 1 100%; }
+.hero-pro .hero-cta .btn.hero-primary { min-height: 58px; padding: 0 32px; font-size: 16px; letter-spacing: .8px; box-shadow: 0 6px 26px rgba(212,175,55,.38); }
+.hero-pills { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 0; padding: 0; }
+.hero-pills li { padding: 8px 16px; border-radius: 999px; font-size: 14.5px; }
+.hero-visual { margin: 0 auto; width: min(100%, 420px); aspect-ratio: 4 / 5; padding: 16px; border-radius: 26px; display: grid; place-items: center; overflow: hidden; }
+.hero-visual:not(.has-poster) { background: #fff; border-color: var(--gold); padding: 26px; }
+.hero-visual img.hero-logo { width: 100%; height: auto; max-height: 100%; margin: 0; object-fit: contain; }
+.hero-visual.has-poster { padding: 8px; }
+.hero-visual.has-poster img.hero-logo { width: 100%; height: 100%; max-height: none; object-fit: cover; object-position: center top; border-radius: 18px; filter: none; }
+@media (max-width: 899px) {
+  .hero.hero-pro { text-align: center; }
+  .hero-pro .hero-cta .btn.hero-primary { flex-basis: 100%; }
+  .hero-pro .hero-cta, .hero-pills { justify-content: center; }
+  .hero-pro .description { margin-left: auto; margin-right: auto; }
+  .hero-visual { width: min(100%, 320px); }
+}
+@media (max-width: 480px) {
+  .hero-pro .hero-cta .btn { width: 100%; }
+  .hero-pro .description { font-size: 17px; }
+}

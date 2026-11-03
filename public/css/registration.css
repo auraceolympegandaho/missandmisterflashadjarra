@@ -4,11 +4,11 @@
    ============================================================ */
 .reg-main { max-width: 760px; margin: 0 auto; padding: 20px 14px 60px; color: var(--ivory); }
 .reg-hero { text-align: center; padding: 28px 8px 8px; }
-.reg-eyebrow { color: var(--gold); letter-spacing: 3px; text-transform: uppercase; font-size: 12px; margin: 0 0 10px; }
+.reg-eyebrow { color: var(--gold); letter-spacing: 3px; text-transform: uppercase; font-size: 13.5px; margin: 0 0 10px; }
 .reg-hero h1 { font-size: clamp(26px, 6.2vw, 42px); line-height: 1.15; margin: 0 0 6px; color: #fff; }
 .reg-hero h1 span { background: var(--gold-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .reg-rule { width: 84px; height: 2px; background: var(--gold-grad); margin: 16px auto; border: 0; }
-.reg-lead { font-size: 17px; line-height: 1.65; color: var(--ivory); margin: 0 auto 12px; max-width: 620px; }
+.reg-lead { font-size: 18px; line-height: 1.65; color: var(--ivory); margin: 0 auto 12px; max-width: 620px; }
 .reg-tagline { font-style: italic; color: var(--gold-light); font-size: 19px; margin: 18px 0 6px; }
 
 .reg-banner { border: 1px solid var(--gold-dark); background: #0d0d0d; border-radius: 12px; padding: 14px 16px; margin: 18px 0; text-align: center; line-height: 1.5; }

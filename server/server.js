@@ -179,6 +179,18 @@ initSchema()
     });
   })
   .catch((err) => {
-    console.error("Impossible d'initialiser la base de donnees :", err);
-    process.exit(1);
+    // Message detaille + delai avant la sortie : garantit que la cause apparait dans les logs Render.
+    console.error(
+      "ECHEC AU DEMARRAGE - impossible d'initialiser la base de donnees :",
+      (err && (err.stack || err.message)) || err,
+      "| code:", err && err.code,
+      "| detail:", err && err.errors ? err.errors.map((e) => e.message || e.code).join(" ; ") : ""
+    );
+    setTimeout(() => process.exit(1), 1500);
   });
+
+process.on("unhandledRejection", (e) => console.error("unhandledRejection:", (e && e.stack) || e));
+process.on("uncaughtException", (e) => {
+  console.error("uncaughtException:", (e && e.stack) || e);
+  setTimeout(() => process.exit(1), 1500);
+});

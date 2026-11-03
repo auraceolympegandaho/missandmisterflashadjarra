@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="/css/nav.css" />
 <link rel="stylesheet" href="/css/home.css" />
 <link rel="stylesheet" href="/css/theme.css" />
+<link rel="stylesheet" href="/css/premium.css" />
 </head>
 <body>
 
@@ -17,14 +18,26 @@
 <main class="home-main">
 
   <!-- A. Presentation officielle (contenu charge depuis /api/homepage) -->
-  <section class="hero">
-    <div class="hero-content">
-      <img class="hero-logo" id="hero-poster" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" />
-      <span class="hero-edition" id="hero-edition">Édition 2027</span>
-      <h1 id="hero-title">MISS &amp; MISTER FLASH ADJARRA</h1>
-      <p class="slogan" id="hero-slogan"></p>
-      <p class="description" id="hero-description"></p>
-      <div class="hero-cta" id="hero-cta"></div>
+  <section class="hero hero-pro">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <span class="hero-edition" id="hero-edition">Édition 2027</span>
+        <span class="hero-reg-chip" id="hero-reg-chip" hidden></span>
+        <h1 id="hero-title">MISS &amp; MISTER FLASH ADJARRA</h1>
+        <p class="slogan" id="hero-slogan"></p>
+        <p class="description" id="hero-description"></p>
+        <div class="hero-cta" id="hero-cta">
+          <a href="/inscriptions.html" class="btn gold hero-primary">Déposer ma candidature</a>
+        </div>
+        <ul class="hero-pills">
+          <li>Réservé aux étudiant(e)s de la FLASH Adjarra</li>
+          <li>Vote en ligne sécurisé</li>
+          <li>Mobile Money &amp; carte bancaire</li>
+        </ul>
+      </div>
+      <figure class="hero-visual glass" id="hero-visual">
+        <img class="hero-logo" id="hero-poster" src="/img/logo.jpg" alt="Miss &amp; Mister Flash Adjarra" />
+      </figure>
     </div>
   </section>
 
