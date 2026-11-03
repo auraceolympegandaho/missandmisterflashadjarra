@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS = {
   max_age: null,
   allowed_fields: [], // vide = toute filiere acceptee (saisie libre)
   allowed_levels: [], // vide = tout niveau accepte (saisie libre)
-  documents: { photo: "required", student_card: "off", id_document: "off" }, // off | optional | required
+  documents: { photo: "off", student_card: "off", id_document: "off" }, // aucune pièce demandée
   special_conditions: "",
   rules_text: "",
   rules_version: "",
@@ -39,7 +39,7 @@ async function getSettings() {
     const stored = r.rowCount ? JSON.parse(r.rows[0].value) : {};
     const merged = { ...DEFAULT_SETTINGS, ...stored };
     merged.documents = { ...DEFAULT_SETTINGS.documents, ...(stored.documents || {}) };
-    merged.documents.photo = "required"; // la photo est toujours exigee
+    merged.documents = { photo: "off", student_card: "off", id_document: "off" }; // plus aucune pièce/photo demandée
     return merged;
   } catch (e) {
     console.error("[registration] lecture des parametres impossible :", e.message);

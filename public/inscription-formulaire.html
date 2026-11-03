@@ -40,7 +40,7 @@
 
       <!-- ETAPE 1 -->
       <section class="reg-card reg-step" data-step="1">
-        <p class="reg-step-title">Étape 1 sur 6</p>
+        <p class="reg-step-title">Étape 1 sur 4</p>
         <h2>Identité du candidat</h2>
         <div class="reg-row two">
           <div class="reg-field" data-f="last_name"><label for="f-last_name">Nom <span class="req">*</span></label><input type="text" id="f-last_name" name="last_name" maxlength="80" autocomplete="family-name" /><p class="reg-err"></p></div>
@@ -63,48 +63,32 @@
           <div class="reg-field" data-f="whatsapp"><label for="f-whatsapp">Numéro WhatsApp <span class="req">*</span></label><input type="tel" id="f-whatsapp" name="whatsapp" inputmode="tel" placeholder="+229 97 00 00 00" /><p class="reg-err"></p>
             <div class="reg-check" style="margin:8px 0 0;padding:8px 10px;"><input type="checkbox" id="same-wa" /><label for="same-wa" style="font-size:14px;">Même numéro que le téléphone</label></div></div>
         </div>
-        <div class="reg-field" data-f="email"><label for="f-email">Adresse électronique <small class="reg-muted">(facultatif)</small></label><input type="email" id="f-email" name="email" maxlength="120" autocomplete="email" /><p class="reg-hint">Utilisée plus tard pour t'envoyer des messages, si l'organisation active ce service.</p><p class="reg-err"></p></div>
       </section>
 
       <!-- ETAPE 2 -->
       <section class="reg-card reg-step" data-step="2" hidden>
-        <p class="reg-step-title">Étape 2 sur 6</p>
+        <p class="reg-step-title">Étape 2 sur 4</p>
         <h2>Informations universitaires</h2>
         <p class="reg-muted">Cette candidature est réservée aux étudiant(e)s de la FLASH Adjarra.</p>
         <div class="reg-field" data-f="field_of_study" id="slot-field"><label for="f-field_of_study">Filière ou spécialité <span class="req">*</span></label><input type="text" id="f-field_of_study" name="field_of_study" maxlength="100" /><p class="reg-err"></p></div>
         <div class="reg-field" data-f="study_level" id="slot-level"><label for="f-study_level">Niveau d'études <span class="req">*</span></label><input type="text" id="f-study_level" name="study_level" maxlength="50" placeholder="ex : Licence 2" /><p class="reg-err"></p></div>
         <div class="reg-field" data-f="academic_year"><label for="f-academic_year">Année académique <span class="req">*</span></label><input type="text" id="f-academic_year" name="academic_year" maxlength="9" placeholder="2026-2027" inputmode="numeric" /><p class="reg-err"></p></div>
+        <div id="answers-slot"></div>
       </section>
 
       <!-- ETAPE 3 -->
       <section class="reg-card reg-step" data-step="3" hidden>
-        <p class="reg-step-title">Étape 3 sur 6</p>
-        <h2>Présentation personnelle</h2>
-        <div id="answers-slot"></div>
-      </section>
-
-      <!-- ETAPE 4 -->
-      <section class="reg-card reg-step" data-step="4" hidden>
-        <p class="reg-step-title">Étape 4 sur 6</p>
-        <h2>Photographies</h2>
-        <p class="reg-muted" id="files-help"></p>
-        <div id="files-slot"></div>
-      </section>
-
-      <!-- ETAPE 5 -->
-      <section class="reg-card reg-step" data-step="5" hidden>
-        <p class="reg-step-title">Étape 5 sur 6</p>
+        <p class="reg-step-title">Étape 3 sur 4</p>
         <h2>Engagement du candidat</h2>
         <div class="reg-check" data-f="consent_info_accuracy"><input type="checkbox" id="c-info_accuracy" data-consent="info_accuracy" /><label for="c-info_accuracy">Je certifie l'exactitude des informations fournies.</label></div>
         <div class="reg-check" data-f="consent_rules_read"><input type="checkbox" id="c-rules_read" data-consent="rules_read" /><label for="c-rules_read">J'ai pris connaissance du <a href="/inscription-conditions.html" target="_blank" rel="noopener">règlement du concours</a>.</label></div>
         <div class="reg-check" data-f="consent_conditions_accepted"><input type="checkbox" id="c-conditions_accepted" data-consent="conditions_accepted" /><label for="c-conditions_accepted">J'accepte les <a href="/inscription-conditions.html" target="_blank" rel="noopener">conditions de participation</a>.</label></div>
         <div class="reg-check" data-f="consent_privacy_read"><input type="checkbox" id="c-privacy_read" data-consent="privacy_read" /><label for="c-privacy_read">J'ai pris connaissance de la <a href="/inscription-conditions.html" target="_blank" rel="noopener">politique de confidentialité</a>.</label></div>
-        <div class="reg-check sep" data-f="consent_photo_consent"><input type="checkbox" id="c-photo_consent" data-consent="photo_consent" /><label for="c-photo_consent"><strong>Consentement photographies :</strong> j'autorise l'organisation à utiliser mes photographies dans le cadre du concours. Rien n'est publié automatiquement : ma candidature doit d'abord être examinée.</label></div>
       </section>
 
-      <!-- ETAPE 6 -->
-      <section class="reg-card reg-step" data-step="6" hidden>
-        <p class="reg-step-title">Étape 6 sur 6</p>
+      <!-- ETAPE 4 -->
+      <section class="reg-card reg-step" data-step="4" hidden>
+        <p class="reg-step-title">Étape 4 sur 4</p>
         <h2>Récapitulatif</h2>
         <p class="reg-muted">Relis attentivement ton dossier. Tu peux revenir en arrière pour corriger.</p>
         <div id="recap"></div>

@@ -2,12 +2,7 @@ const NAME_RE = /^[\p{L}\p{M}][\p{L}\p{M}' .-]{1,79}$/u;
 const YEAR_RE = /^\d{4}\s?[-/]\s?\d{4}$/;
 
 const ANSWER_LIMITS = {
-  q1_presentation: { label: "Présentation", min: 20, max: 600 },
   q2_motivation: { label: "Motivation", min: 20, max: 800 },
-  q3_qualities: { label: "Qualités", min: 10, max: 400 },
-  q4_talents: { label: "Talents", min: 5, max: 400 },
-  q5_leadership: { label: "Vision du leadership", min: 20, max: 600 },
-  q6_contribution: { label: "Apport à la FLASH Adjarra", min: 20, max: 800 },
 };
 
 const CONSENTS = [
@@ -15,7 +10,6 @@ const CONSENTS = [
   "rules_read",
   "conditions_accepted",
   "privacy_read",
-  "photo_consent",
 ];
 
 // Retire les caracteres de controle ; conserve les retours a la ligne.
@@ -86,9 +80,7 @@ function validateApplication(raw, settings) {
   v.whatsapp = normalizePhone(d.whatsapp);
   if (!v.whatsapp) errors.whatsapp = "Numéro WhatsApp invalide (8 à 15 chiffres).";
 
-  v.email = clean(d.email).toLowerCase();
-  if (v.email && (v.email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email)))
-    errors.email = "Adresse électronique invalide.";
+  v.email = ""; // adresse électronique non demandée
 
   v.field_of_study = clean(d.field_of_study);
   if (v.field_of_study.length < 2 || v.field_of_study.length > 100) errors.field_of_study = "Filière requise.";

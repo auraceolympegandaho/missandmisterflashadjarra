@@ -99,7 +99,6 @@
 
   function initTrack() {
     var ref = document.getElementById("t-ref");
-    var code = document.getElementById("t-code");
     var btn = document.getElementById("t-btn");
     var alertBox = document.getElementById("t-alert");
     var result = document.getElementById("t-result");
@@ -111,13 +110,13 @@
     function go() {
       alertBox.className = "reg-alert";
       result.hidden = true;
-      if (!ref.value.trim() || !code.value.trim()) return showErr("Renseigne ta référence et ton code de suivi.");
+      if (!ref.value.trim()) return showErr("Renseigne ta référence de candidature.");
       btn.disabled = true;
       btn.textContent = "Vérification…";
       fetch("/api/registration/track", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reference: ref.value, code: code.value }),
+        body: JSON.stringify({ reference: ref.value }),
       })
         .then(function (r) {
           return r.json().then(function (b) { return { ok: r.ok, body: b }; });
@@ -162,7 +161,7 @@
       result.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     btn.addEventListener("click", go);
-    [ref, code].forEach(function (i) {
+    [ref].forEach(function (i) {
       i.addEventListener("keydown", function (e) { if (e.key === "Enter") go(); });
     });
   }

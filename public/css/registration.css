@@ -117,3 +117,6 @@
 .reg-timeline li { margin: 0 0 12px; padding-left: 10px; position: relative; }
 .reg-timeline li::before { content: ""; position: absolute; left: -23px; top: 7px; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); }
 .reg-timeline small { display: block; color: var(--text-muted); }
+
+/* Les boutons caches (attribut hidden) doivent vraiment disparaitre */
+.reg-btn[hidden], .reg-nav [hidden] { display: none !important; }

@@ -47,8 +47,6 @@
     $("rg-closedmsg").value = s.closed_message;
     $("rg-fields").value = s.allowed_fields.join("\n");
     $("rg-levels").value = s.allowed_levels.join("\n");
-    $("rg-doc-student_card").value = s.documents.student_card;
-    $("rg-doc-id_document").value = s.documents.id_document;
     $("rg-special").value = s.special_conditions;
     $("rg-rules").value = s.rules_text;
     $("rg-privacy").value = s.privacy_text;
@@ -67,7 +65,6 @@
         closed_message: $("rg-closedmsg").value, edition: $("rg-edition").value,
         min_age: $("rg-minage").value, max_age: $("rg-maxage").value,
         allowed_fields: lines($("rg-fields").value), allowed_levels: lines($("rg-levels").value),
-        documents: { student_card: $("rg-doc-student_card").value, id_document: $("rg-doc-id_document").value },
         special_conditions: $("rg-special").value, rules_text: $("rg-rules").value, privacy_text: $("rg-privacy").value,
       }),
     }).then(function (d) { showSettings(d); msg.style.color = "green"; msg.textContent = "Paramètres enregistrés."; })
@@ -125,7 +122,7 @@
   }
   $("rg-export").addEventListener("click", function () { exportCsv(false); });
   $("rg-export-contacts").addEventListener("click", function () {
-    if (confirm("Cet export contient des données personnelles (téléphone, WhatsApp, email). Continuer ?")) exportCsv(true);
+    if (confirm("Cet export contient des données personnelles (téléphone et WhatsApp). Continuer ?")) exportCsv(true);
   });
 
   // ---------- Detail ----------
@@ -146,12 +143,13 @@
     root.appendChild(el("h3", null, "Identité et contact"));
     var dl = el("dl", "rg-kv");
     kv(dl, "Date de naissance", a.birth_date); kv(dl, "Nationalité", a.nationality); kv(dl, "Ville", a.city);
-    kv(dl, "Téléphone", a.phone); kv(dl, "WhatsApp", a.whatsapp); kv(dl, "Email", a.email);
+    kv(dl, "Téléphone", a.phone); kv(dl, "WhatsApp", a.whatsapp);
     kv(dl, "Filière", a.field_of_study); kv(dl, "Niveau", a.study_level); kv(dl, "Année académique", a.academic_year);
     root.appendChild(dl);
 
     root.appendChild(el("h3", null, "Réponses"));
     Object.keys(ANSWER_LABELS).forEach(function (k) {
+      if (!(a.answers || {})[k]) return;
       root.appendChild(el("strong", null, ANSWER_LABELS[k]));
       root.appendChild(el("div", "rg-ans", (a.answers || {})[k] || ""));
     });

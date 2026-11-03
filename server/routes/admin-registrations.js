@@ -93,11 +93,7 @@ router.put("/settings", async (req, res) => {
     s.allowed_fields = cleanList(b.allowed_fields);
     s.allowed_levels = cleanList(b.allowed_levels);
 
-    const docs = b.documents && typeof b.documents === "object" ? b.documents : {};
-    s.documents = { photo: "required" };
-    for (const k of ["student_card", "id_document"]) {
-      s.documents[k] = ["off", "optional", "required"].includes(docs[k]) ? docs[k] : "off";
-    }
+    s.documents = { photo: "off", student_card: "off", id_document: "off" }; // plus de pièces demandées
 
     s.special_conditions = String(b.special_conditions || "").slice(0, 10000);
     const rules = String(b.rules_text || "").slice(0, 30000);
@@ -178,12 +174,12 @@ router.get("/export.csv", async (req, res) => {
     const { sql, params } = buildFilter(req.query);
     const r = await pool.query(
       `SELECT reference, last_name, first_names, category, field_of_study, study_level, academic_year,
-              city, phone, whatsapp, email, status, is_complete, created_at
+              city, phone, whatsapp, status, is_complete, created_at
        FROM registration_applications ${sql} ORDER BY created_at ASC, id ASC`,
       params
     );
     const head = ["Référence", "Nom", "Prénoms", "Catégorie", "Filière", "Niveau", "Année académique", "Ville", "Statut", "Dossier complet", "Date de soumission"];
-    if (withContacts) head.push("Téléphone", "WhatsApp", "Email");
+    if (withContacts) head.push("Téléphone", "WhatsApp");
     const lines = [head.map(csvCell).join(";")];
     for (const x of r.rows) {
       const row = [
@@ -191,7 +187,7 @@ router.get("/export.csv", async (req, res) => {
         x.city, (STATUSES[x.status] || {}).label || x.status, x.is_complete ? "Oui" : "Non",
         new Date(x.created_at).toISOString(),
       ];
-      if (withContacts) row.push(x.phone, x.whatsapp, x.email);
+      if (withContacts) row.push(x.phone, x.whatsapp);
       lines.push(row.map(csvCell).join(";"));
     }
     res.set("Content-Type", "text/csv; charset=utf-8");

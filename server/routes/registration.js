@@ -1,6 +1,5 @@
 const express = require("express");
 const crypto = require("crypto");
-const bcrypt = require("bcryptjs");
 const multer = require("multer");
 const { pool } = require("../db");
 const { getSettings, computePhase, DOC_TYPES } = require("../registration/config");
@@ -58,7 +57,6 @@ function randomString(n) {
   return s;
 }
 const makeReference = (edition) => `MMFA-${edition}-${randomString(6)}`;
-const makeTrackingCode = () => `${randomString(4)}-${randomString(4)}`;
 
 // GET /api/registration/config -> informations PUBLIQUES uniquement
 router.get("/config", configLimiter, async (req, res) => {
@@ -165,8 +163,7 @@ router.post("/submit", submitLimiter, async (req, res) => {
       return res.status(422).json({ error: "Certains champs sont à corriger.", fields: errors });
     }
 
-    const trackingCode = makeTrackingCode();
-    const trackingHash = await bcrypt.hash(trackingCode, 10);
+    const trackingHash = ""; // le suivi se fait avec la seule référence de candidature
     const ipHash = hashIp(req.ip);
 
     let result = null;
@@ -178,13 +175,13 @@ router.post("/submit", submitLimiter, async (req, res) => {
         const ins = await client.query(
           `INSERT INTO registration_applications
              (reference, tracking_code_hash, edition, last_name, first_names, category, birth_date,
-              nationality, city, phone, whatsapp, email, field_of_study, study_level, academic_year,
+              nationality, city, phone, whatsapp, field_of_study, study_level, academic_year,
               answers, status, submitted_ip_hash)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,'submitted',$17)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'submitted',$16)
            RETURNING id, created_at`,
           [
             reference, trackingHash, settings.edition, value.last_name, value.first_names, value.category,
-            value.birth_date, value.nationality, value.city, value.phone, value.whatsapp, value.email,
+            value.birth_date, value.nationality, value.city, value.phone, value.whatsapp,
             value.field_of_study, value.study_level, value.academic_year, JSON.stringify(value.answers), ipHash,
           ]
         );
@@ -228,14 +225,11 @@ router.post("/submit", submitLimiter, async (req, res) => {
     if (!result) throw new Error("Impossible de generer une reference unique.");
 
     // Notifications : apres validation de la transaction, jamais bloquantes
-    const emailSent = await enqueue("applicant_receipt", result.id, value.email);
     await enqueue("admin_new_application", result.id, "");
 
     res.status(201).json({
       reference: result.reference,
-      tracking_code: trackingCode, // affiche une seule fois ; seul son hash est conserve
       submitted_at: result.created_at,
-      email_sent: emailSent,
     });
   } catch (err) {
     console.error("[registration] submit :", err);
@@ -243,54 +237,30 @@ router.post("/submit", submitLimiter, async (req, res) => {
   }
 });
 
-// POST /api/registration/track { reference, code }
-const GENERIC_FAIL = "Référence ou code de suivi incorrect.";
-const LOCK_AFTER = 5;
-const LOCK_MINUTES = 15;
-const DUMMY_HASH = bcrypt.hashSync("dummy-value-for-timing", 10);
+// POST /api/registration/track { reference }
+const GENERIC_FAIL = "Référence introuvable. Vérifie-la et réessaie.";
+
+// Nom abrégé : la référence seule ne doit pas exposer l'identité complète.
+function maskName(first, last) {
+  const f = String(first || "").trim().split(/\s+/)[0] || "";
+  const l = String(last || "").trim();
+  return l ? `${f} ${l.charAt(0).toUpperCase()}.` : f;
+}
 
 router.post("/track", trackLimiter, async (req, res) => {
   try {
     const reference = String((req.body && req.body.reference) || "").trim().toUpperCase();
-    const code = String((req.body && req.body.code) || "").trim().toUpperCase();
-    if (!/^MMFA-\d{4}-[A-Z0-9]{6}$/.test(reference) || !/^[A-Z0-9]{4}-?[A-Z0-9]{4}$/.test(code)) {
-      return res.status(401).json({ error: GENERIC_FAIL });
+    if (!/^MMFA-\d{4}-[A-Z0-9]{6}$/.test(reference)) {
+      return res.status(404).json({ error: GENERIC_FAIL });
     }
-    const normalizedCode = code.includes("-") ? code : `${code.slice(0, 4)}-${code.slice(4)}`;
-
     const r = await pool.query(
-      `SELECT id, reference, tracking_code_hash, last_name, first_names, category, status, public_message,
-              created_at, updated_at, track_failed_attempts, track_locked_until
+      `SELECT id, reference, last_name, first_names, category, status, public_message, created_at, updated_at
        FROM registration_applications WHERE reference = $1`,
       [reference]
     );
     const row = r.rows[0];
+    if (!row) return res.status(404).json({ error: GENERIC_FAIL });
 
-    if (!row) {
-      bcrypt.compareSync(normalizedCode, DUMMY_HASH); // meme duree de traitement
-      return res.status(401).json({ error: GENERIC_FAIL });
-    }
-    if (row.track_locked_until && new Date(row.track_locked_until) > new Date()) {
-      return res.status(429).json({ error: "Trop de tentatives. Réessaie dans quelques minutes." });
-    }
-
-    if (!bcrypt.compareSync(normalizedCode, row.tracking_code_hash)) {
-      const attempts = row.track_failed_attempts + 1;
-      const lock = attempts >= LOCK_AFTER;
-      await pool.query(
-        `UPDATE registration_applications
-         SET track_failed_attempts = $2,
-             track_locked_until = CASE WHEN $3 THEN NOW() + ($4 || ' minutes')::interval ELSE track_locked_until END
-         WHERE id = $1`,
-        [row.id, lock ? 0 : attempts, lock, String(LOCK_MINUTES)]
-      );
-      return res.status(401).json({ error: GENERIC_FAIL });
-    }
-
-    await pool.query(
-      "UPDATE registration_applications SET track_failed_attempts = 0, track_locked_until = NULL WHERE id = $1",
-      [row.id]
-    );
     const hist = await pool.query(
       `SELECT new_status, note, created_at FROM registration_status_history
        WHERE application_id = $1 AND visible_to_candidate = TRUE AND event_type = 'status'
@@ -301,7 +271,7 @@ router.post("/track", trackLimiter, async (req, res) => {
     // Uniquement le necessaire au suivi : aucune coordonnee, aucun fichier.
     res.json({
       reference: row.reference,
-      name: `${row.first_names} ${row.last_name}`,
+      name: maskName(row.first_names, row.last_name),
       category: row.category,
       status: row.status,
       status_label: st.label,
