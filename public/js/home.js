@@ -76,7 +76,7 @@ async function loadPrice() {
   try {
     const res = await fetch("/api/settings/price");
     const data = await res.json();
-    document.getElementById("price-label").textContent = data.price_per_vote;
+    const pl = document.getElementById("price-label"); if (pl) pl.textContent = data.price_per_vote;
   } catch (e) {
     console.error("Impossible de charger le prix du vote", e);
   }

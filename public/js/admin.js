@@ -142,7 +142,7 @@ async function loadHomepage() {
     document.getElementById("h-organizer").value = data.organizer_text || "";
 
     const posterPreview = document.getElementById("h-poster-preview");
-    posterPreview.src = data.poster_path || "/img/logo.jpg";
+    posterPreview.src = data.poster_path || "/img/logo.png";
     document.getElementById("h-poster").value = "";
 
     const objectivesList = document.getElementById("h-objectives-list");

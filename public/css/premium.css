@@ -8,7 +8,7 @@
   --text: #f7f3ea;
   --text-muted: #d4cbb3;
   --glass-bg: linear-gradient(160deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
-  --glass-border: rgba(212,175,55,.32);
+  --glass-border: rgba(255,190,16,.32);
   --glass-blur: blur(14px);
   --glass-shadow: 0 10px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.10);
   --radius: 18px;
@@ -21,9 +21,9 @@ body {
 body::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(60% 45% at 50% -5%, rgba(212,175,55,.20), transparent 70%),
+    radial-gradient(60% 45% at 50% -5%, rgba(255,190,16,.20), transparent 70%),
     radial-gradient(45% 40% at 105% 55%, rgba(156,118,21,.16), transparent 70%),
-    radial-gradient(45% 40% at -5% 85%, rgba(245,215,110,.09), transparent 70%),
+    radial-gradient(45% 40% at -5% 85%, rgba(255,214,90,.09), transparent 70%),
     linear-gradient(180deg, #050505 0%, #0a0907 100%);
 }
 
@@ -47,12 +47,12 @@ body::before {
 .objective-card, .discover-card, .news-card { transition: transform .2s, border-color .2s, box-shadow .2s; }
 .objective-card:hover, .discover-card:hover, .news-card:hover {
   transform: translateY(-3px); border-color: var(--gold);
-  box-shadow: 0 14px 40px rgba(0,0,0,.5), 0 0 24px rgba(212,175,55,.18), inset 0 1px 0 rgba(255,255,255,.14);
+  box-shadow: 0 14px 40px rgba(0,0,0,.5), 0 0 24px rgba(255,190,16,.18), inset 0 1px 0 rgba(255,255,255,.14);
 }
 header.site-header, .site-header.glass {
   background: rgba(5,5,5,.72) !important;
   -webkit-backdrop-filter: blur(16px) saturate(150%); backdrop-filter: blur(16px) saturate(150%);
-  border-bottom: 1px solid rgba(212,175,55,.55);
+  border-bottom: 1px solid rgba(255,190,16,.55);
 }
 
 /* ---------- Échelle typographique ---------- */
@@ -107,7 +107,7 @@ input, select, textarea { font-size: 16px; } /* 16px minimum : pas de zoom autom
 }
 .hero-pro h1 .l1 { display: block; }
 .hero-pro h1 .l2 {
-  display: block; white-space: nowrap; background: linear-gradient(90deg, #d4af37 0%, #f5d76e 50%, #d4af37 100%); -webkit-background-clip: text; background-clip: text;
+  display: block; white-space: nowrap; background: linear-gradient(90deg, #FFBE10 0%, #FFD65A 50%, #FFBE10 100%); -webkit-background-clip: text; background-clip: text;
   color: transparent; -webkit-text-fill-color: transparent;
 }
 .hero-pro .slogan { font-size: clamp(19px, 3.6vw, 26px); margin: 0 0 16px; color: var(--gold-light); }
@@ -115,7 +115,7 @@ input, select, textarea { font-size: 16px; } /* 16px minimum : pas de zoom autom
 .hero-pro .hero-cta { justify-content: flex-start; gap: 12px; }
 .hero-pro .hero-cta .btn { min-height: 52px; padding: 0 20px; font-size: 14px; letter-spacing: .5px; }
 .hero-pro .hero-cta .btn.hero-primary { flex: 1 1 100%; }
-.hero-pro .hero-cta .btn.hero-primary { min-height: 58px; padding: 0 32px; font-size: 16px; letter-spacing: .8px; box-shadow: 0 6px 26px rgba(212,175,55,.38); }
+.hero-pro .hero-cta .btn.hero-primary { min-height: 58px; padding: 0 32px; font-size: 16px; letter-spacing: .8px; box-shadow: 0 6px 26px rgba(255,190,16,.38); }
 .hero-pills { list-style: none; display: flex; flex-wrap: wrap; gap: 10px; margin: 26px 0 0; padding: 0; }
 .hero-pills li { padding: 8px 16px; border-radius: 999px; font-size: 14.5px; }
 .hero-visual { margin: 0 auto; width: min(100%, 420px); aspect-ratio: 4 / 5; padding: 16px; border-radius: 26px; display: grid; place-items: center; overflow: hidden; }
@@ -134,3 +134,76 @@ input, select, textarea { font-size: 16px; } /* 16px minimum : pas de zoom autom
   .hero-pro .hero-cta .btn { width: 100%; }
   .hero-pro .description { font-size: 17px; }
 }
+
+/* ============================================================
+   V5 — Nouveau logo (or #FFBE10) + or plus rare.
+   L'or reste reserve aux accents (boutons, badges, chiffres, etats actifs) ;
+   bordures, halos et titres passent en neutre pour alleger l'ensemble.
+   ============================================================ */
+:root {
+  --border: rgba(255, 255, 255, 0.14);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --gold-edge: rgba(255, 190, 16, 0.28);
+}
+
+/* Logo : en-tete (logo seul, le texte est deja dans le logo) */
+header.site-header .logo { width: auto; height: 46px; max-width: 170px; border-radius: 0; object-fit: contain; }
+header.site-header .header-titles { display: none; }
+header.site-header .header-brand { gap: 0; }
+@media (max-width: 380px) { header.site-header .logo { width: auto; height: 34px; } }
+
+/* Logo : accueil (carte sombre, plus de fond blanc) */
+.hero-visual:not(.has-poster) {
+  background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.015)), rgba(12,12,12,.6);
+  border-color: rgba(255, 255, 255, 0.14); padding: 28px; aspect-ratio: auto; min-height: 220px;
+}
+.hero-visual img.hero-logo { filter: drop-shadow(0 6px 24px rgba(255, 190, 16, .18)); }
+
+/* Halos de fond : plus discrets */
+body::before {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 214, 90, 0.09), transparent 38%),
+    radial-gradient(circle at 90% 45%, rgba(185, 134, 0, 0.09), transparent 42%),
+    radial-gradient(circle at 20% 92%, rgba(255, 190, 16, 0.06), transparent 40%),
+    #050505;
+}
+.hero {
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 190, 16, 0.10), transparent 60%), linear-gradient(180deg, #050505 0%, #0d0d0d 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.hero::before { background: none; }
+
+/* Bordures et lueurs dorees -> neutres */
+header.site-header, .site-header.glass {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12); box-shadow: 0 2px 14px rgba(0, 0, 0, 0.4);
+}
+footer { border-top: 1px solid rgba(255, 255, 255, 0.12); }
+.vote-bar { border-top: 1px solid rgba(255, 255, 255, 0.14); }
+.nav-drawer { border-left-color: rgba(255, 255, 255, 0.14); }
+.nav-toggle { border-color: rgba(255, 255, 255, 0.28); }
+.countdown-section { border-top: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+.countdown-unit { box-shadow: none; }
+.card, .objective-card, .news-card, .discover-card, .partner-card, .partner-tile, .leaderboard-row,
+.panel, .ticket, .faq-item, .profile-card, .stat, .organizer-card, .modal, .countdown-unit, .contact-item {
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.10), 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+.card:hover, .discover-card:hover, .news-card:hover, .objective-card:hover {
+  border-color: var(--gold-edge); box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+.card .photo-wrap { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14); }
+.leaderboard-row.rank-1, .ticket.featured { border-color: var(--gold-edge); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45); }
+.profile-project, .note, .profile-fact, .profile-stats-hidden { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); }
+.hero-pro .hero-cta .btn.hero-primary { box-shadow: 0 4px 18px rgba(255, 190, 16, .22); }
+
+/* Titres : ivoire (l'or reste sur le trait d'accent et les chiffres) */
+.home-section h2, .page-head h1, .candidates-header h1, .results-cat-title, .panel h2, .panel h3, .ticket-name, .modal h2 { color: var(--ivory); }
+.objective-card .icon, .discover-card .icon { color: var(--gold); }
+.countdown-label { color: var(--text-muted); }
+.news-card .news-tag { color: var(--gold); }
+.hero h1 { background: none; color: #fff; -webkit-text-fill-color: #fff; }
+.hero-pro .slogan, .hero .slogan { color: var(--ivory); }
+.hero-pro h1 .l2 { background: none; color: var(--gold); -webkit-text-fill-color: var(--gold); }
+.back-link, .nav-drawer-title, .profile-section-title { color: var(--ivory); }
+.site-menu-link:hover, .nav-drawer-link:hover { background: rgba(255, 255, 255, 0.07); color: #fff; }
+.site-menu-link.active, .nav-drawer-link.active { background: rgba(255, 190, 16, 0.10); color: var(--gold-light); }

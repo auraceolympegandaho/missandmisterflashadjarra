@@ -56,7 +56,7 @@
     '<header class="site-header glass">' +
     '  <div class="header-bar">' +
     '    <a class="header-brand" href="/index.html">' +
-    '      <img class="logo" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" />' +
+    '      <img class="logo" src="/img/logo.png" alt="Miss & Mister Flash Adjarra" />' +
     '      <span class="header-titles">' +
     "        <span class=\"brand-name\">Miss &amp; Mister</span>" +
     '        <span class="brand-sub">Flash Adjarra</span>' +

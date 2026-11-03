@@ -12,7 +12,7 @@
 .reg-tagline { font-style: italic; color: var(--gold-light); font-size: 19px; margin: 18px 0 6px; }
 
 .reg-banner { border: 1px solid var(--gold-dark); background: #0d0d0d; border-radius: 12px; padding: 14px 16px; margin: 18px 0; text-align: center; line-height: 1.5; }
-.reg-banner.open { border-color: var(--gold); box-shadow: 0 0 22px rgba(212,175,55,.18); color: var(--gold-light); }
+.reg-banner.open { border-color: var(--gold); box-shadow: 0 0 22px rgba(255,190,16,.18); color: var(--gold-light); }
 .reg-banner strong { display: block; letter-spacing: 1px; text-transform: uppercase; font-size: 12px; color: var(--gold); margin-bottom: 4px; }
 
 .reg-actions { display: grid; gap: 12px; margin: 22px 0; }
@@ -22,14 +22,14 @@
   min-height: 52px; padding: 12px 18px; border-radius: 10px; cursor: pointer; text-decoration: none;
   font: 700 14px/1.2 var(--font-body); letter-spacing: .8px; text-transform: uppercase;
   background: var(--gold-grad); color: #000; border: 1px solid var(--gold);
-  box-shadow: 0 2px 10px rgba(212,175,55,.22);
+  box-shadow: 0 2px 10px rgba(255,190,16,.22);
 }
-.reg-btn:hover { box-shadow: 0 0 18px rgba(245,215,110,.45); color: #000; }
+.reg-btn:hover { box-shadow: 0 0 18px rgba(255,214,90,.45); color: #000; }
 .reg-btn.ghost { background: transparent; color: var(--gold-light); border-color: var(--gold); box-shadow: none; }
-.reg-btn.ghost:hover { background: rgba(212,175,55,.12); color: var(--gold-light); }
+.reg-btn.ghost:hover { background: rgba(255,190,16,.12); color: var(--gold-light); }
 .reg-btn[aria-disabled="true"], .reg-btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
 
-.reg-card { background: var(--black-2); border: 1px solid rgba(212,175,55,.45); border-radius: 16px; padding: 20px 16px; margin: 0 0 16px; }
+.reg-card { background: var(--black-2); border: 1px solid rgba(255,190,16,.45); border-radius: 16px; padding: 20px 16px; margin: 0 0 16px; }
 @media (min-width: 600px) { .reg-card { padding: 26px 28px; } }
 .reg-card h2 { margin: 0 0 12px; color: var(--gold-light); font-size: 22px; }
 .reg-card h3 { color: var(--gold); margin: 18px 0 6px; font-size: 16px; letter-spacing: .5px; }
@@ -61,7 +61,7 @@
 .reg-field input[type=text], .reg-field input[type=tel], .reg-field input[type=email], .reg-field input[type=date],
 .reg-field select, .reg-field textarea {
   width: 100%; box-sizing: border-box; min-height: 48px; padding: 11px 13px; border-radius: 10px;
-  background: #080808; color: #fff; border: 1px solid rgba(212,175,55,.45);
+  background: #080808; color: #fff; border: 1px solid rgba(255,190,16,.45);
   font: 16px/1.4 var(--font-body); /* 16px : empeche le zoom automatique sur iPhone */
   -webkit-appearance: none; appearance: none;
 }
@@ -77,10 +77,10 @@
 .reg-seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .reg-seg label { margin: 0; cursor: pointer; }
 .reg-seg input { position: absolute; opacity: 0; pointer-events: none; }
-.reg-seg span { display: flex; align-items: center; justify-content: center; min-height: 52px; border: 1px solid rgba(212,175,55,.45); border-radius: 10px; font-weight: 700; letter-spacing: 1px; background: #080808; }
+.reg-seg span { display: flex; align-items: center; justify-content: center; min-height: 52px; border: 1px solid rgba(255,190,16,.45); border-radius: 10px; font-weight: 700; letter-spacing: 1px; background: #080808; }
 .reg-seg input:checked + span { background: var(--gold-grad); color: #000; border-color: var(--gold); }
 .reg-seg input:focus-visible + span { outline: 2px solid var(--gold-light); outline-offset: 2px; }
-.reg-check { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid rgba(212,175,55,.3); border-radius: 10px; margin: 0 0 10px; background: #080808; }
+.reg-check { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 1px solid rgba(255,190,16,.3); border-radius: 10px; margin: 0 0 10px; background: #080808; }
 .reg-check input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--gold); flex: none; }
 .reg-check label { margin: 0; font-weight: 400; line-height: 1.5; font-size: 15px; }
 .reg-check.invalid { border-color: var(--danger); }
@@ -102,7 +102,7 @@
 .reg-ok { border-color: var(--success); color: #d4f5df; background: rgba(95,208,138,.08); }
 
 /* --- Confirmation prestigieuse --- */
-.reg-confirm { text-align: center; border: 1px solid var(--gold); box-shadow: 0 0 40px rgba(212,175,55,.2); }
+.reg-confirm { text-align: center; border: 1px solid var(--gold); box-shadow: 0 0 40px rgba(255,190,16,.2); }
 .reg-confirm .crown { font-size: 44px; color: var(--gold-light); }
 .reg-confirm h2 { font-size: 30px; margin: 4px 0 10px; }
 .reg-code { margin: 14px auto; padding: 14px; border: 1px dashed var(--gold); border-radius: 12px; max-width: 420px; background: #080808; }

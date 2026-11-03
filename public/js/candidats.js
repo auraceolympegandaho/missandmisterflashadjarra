@@ -22,7 +22,7 @@ async function loadPrice() {
     const res = await fetch("/api/settings/price");
     const data = await res.json();
     pricePerVote = data.price_per_vote;
-    priceLabel.textContent = pricePerVote;
+    if (priceLabel) priceLabel.textContent = pricePerVote;
     updateTotal();
   } catch (e) {
     console.error("Impossible de charger le prix du vote", e);
