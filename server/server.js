@@ -6,6 +6,7 @@ const { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT, DEFAUL
 
 const { router: candidatesRoutes, getPublicDisplay } = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
+require("./payments/fedapay").checkConfig();
 const adminRoutes = require("./routes/admin");
 const { router: registrationRoutes } = require("./routes/registration");
 const { createLimiter } = require("./registration/security");
