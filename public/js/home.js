@@ -152,24 +152,45 @@ function escapeHtml(str) {
 }
 
 async function loadPartners() {
-  const section = document.getElementById("partenaires");
-  const grid = document.getElementById("partners-grid");
+  const marquee = document.getElementById("partners-marquee");
+  const track = document.getElementById("partners-track");
+  const all = document.getElementById("partners-all");
+  const cta = document.getElementById("partner-cta-btn");
+
+  // Bouton "Contacter l'equipe" : WhatsApp du comite (gere dans l'admin > Contact)
+  try {
+    const c = await (await fetch("/api/contact")).json();
+    const num = String((c && c.whatsapp) || "").replace(/\D/g, "");
+    if (num.length >= 8) {
+      cta.href = `https://wa.me/${num}?text=${encodeURIComponent("Bonjour, nous souhaitons devenir partenaire de Miss & Mister Flash Adjarra.")}`;
+      cta.target = "_blank";
+      cta.rel = "noopener noreferrer";
+    }
+  } catch (e) {}
+
   try {
     const res = await fetch("/api/partners");
     const partners = await res.json();
-    if (!partners.length) return; // section reste masquee
+    if (!partners.length) return; // pas de carrousel, seule l'invitation reste
 
-    grid.innerHTML = partners
-      .map((p) => {
-        const logo = p.logo_path
-          ? `<img src="${p.logo_path}" alt="${escapeHtml(p.name)}" loading="lazy" />`
-          : `<span class="partner-fallback">${escapeHtml(p.name)}</span>`;
-        return p.website_url
-          ? `<a class="partner-card" href="${escapeHtml(p.website_url)}" target="_blank" rel="noopener noreferrer">${logo}</a>`
-          : `<div class="partner-card">${logo}</div>`;
-      })
-      .join("");
-    section.style.display = "block";
+    const item = (p, hidden) => {
+      const logo = p.logo_path
+        ? `<span class="pm-logo"><img src="${escapeHtml(p.logo_path)}" alt="${hidden ? "" : escapeHtml(p.name)}" loading="lazy" /></span>`
+        : `<span class="pm-logo pm-fallback">${escapeHtml(p.name)}</span>`;
+      const inner = `${logo}<span class="pm-name">${escapeHtml(p.name)}</span>`;
+      const attrs = hidden ? ' aria-hidden="true" tabindex="-1"' : "";
+      return p.website_url
+        ? `<a class="partner-card"${attrs} href="${escapeHtml(p.website_url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+        : `<div class="partner-card"${attrs}>${inner}</div>`;
+    };
+    const base = partners.map((p) => item(p, false)).join("");
+    // Defilement continu seulement s'il y a assez de logos pour remplir la ligne
+    const scroll = partners.length > 4;
+    track.innerHTML = scroll ? base + partners.map((p) => item(p, true)).join("") : base;
+    marquee.classList.toggle("is-scrolling", scroll);
+    track.style.setProperty("--pm-duration", Math.max(20, partners.length * 5) + "s");
+    marquee.hidden = false;
+    all.hidden = false;
   } catch (e) {
     console.error("Impossible de charger les partenaires", e);
   }
