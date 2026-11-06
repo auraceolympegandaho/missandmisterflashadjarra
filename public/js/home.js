@@ -209,24 +209,19 @@ async function loadAnnouncements() {
       return;
     }
 
-    const card = (a, featured) => `
-      <article class="news-card${featured ? " is-featured" : ""}">
+    grid.innerHTML = items
+      .map(
+        (a) => `
+      <div class="news-card">
         ${a.tag ? `<span class="news-tag">${escapeHtml(a.tag)}</span>` : ""}
         <p>${escapeHtml(a.content)}</p>
-      </article>`;
-    if (items.length === 1) {
-      grid.classList.remove("has-feature");
-      grid.innerHTML = card(items[0], true);
-    } else {
-      grid.classList.add("has-feature");
-      grid.innerHTML =
-        card(items[0], true) +
-        `<div class="news-rest">${items.slice(1).map((a) => card(a, false)).join("")}</div>`;
-    }
+      </div>`
+      )
+      .join("");
   } catch (e) {
     console.error("Impossible de charger les actualités", e);
     grid.innerHTML =
-      "<p class='loading-line'>Impossible de charger les actualités.</p>";
+      "<p style='text-align:center; color:var(--text-muted); grid-column:1/-1; font-size:13px;'>Impossible de charger les actualités.</p>";
   }
 }
 
@@ -241,64 +236,10 @@ async function loadRegistrationChip() {
       chip.textContent += " · jusqu'au " + new Date(c.ends_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
     }
     chip.hidden = false;
-    const phase = document.getElementById("phase-reg");
-    if (phase) phase.hidden = false;
   } catch (e) {}
 }
 
-function initials(name) {
-  return String(name || "")
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
-    .join("");
-}
-
-async function loadShowcase() {
-  try {
-    const res = await fetch("/api/candidates");
-    const list = await res.json();
-    if (!Array.isArray(list) || !list.length) return;
-
-    // Rail de candidats (les photos manquantes laissent apparaître les initiales)
-    const rail = document.getElementById("home-candidates");
-    rail.innerHTML = list
-      .slice(0, 12)
-      .map(
-        (c) => `
-      <a class="arch-card" href="/candidat.html?id=${c.id}">
-        <span class="arch-photo">
-          <span class="arch-initials" aria-hidden="true">${escapeHtml(initials(c.name))}</span>
-          ${c.photo_path ? `<img src="${escapeHtml(c.photo_path)}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.remove()" />` : ""}
-        </span>
-        <h3>${escapeHtml(c.name)}</h3>
-        <p>${escapeHtml(c.category)}${c.candidacy_number ? " · N° " + escapeHtml(c.candidacy_number) : ""}</p>
-      </a>`
-      )
-      .join("");
-    document.getElementById("candidats-apercu").hidden = false;
-
-    // Projets d'impact : trois extraits
-    const withProject = list.filter((c) => c.project_desc && c.project_desc.trim()).slice(0, 3);
-    if (withProject.length) {
-      document.getElementById("home-projects").innerHTML = withProject
-        .map(
-          (c) => `
-        <a class="proj-teaser" href="/candidat.html?id=${c.id}">
-          ${c.photo_path ? `<img class="proj-thumb" src="${escapeHtml(c.photo_path)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'" />` : `<span class="proj-thumb"></span>`}
-          <div><h3>${escapeHtml(c.name)}</h3><p>${escapeHtml(c.project_desc)}</p></div>
-        </a>`
-        )
-        .join("");
-    }
-  } catch (e) {
-    console.error("Impossible de charger l'aperçu des candidats", e);
-  }
-}
-
 loadHomepage();
-loadShowcase();
 loadRegistrationChip();
 loadPrice();
 loadCountdown();
