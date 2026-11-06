@@ -6,12 +6,8 @@
 <title>Contact — Miss & Mister Flash Adjarra</title>
 <meta name="description" content="Contactez l'organisation du concours Miss & Mister Flash Adjarra." />
 <link rel="icon" type="image/png" href="/img/favicon.png" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="stylesheet" href="/css/nav.css" />
-<link rel="stylesheet" href="/css/pages.css" />
-<link rel="stylesheet" href="/css/theme.css" />
-<link rel="stylesheet" href="/css/premium.css" />
-<link rel="stylesheet" href="/css/light.css" />
+<link rel="stylesheet" href="/css/atelier-core.css" />
+<link rel="stylesheet" href="/css/atelier.css" />
 </head>
 <body>
 
@@ -25,60 +21,60 @@
 
   <div class="panel">
     <h2>Coordonnées</h2>
-    <div class="contact-list">
-      <a class="contact-item" id="contact-whatsapp" href="#" target="_blank" rel="noopener">
-        <div>
-          <b>WhatsApp</b>
-          <span id="contact-whatsapp-label">Écrire à l'organisation</span>
-        </div>
-      </a>
-      <a class="contact-item" id="contact-email" href="#">
-        <div>
-          <b>E-mail</b>
-          <span id="contact-email-label">Envoyer un message</span>
-        </div>
-      </a>
-      <div class="contact-item">
-        <div>
-          <b>Sur place</b>
-          <span id="contact-address">Chargement...</span>
+    <div>
+      <div class="contact-list">
+        <a class="contact-item" id="contact-whatsapp" href="#" target="_blank" rel="noopener">
+          <div>
+            <b>WhatsApp</b>
+            <span id="contact-whatsapp-label">Écrire à l'organisation</span>
+          </div>
+        </a>
+        <a class="contact-item" id="contact-email" href="#">
+          <div>
+            <b>E-mail</b>
+            <span id="contact-email-label">Envoyer un message</span>
+          </div>
+        </a>
+        <div class="contact-item">
+          <div>
+            <b>Sur place</b>
+            <span id="contact-address">Chargement...</span>
+          </div>
         </div>
       </div>
+      <p class="form-hint" style="margin-top:14px;">
+        Réponse généralement sous 24 à 48 heures les jours ouvrés.
+      </p>
     </div>
-    <p class="form-hint">
-      Réponse généralement sous 24 à 48 heures les jours ouvrés.
-    </p>
   </div>
 
   <div class="panel">
-    <h2>Formulaire</h2>
-    <p>
-      Renseignez votre message ci-dessous : il sera préparé et ouvert dans WhatsApp ou dans
-      votre messagerie, prêt à être envoyé.
-    </p>
-
-    <div class="form-field">
-      <label for="contact-name">Votre nom</label>
-      <input type="text" id="contact-name" placeholder="Nom et prénom" />
+    <h2>Écrire à l'équipe</h2>
+    <div>
+      <p>
+        Renseignez votre message ci-dessous : il sera préparé et ouvert dans WhatsApp ou dans
+        votre messagerie, prêt à être envoyé.
+      </p>
+      <div class="form-field">
+        <label for="contact-name">Votre nom</label>
+        <input type="text" id="contact-name" placeholder="Nom et prénom" />
+      </div>
+      <div class="form-field">
+        <label for="contact-subject">Sujet</label>
+        <select id="contact-subject">
+          <option>Chargement...</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="contact-message">Votre message</label>
+        <textarea id="contact-message" placeholder="Décrivez votre demande en quelques lignes..."></textarea>
+      </div>
+      <div class="share-row">
+        <button class="btn gold" id="send-whatsapp" type="button" style="flex:1 1 180px;">Envoyer via WhatsApp</button>
+        <button class="btn" id="send-email" type="button" style="flex:1 1 180px;">Envoyer par e-mail</button>
+      </div>
+      <p class="form-hint" id="contact-feedback" role="status"></p>
     </div>
-
-    <div class="form-field">
-      <label for="contact-subject">Sujet</label>
-      <select id="contact-subject">
-        <option>Chargement...</option>
-      </select>
-    </div>
-
-    <div class="form-field">
-      <label for="contact-message">Votre message</label>
-      <textarea id="contact-message" placeholder="Décrivez votre demande en quelques lignes..."></textarea>
-    </div>
-
-    <div class="share-row" style="display:flex; gap:8px; flex-wrap:wrap;">
-      <button class="btn gold" id="send-whatsapp" type="button" style="flex:1 1 160px;">Envoyer via WhatsApp</button>
-      <button class="btn" id="send-email" type="button" style="flex:1 1 160px;">Envoyer par e-mail</button>
-    </div>
-    <p class="form-hint" id="contact-feedback" role="status"></p>
   </div>
 
   <div class="panel">
@@ -90,12 +86,9 @@
       concerné(e) : cela accélère beaucoup le traitement.
     </p>
   </div>
-
 </main>
+<footer></footer>
 
-<footer>
-  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
-</footer>
 <script src="/js/contact.js"></script>
 </body>
 </html>

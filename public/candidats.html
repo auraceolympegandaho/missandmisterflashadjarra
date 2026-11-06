@@ -4,59 +4,57 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Les Candidats — Miss & Mister Flash Adjarra</title>
+
 <link rel="icon" type="image/png" href="/img/favicon.png" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="stylesheet" href="/css/nav.css" />
-<link rel="stylesheet" href="/css/candidates.css" />
-<link rel="stylesheet" href="/css/theme.css" />
-<link rel="stylesheet" href="/css/premium.css" />
-<link rel="stylesheet" href="/css/light.css" />
+<link rel="stylesheet" href="/css/atelier-core.css" />
+<link rel="stylesheet" href="/css/atelier.css" />
 </head>
 <body>
 
 <script src="/js/nav.js"></script>
 
-<div class="candidates-header">
-  <h1>Les Candidats</h1>
-  <p>Découvrez et soutenez les candidat(e)s de l'édition 2027</p>
+<div class="page-main" style="padding-bottom:0;">
+  <div class="page-head" style="margin-bottom:0;border-bottom:0;">
+    <h1>Les candidats</h1>
+    <p>Découvrez les candidat(e)s de l'édition 2027, leur parcours et leur projet, puis soutenez votre favori(te).</p>
+  </div>
 </div>
 
-<div class="search-bar">
-  <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8" stroke-linecap="round"/></svg>
-  <input type="text" id="search-input" placeholder="Rechercher par nom ou numéro..." />
+<div class="cand-bar">
+  <div class="cand-bar-inner">
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-cat="">Tous</button>
+      <button class="tab-btn" data-cat="Miss">Miss</button>
+      <button class="tab-btn" data-cat="Mister">Mister</button>
+    </div>
+    <div class="search-bar">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.8-4.8" stroke-linecap="round"/></svg>
+      <input type="text" id="search-input" placeholder="Rechercher par nom ou numéro" aria-label="Rechercher un(e) candidat(e)" />
+    </div>
+  </div>
 </div>
 
-<div class="tabs">
-  <button class="tab-btn active" data-cat="">Tous</button>
-  <button class="tab-btn" data-cat="Miss">Miss</button>
-  <button class="tab-btn" data-cat="Mister">Mister</button>
-</div>
+<p class="results-count" id="results-count" role="status"></p>
 
-<p class="results-count" id="results-count"></p>
-
-<main>
+<main class="cand-main">
   <div id="grid" class="grid"></div>
   <div id="empty" class="empty-state" style="display:none;">
     Aucun candidat ne correspond à votre recherche.
   </div>
 </main>
 
-<footer>
-  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
-</footer>
-
 <a class="admin-link" href="/admin.html">admin</a>
 
 <!-- Modal de vote -->
 <div class="overlay" id="overlay">
-  <div class="modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
     <h2 id="modal-title">Voter</h2>
 
     <label for="qty">Nombre de votes</label>
     <div class="qty-row">
-      <button type="button" id="qty-minus">−</button>
+      <button type="button" id="qty-minus" aria-label="Moins un vote">−</button>
       <input type="number" id="qty" value="1" min="1" />
-      <button type="button" id="qty-plus">+</button>
+      <button type="button" id="qty-plus" aria-label="Plus un vote">+</button>
     </div>
 
     <label for="phone">Numéro de téléphone (Mobile Money)</label>
@@ -72,6 +70,7 @@
     <span class="close-link" id="close-modal">Annuler</span>
   </div>
 </div>
+<footer></footer>
 
 <script src="/js/candidats.js"></script>
 </body>

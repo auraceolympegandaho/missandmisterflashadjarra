@@ -13,27 +13,26 @@ async function loadProjects() {
 
     if (!withProject.length) {
       list.innerHTML =
-        "<p style='text-align:center; color:var(--text-muted);'>Aucun projet renseigné pour le moment.</p>";
+        "<p class='empty-state'>Aucun projet renseigné pour le moment.</p>";
       return;
     }
 
     list.innerHTML = withProject
       .map(
         (c) => `
-      <div class="profile-project" style="display:flex; gap:16px; align-items:flex-start; margin-bottom:16px;">
-        <img src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" style="width:64px; height:64px; border-radius:12px; object-fit:cover; background:#fff; flex-shrink:0;" onerror="this.style.background='#fff'; this.src='';" />
+      <article class="project-row">
+        <img class="project-thumb" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" onerror="this.style.visibility='hidden';" />
+        <h2>${escapeHtml(c.name)}</h2>
+        <p class="project-meta">${escapeHtml(c.category)}${c.candidacy_number ? " · N° " + escapeHtml(c.candidacy_number) : ""}</p>
         <div>
-          <h2 style="margin:0 0 4px; text-transform:none; font-size:16px; color:var(--blue-dark); font-family:var(--font-display);">
-            ${escapeHtml(c.name)} <span style="font-size:11px; color:var(--blue); font-weight:400;">— ${escapeHtml(c.category)}${c.candidacy_number ? " · N° " + escapeHtml(c.candidacy_number) : ""}</span>
-          </h2>
-          <p style="margin:0 0 8px;">${escapeHtml(c.project_desc)}</p>
-          <a href="/candidat.html?id=${c.id}" style="font-size:12px; color:var(--blue-dark); text-decoration:underline;">Voir le profil complet</a>
+          <p class="project-text">${escapeHtml(c.project_desc)}</p>
+          <a class="text-link" href="/candidat.html?id=${c.id}">Voir le profil complet</a>
         </div>
-      </div>`
+      </article>`
       )
       .join("");
   } catch (e) {
-    list.innerHTML = "<p style='text-align:center;'>Impossible de charger les projets.</p>";
+    list.innerHTML = "<p class='empty-state'>Impossible de charger les projets.</p>";
   }
 }
 

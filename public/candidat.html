@@ -6,12 +6,8 @@
 <title>Profil du candidat — Miss & Mister Flash Adjarra</title>
 <meta name="description" content="Fiche publique d'un(e) candidat(e) du concours Miss & Mister Flash Adjarra : profil, projet d'impact et vote en ligne." />
 <link rel="icon" type="image/png" href="/img/favicon.png" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="stylesheet" href="/css/nav.css" />
-<link rel="stylesheet" href="/css/profile.css" />
-<link rel="stylesheet" href="/css/theme.css" />
-<link rel="stylesheet" href="/css/premium.css" />
-<link rel="stylesheet" href="/css/light.css" />
+<link rel="stylesheet" href="/css/atelier-core.css" />
+<link rel="stylesheet" href="/css/atelier.css" />
 </head>
 <body>
 
@@ -21,7 +17,7 @@
   <a class="back-link" href="/candidats.html">&larr; Tous les candidats</a>
 
   <div id="profile-content">
-    <!-- Squelette de chargement : evite un ecran vide sur connexion lente -->
+    <!-- Squelette de chargement : évite un écran vide sur connexion lente -->
     <div class="profile-card skeleton-card">
       <div class="sk sk-photo"></div>
       <div class="profile-body">
@@ -35,7 +31,7 @@
   </div>
 </main>
 
-<!-- Barre de vote collante : le bouton reste accessible pendant le defilement -->
+<!-- Barre de vote collante : le bouton reste accessible pendant le défilement -->
 <div class="vote-bar" id="vote-bar" hidden>
   <div class="vote-bar-inner">
     <div class="vote-bar-info">
@@ -46,18 +42,12 @@
   </div>
 </div>
 
-<!-- Visionneuse plein ecran pour la galerie -->
+<!-- Visionneuse plein écran pour la galerie -->
 <div class="lightbox" id="lightbox" hidden>
   <button class="lightbox-close" id="lightbox-close" type="button" aria-label="Fermer l'image">&times;</button>
   <img id="lightbox-img" src="" alt="" />
 </div>
-
-<footer>
-  <p style="margin:0 0 8px;">
-    <a href="/candidats.html" style="color:var(--blue-dark); text-decoration:none; font-weight:700;">&larr; Retour à tous les candidats</a>
-  </p>
-  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
-</footer>
+<footer></footer>
 
 <script src="/js/candidat.js"></script>
 </body>

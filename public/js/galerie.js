@@ -27,7 +27,7 @@ async function loadGallery() {
       )
       .join("");
   } catch (e) {
-    grid.innerHTML = "<p style='text-align:center;'>Impossible de charger la galerie.</p>";
+    grid.innerHTML = "<p class='empty-state'>Impossible de charger la galerie.</p>";
   }
 }
 

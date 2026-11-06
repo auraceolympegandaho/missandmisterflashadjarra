@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>J'y serai — Miss &amp; Mister Flash Adjarra</title>
+
+<link rel="icon" type="image/png" href="/img/favicon.png" />
+<link rel="stylesheet" href="/css/atelier-core.css" />
+<link rel="stylesheet" href="/css/atelier.css" />
+</head>
+<body>
+
+<script src="/js/nav.js"></script>
+
+<main class="page-main">
+  <div class="page-head">
+    <h1>J'y serai</h1>
+    <p>Gardez la soirée de gala dans votre agenda et invitez vos proches à venir soutenir les candidat(e)s.</p>
+  </div>
+
+  <div class="save-grid">
+    <section class="save-card" aria-labelledby="save-title">
+      <h2 id="save-title">La soirée de gala</h2>
+      <div class="countdown-section">
+        <p class="countdown-label" id="countdown-label">Chargement...</p>
+        <div id="countdown-body">
+          <div class="countdown-grid" id="countdown-grid" style="display:none;">
+            <div class="countdown-unit"><span class="num" id="cd-days">–</span><span class="unit">jours</span></div>
+            <div class="countdown-unit"><span class="num" id="cd-hours">–</span><span class="unit">heures</span></div>
+            <div class="countdown-unit"><span class="num" id="cd-min">–</span><span class="unit">minutes</span></div>
+            <div class="countdown-unit"><span class="num" id="cd-sec">–</span><span class="unit">secondes</span></div>
+          </div>
+          <p class="countdown-empty" id="countdown-empty" style="display:none;">La date sera annoncée prochainement.</p>
+        </div>
+      </div>
+      <div class="save-actions">
+        <button class="btn gold block" id="save-ics" type="button">Ajouter à mon agenda</button>
+        <button class="btn block" id="save-wa" type="button">Prévenir mes amis sur WhatsApp</button>
+        <a class="btn block" href="/billetterie.html">Réserver mon billet</a>
+      </div>
+      <p class="save-msg" id="save-msg" role="status"></p>
+    </section>
+
+    <div>
+      <div class="panel" style="padding-top:0;">
+        <h2>Pourquoi venir</h2>
+        <ul>
+          <li>Voir sur scène les candidat(e)s que vous avez soutenu(e)s en ligne.</li>
+          <li>Assister à la délibération du jury et au couronnement.</li>
+          <li>Retrouver la communauté étudiante de la FLASH Adjarra.</li>
+        </ul>
+      </div>
+      <div class="panel" style="border-bottom:0;">
+        <h2>Bon à savoir</h2>
+        <p>Cette page garde la date en mémoire dans votre agenda : elle n'enregistre aucune réservation. Pour une place assurée, prenez un billet depuis la <a href="/billetterie.html">billetterie</a>. Le lieu exact est annoncé sur la page d'accueil dès confirmation.</p>
+      </div>
+    </div>
+  </div>
+</main>
+<footer></footer>
+
+<script src="/js/jy-serai.js"></script>
+</body>
+</html>
