@@ -1,0 +1,20 @@
+/* ============================================================
+   V11 — Couronne en arriere-plan sur tout le site (pages publiques).
+   Une seule couronne, fixe, tres discrete, derriere le contenu.
+   Sur l'accueil (body.page-home), la couronne est portee par le hero
+   (voir showcase.css) : le fond fixe y est donc desactive.
+   Retour arriere : retirer la ligne <link> de cette feuille.
+   ============================================================ */
+body::after {
+  content: ""; position: fixed; z-index: -1; pointer-events: none;
+  left: 50%; top: calc(var(--header-h, 60px) + 6vh); transform: translateX(-50%);
+  width: min(880px, 118vw); aspect-ratio: 900 / 688;
+  background: url("/img/crown.webp") center / contain no-repeat;
+  opacity: .085;
+  filter: drop-shadow(0 0 40px rgba(255, 190, 16, .35));
+}
+body.page-home::after { display: none; }
+@media (max-width: 599px) {
+  body::after { top: calc(var(--header-h, 60px) + 10vh); width: 130vw; opacity: .075; }
+}
+@media print { body::after { display: none; } }

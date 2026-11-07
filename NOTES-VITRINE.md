@@ -7,5 +7,5 @@
 - Un profil est public s'il est **publié ET actif** (le bouton « Masquer » retire aussi le profil de la vitrine).
 - API publique : `GET /api/showcase` et `GET /api/showcase/:id` (aucune donnée de vote ni de classement).
 - Page profil : `/profil.html?id=…` (sans bouton de vote). La page de vote `/candidat.html` est inchangée.
-- Couronne du hero : `public/img/crown.svg` + `.hero-crown` dans `public/css/showcase.css`.
+- Couronne : `public/img/crown.webp` (votre photo, fond détouré). Hero de l’accueil : `.hero-crown` dans `public/css/showcase.css`. Autres pages : fond fixe très discret dans `public/css/crown-bg.css`.
 - La mention « admin » a été retirée des pages publiques ; l'interface reste accessible via `/admin.html` (connexion habituelle).
