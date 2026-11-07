@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>J'y serai — Miss & Mister Flash Adjarra</title>
+<meta name="description" content="Marquez la date dans votre agenda et créez votre carte « J'y serai » à partager." />
+<link rel="icon" type="image/png" href="/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Instrument+Sans:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/css/mm.css" />
+<link rel="stylesheet" href="/css/mm-pages.css" />
+</head>
+<body>
+
+<script src="/js/nav.js"></script>
+
+<main>
+  <header class="page-head wrap">
+    <h1>J'y serai</h1>
+    <p class="lede">Gardez la date en tête et annoncez à vos amis que vous serez là.</p>
+  </header>
+
+  <div class="wrap page-body">
+    <div class="iy-grid">
+      <div>
+        <div class="iy-date" id="iy-date">
+          <small id="iy-label">Prochaine échéance</small>
+          <strong id="iy-when">Chargement…</strong>
+        </div>
+
+        <h2>Marquez la date</h2>
+        <p>Ajoutez le rendez-vous à votre agenda pour ne rien manquer, puis invitez vos proches.</p>
+        <div class="iy-actions">
+          <button class="btn" type="button" id="iy-ics">Ajouter à mon agenda</button>
+          <a class="btn outline" id="iy-wa" href="#" target="_blank" rel="noopener noreferrer">Inviter sur WhatsApp</a>
+        </div>
+        <p class="form-hint" id="iy-hint"></p>
+
+        <p style="margin-top:28px;">
+          Pas encore de billet ? Rendez-vous sur la <a href="/billetterie.html">billetterie</a>.
+          Pour soutenir un(e) candidat(e), c'est par ici : <a href="/candidats.html">les candidats</a>.
+        </p>
+      </div>
+
+      <div class="iy-maker">
+        <h2>Ma carte « J'y serai »</h2>
+        <div class="form-field">
+          <label for="iy-name">Votre prénom ou votre nom</label>
+          <input type="text" id="iy-name" maxlength="32" placeholder="ex : Aïcha" autocomplete="given-name" />
+        </div>
+        <div class="iy-preview"><canvas id="iy-canvas" width="1080" height="1350" aria-label="Aperçu de votre carte J'y serai"></canvas></div>
+        <div class="form-actions">
+          <button class="btn" type="button" id="iy-download">Télécharger ma carte</button>
+          <button class="btn outline" type="button" id="iy-share">Partager</button>
+        </div>
+        <p class="form-hint" id="iy-feedback" role="status"></p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer></footer>
+<script src="/js/j-y-serai.js"></script>
+</body>
+</html>

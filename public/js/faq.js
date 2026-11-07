@@ -1,22 +1,46 @@
+// Page FAQ : contenu entierement pilote par /api/faq (gere dans l'admin).
+const container = document.getElementById("faq-container");
+
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str || "";
-  return div.innerHTML;
+  return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-async function load() {
-  const list = document.getElementById("faq-list");
+async function loadFaq() {
   try {
-    const pages = await fetch("/api/pages").then((r) => r.json());
-    const items = (pages.faq || []).filter((i) => i.question && i.answer);
-    if (!items.length) { document.getElementById("faq-empty").style.display = "block"; return; }
-    list.innerHTML = items.map((i) => `
-      <details class="faq-item">
-        <summary>${escapeHtml(i.question)}</summary>
-        <div class="faq-answer">${escapeHtml(i.answer)}</div>
-      </details>`).join("");
+    const res = await fetch("/api/faq");
+    if (!res.ok) throw new Error("http");
+    const data = await res.json();
+    const sections = Array.isArray(data.sections) ? data.sections : [];
+
+    if (!sections.length) {
+      container.innerHTML =
+        "<p class='loading-line'>La FAQ sera bientôt disponible.</p>";
+      return;
+    }
+
+    container.innerHTML = sections
+      .map(
+        (section) => `
+      <section class="split-block">
+        <h2>${escapeHtml(section.title)}</h2>
+        <div class="block-body">${(section.items || [])
+          .map(
+            (item) => `
+          <details class="faq-item">
+            <summary>${escapeHtml(item.q)}</summary>
+            <p class="faq-answer">${escapeHtml(item.a)}</p>
+          </details>`
+          )
+          .join("")}</div>
+      </section>`
+      )
+      .join("");
   } catch (e) {
-    list.innerHTML = "<p class='empty-note'>Impossible de charger la FAQ pour le moment.</p>";
+    container.innerHTML =
+      "<p class='loading-line'>Impossible de charger la FAQ pour le moment. Réessayez plus tard.</p>";
   }
 }
-load();
+
+loadFaq();

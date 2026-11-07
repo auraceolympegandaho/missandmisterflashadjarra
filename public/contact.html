@@ -4,50 +4,93 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Contact — Miss & Mister Flash Adjarra</title>
-<link rel="icon" href="/img/logo.jpg" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="stylesheet" href="/css/profile.css" />
-<link rel="stylesheet" href="/css/content.css" />
+<meta name="description" content="Contactez l'organisation de Miss & Mister Flash Adjarra." />
+<link rel="icon" type="image/png" href="/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Instrument+Sans:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/css/mm.css" />
+<link rel="stylesheet" href="/css/mm-pages.css" />
 </head>
 <body>
 
-<header class="site-header glass">
-  <div class="header-top">
-    <a href="/index.html"><img class="logo" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" /></a>
-    <div class="header-titles">
-      <h1>Miss &amp; Mister</h1>
-      <p>Flash Adjarra</p>
-    </div>
-    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="site-menu">
-      <span></span>
-    </button>
-  </div>
-  <nav class="site-menu" id="site-menu" aria-label="Navigation principale">
-    <a href="/index.html" class="site-menu-link">Accueil</a>
-    <a href="/candidats.html" class="site-menu-link">Candidats</a>
-    <a href="/billetterie.html" class="site-menu-link">Billetterie</a>
-    <a href="/projets.html" class="site-menu-link">Projets d'impact</a>
-    <a href="/galerie.html" class="site-menu-link">Galerie</a>
-    <a href="/resultats.html" class="site-menu-link">Résultats</a>
-    <a href="/apropos.html" class="site-menu-link">À propos</a>
-    <a href="/partenaires.html" class="site-menu-link">Partenaires</a>
-    <a href="/faq.html" class="site-menu-link">FAQ</a>
-    <a href="/contact.html" class="site-menu-link active">Contact</a>
-  </nav>
-</header>
+<script src="/js/nav.js"></script>
 
-<main class="profile-main" style="max-width:760px;">
-  <h1 class="page-title">Contact</h1>
-  <p class="page-sub">Une question ? Écrivez-nous</p>
-  <div class="contact-grid" id="contact-grid"></div>
-  <p class="empty-note" id="contact-empty" style="display:none;">Les coordonnées seront bientôt disponibles.</p>
+<main>
+  <header class="page-head wrap">
+    <h1>Nous contacter</h1>
+    <p class="lede">Une question, une réservation, un partenariat ? Écrivez-nous.</p>
+  </header>
+
+  <div class="wrap page-body">
+    <div class="contact-grid">
+      <div>
+        <div class="contact-list">
+          <a class="contact-item" id="contact-whatsapp" href="#" target="_blank" rel="noopener">
+            <div>
+              <b>WhatsApp</b>
+              <span id="contact-whatsapp-label">Écrire à l'organisation</span>
+            </div>
+          </a>
+          <a class="contact-item" id="contact-email" href="#">
+            <div>
+              <b>E-mail</b>
+              <span id="contact-email-label">Envoyer un message</span>
+            </div>
+          </a>
+          <div class="contact-item">
+            <div>
+              <b>Sur place</b>
+              <span id="contact-address">Chargement...</span>
+            </div>
+          </div>
+        </div>
+        <p class="form-hint" style="margin-top:14px;">
+          Réponse généralement sous 24 à 48 heures les jours ouvrés.
+        </p>
+        <p class="form-hint">
+          La plupart des questions sur les votes, les paiements et les billets trouvent déjà
+          leur réponse sur la page <a href="/faq.html">FAQ</a>. Pour un problème de paiement,
+          indiquez la date, le montant, le numéro utilisé et le nom du/de la candidat(e)
+          concerné(e) : cela accélère beaucoup le traitement.
+        </p>
+      </div>
+
+      <div class="contact-form">
+        <h2>Écrire un message</h2>
+        <p class="form-hint">
+          Renseignez votre message ci-dessous : il sera préparé et ouvert dans WhatsApp ou dans
+          votre messagerie, prêt à être envoyé.
+        </p>
+
+        <div class="form-field">
+          <label for="contact-name">Votre nom</label>
+          <input type="text" id="contact-name" placeholder="Nom et prénom" />
+        </div>
+
+        <div class="form-field">
+          <label for="contact-subject">Sujet</label>
+          <select id="contact-subject">
+            <option>Chargement...</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="contact-message">Votre message</label>
+          <textarea id="contact-message" placeholder="Décrivez votre demande en quelques lignes..."></textarea>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn" id="send-whatsapp" type="button">Envoyer via WhatsApp</button>
+          <button class="btn outline" id="send-email" type="button">Envoyer par e-mail</button>
+        </div>
+        <p class="form-hint" id="contact-feedback" role="status"></p>
+      </div>
+    </div>
+  </div>
 </main>
 
-<footer>
-  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
-</footer>
-
-<script src="/js/menu.js"></script>
+<footer></footer>
 <script src="/js/contact.js"></script>
 </body>
 </html>

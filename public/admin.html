@@ -3,205 +3,374 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Admin — Miss & Mister Flash Adjarra</title>
-<link rel="icon" href="/img/logo.jpg" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="stylesheet" href="/css/admin.css" />
+<meta name="robots" content="noindex" />
+<title>Administration — Miss & Mister Flash Adjarra</title>
+<link rel="icon" type="image/png" href="/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Instrument+Sans:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/css/mm-admin.css" />
 </head>
 <body>
 
-<!-- Ecran de connexion -->
+<!-- Écran de connexion -->
 <div id="login-screen" class="login-screen">
+  <div class="login-art" aria-hidden="true">
+    <div class="login-arch"><img src="/img/logo.png" alt="" /></div>
+    <p>Miss &amp; Mister<br />Flash Adjarra</p>
+  </div>
   <div class="login-box">
-    <img src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" style="max-width:140px; width:100%; height:auto; display:block; margin:0 auto 14px;" />
-    <h1>Panel admin</h1>
-    <p class="sub">Miss &amp; Mister Flash Adjarra</p>
-    <label>Identifiant</label>
+    <h1>Espace organisation</h1>
+    <p class="sub">Connectez-vous pour gérer le concours.</p>
+    <label for="login-user">Identifiant</label>
     <input id="login-user" type="text" autocomplete="username" />
-    <label>Mot de passe</label>
+    <label for="login-pass">Mot de passe</label>
     <input id="login-pass" type="password" autocomplete="current-password" />
-    <button class="btn block" id="login-btn">Se connecter</button>
+    <button class="btn gold block" id="login-btn">Se connecter</button>
     <p class="error-msg" id="login-error"></p>
   </div>
 </div>
 
-<!-- Dashboard -->
+<!-- Tableau de bord -->
 <div id="dashboard" class="dashboard" style="display:none;">
-  <header class="admin-header">
-    <div>
-      <h1>Miss &amp; Mister Flash Adjarra</h1>
-      <p>Panel administrateur</p>
-    </div>
-    <button class="btn" id="logout-btn">Déconnexion</button>
-  </header>
+  <div class="adm-shell">
 
-  <nav class="admin-tabs">
-    <button class="admin-tab-btn active" data-tab="results">Résultats</button>
-    <button class="admin-tab-btn" data-tab="home">Accueil</button>
-    <button class="admin-tab-btn" data-tab="candidates">Candidats</button>
-    <button class="admin-tab-btn" data-tab="transactions">Transactions</button>
-    <button class="admin-tab-btn" data-tab="announcements">Actualités</button>
-    <button class="admin-tab-btn" data-tab="partners">Partenaires</button>
-    <button class="admin-tab-btn" data-tab="pages">Pages</button>
-    <button class="admin-tab-btn" data-tab="settings">Réglages</button>
-  </nav>
-
-  <section id="tab-results" class="tab-panel">
-    <div class="stat-cards">
-      <div class="stat-card">
-        <span class="label">Total encaissé</span>
-        <span class="value" id="stat-total-fcfa">0 FCFA</span>
+    <aside class="adm-side" id="adm-side">
+      <div class="adm-brand">
+        <img src="/img/logo.png" alt="" />
+        <div><strong>Miss &amp; Mister</strong><span>Administration</span></div>
       </div>
-      <div class="stat-card">
-        <span class="label">Transactions payées</span>
-        <span class="value" id="stat-nb-tx">0</span>
+
+      <nav class="admin-tabs" aria-label="Sections">
+        <p class="adm-group">Pilotage</p>
+        <button class="admin-tab-btn active" data-tab="results">Tableau de bord</button>
+        <button class="admin-tab-btn" data-tab="transactions">Transactions</button>
+        <p class="adm-group">Concours</p>
+        <button class="admin-tab-btn" data-tab="candidates">Candidats</button>
+        <button class="admin-tab-btn" data-tab="registrations">Gestion des candidatures</button>
+        <p class="adm-group">Contenu du site</p>
+        <button class="admin-tab-btn" data-tab="home">Accueil</button>
+        <button class="admin-tab-btn" data-tab="announcements">Actualités</button>
+        <button class="admin-tab-btn" data-tab="partners">Partenaires</button>
+        <button class="admin-tab-btn" data-tab="about">À propos</button>
+        <button class="admin-tab-btn" data-tab="faq-contact">FAQ &amp; Contact</button>
+        <p class="adm-group">Configuration</p>
+        <button class="admin-tab-btn" data-tab="settings">Réglages</button>
+      </nav>
+
+      <div class="adm-side-foot">
+        <a href="/index.html" target="_blank" rel="noopener">Voir le site public</a>
+        <button class="btn" id="logout-btn">Déconnexion</button>
+      </div>
+    </aside>
+    <div class="adm-scrim" id="adm-scrim" hidden></div>
+
+    <div class="adm-main">
+      <header class="admin-header">
+        <button class="adm-menu" id="adm-menu" type="button" aria-label="Ouvrir le menu" aria-controls="adm-side" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <h1 id="adm-title">Tableau de bord</h1>
+      </header>
+
+      <div class="adm-content">
+
+        <!-- TABLEAU DE BORD -->
+        <section id="tab-results" class="tab-panel">
+          <div class="stat-cards">
+            <div class="stat-card">
+              <span class="label">Total encaissé</span>
+              <span class="value" id="stat-total-fcfa">0 FCFA</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">Transactions payées</span>
+              <span class="value" id="stat-nb-tx">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">Votes comptabilisés</span>
+              <span class="value" id="stat-total-votes">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="label">Candidats</span>
+              <span class="value" id="stat-nb-cand">0</span>
+            </div>
+          </div>
+
+          <div class="adm-cols">
+            <div class="panel-card">
+              <h2>Miss : en tête</h2>
+              <div class="bars" id="bars-miss"></div>
+            </div>
+            <div class="panel-card">
+              <h2>Mister : en tête</h2>
+              <div class="bars" id="bars-mister"></div>
+            </div>
+          </div>
+
+          <h2 class="sect-title">Classement complet</h2>
+          <div class="table-wrap">
+            <table class="admin-table" id="results-table">
+              <thead><tr><th>#</th><th>Candidat</th><th>Catégorie</th><th>Votes</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ACCUEIL -->
+        <section id="tab-home" class="tab-panel" style="display:none;">
+          <div class="form-card wide">
+            <h3>Présentation</h3>
+            <label>Édition (ex : Édition 2027)</label>
+            <input type="text" id="h-edition" />
+            <label>Titre principal</label>
+            <input type="text" id="h-title" />
+            <label>Slogan</label>
+            <input type="text" id="h-slogan" />
+            <label>Texte de présentation</label>
+            <textarea id="h-description" rows="4"></textarea>
+            <label>Affiche / visuel principal</label>
+            <img id="h-poster-preview" class="poster-preview" alt="" />
+            <input type="file" id="h-poster" accept="image/*" />
+
+            <h3>Organisateur</h3>
+            <label>Texte de la bannière organisateur (le gras <code>&lt;b&gt;</code> est autorisé)</label>
+            <textarea id="h-organizer" rows="2"></textarea>
+
+            <h3>Objectifs du concours</h3>
+            <div id="h-objectives-list"></div>
+            <button class="btn" type="button" id="h-add-objective">+ Ajouter un objectif</button>
+
+            <h3>Boutons de l'accueil</h3>
+            <p class="help">
+              Le premier bouton est mis en avant. Les destinations acceptent une page du site
+              (ex : <code>/candidats.html</code>), une ancre (ex : <code>#objectifs</code>) ou un lien complet.
+            </p>
+            <div id="h-buttons-list"></div>
+            <button class="btn" type="button" id="h-add-button">+ Ajouter un bouton</button>
+
+            <div class="form-foot">
+              <button class="btn gold" id="save-homepage-btn">Enregistrer l'accueil</button>
+              <p class="error-msg" id="homepage-msg"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- CANDIDATS -->
+        <section id="tab-candidates" class="tab-panel" style="display:none;">
+          <div class="toolbar"><button class="btn gold" id="new-candidate-btn">+ Ajouter un(e) candidat(e)</button></div>
+          <div class="table-wrap">
+            <table class="admin-table" id="candidates-table">
+              <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Lien de vote</th><th>Fiche</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- CANDIDATURES -->
+        <section id="tab-registrations" class="tab-panel" style="display:none;">
+          <h2 class="rg-h">Gestion des candidatures</h2>
+          <div class="rg-stats" id="rg-stats"></div>
+
+          <details class="form-card wide" id="rg-settings-card">
+            <summary class="rg-summary">Paramètres des inscriptions</summary>
+            <div id="rg-phase" class="rg-phase"></div>
+            <ul id="rg-warnings" class="rg-warnings"></ul>
+            <label class="rg-inline"><input type="checkbox" id="rg-open" /> Inscriptions ouvertes (interrupteur principal)</label>
+            <div class="rg-grid">
+              <div><label>Début (heure locale)</label><input type="datetime-local" id="rg-starts" /></div>
+              <div><label>Clôture (heure locale)</label><input type="datetime-local" id="rg-ends" /></div>
+              <div><label>Âge minimum (vide = aucune limite)</label><input type="number" id="rg-minage" min="0" max="120" /></div>
+              <div><label>Âge maximum (vide = aucune limite)</label><input type="number" id="rg-maxage" min="0" max="120" /></div>
+              <div><label>Édition</label><input type="text" id="rg-edition" maxlength="4" /></div>
+            </div>
+            <label>Message personnalisé quand les inscriptions sont fermées (facultatif)</label>
+            <textarea id="rg-closedmsg" rows="2"></textarea>
+            <div class="rg-grid">
+              <div><label>Filières autorisées (une par ligne — vide = saisie libre)</label><textarea id="rg-fields" rows="4"></textarea></div>
+              <div><label>Niveaux autorisés (une par ligne — vide = saisie libre)</label><textarea id="rg-levels" rows="4"></textarea></div>
+            </div>
+            <label>Conditions particulières</label>
+            <textarea id="rg-special" rows="3"></textarea>
+            <label>Règlement applicable (texte affiché au public)</label>
+            <textarea id="rg-rules" rows="6"></textarea>
+            <label>Politique de confidentialité (texte affiché au public)</label>
+            <textarea id="rg-privacy" rows="6"></textarea>
+            <div class="form-foot">
+              <button class="btn gold" id="rg-save-settings">Enregistrer les paramètres</button>
+              <p class="error-msg" id="rg-settings-msg"></p>
+            </div>
+          </details>
+
+          <div class="form-card wide rg-filters">
+            <input type="search" id="rg-q" placeholder="Rechercher (nom, référence, téléphone)" />
+            <select id="rg-cat"><option value="">Toutes catégories</option><option value="Miss">Miss</option><option value="Mister">Mister</option></select>
+            <select id="rg-status"><option value="">Tous statuts</option></select>
+            <select id="rg-field"><option value="">Toutes filières</option></select>
+            <select id="rg-complete"><option value="">Complet ou non</option><option value="1">Dossiers complets</option><option value="0">Dossiers non complets</option></select>
+            <button class="btn" id="rg-export">Exporter CSV</button>
+            <button class="btn" id="rg-export-contacts" title="Inclut téléphone et WhatsApp">CSV + coordonnées</button>
+          </div>
+
+          <div class="rg-table-wrap table-wrap">
+            <table class="admin-table" id="rg-table">
+              <thead><tr><th>Référence</th><th>Candidat(e)</th><th>Catégorie</th><th>Filière</th><th>Statut</th><th>Soumise le</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="rg-pager"><button class="btn" id="rg-prev">← Précédent</button><span id="rg-page"></span><button class="btn" id="rg-next">Suivant →</button></div>
+
+          <div id="rg-detail" class="form-card wide rg-detail" hidden></div>
+        </section>
+
+        <!-- TRANSACTIONS -->
+        <section id="tab-transactions" class="tab-panel" style="display:none;">
+          <div class="table-wrap">
+            <table class="admin-table" id="transactions-table">
+              <thead><tr><th>Date</th><th>Candidat</th><th>Votes</th><th>Montant</th><th>Téléphone</th><th>Statut</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ACTUALITES -->
+        <section id="tab-announcements" class="tab-panel" style="display:none;">
+          <div class="toolbar"><button class="btn gold" id="new-announcement-btn">+ Ajouter une actualité</button></div>
+          <div class="table-wrap">
+            <table class="admin-table" id="announcements-table">
+              <thead><tr><th>Date</th><th>Étiquette</th><th>Contenu</th><th>Statut</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- PARTENAIRES -->
+        <section id="tab-partners" class="tab-panel" style="display:none;">
+          <div class="toolbar"><button class="btn gold" id="new-partner-btn">+ Ajouter un partenaire</button></div>
+          <div class="table-wrap">
+            <table class="admin-table" id="partners-table">
+              <thead><tr><th>Logo</th><th>Nom</th><th>Site web</th><th>Ordre</th><th>Statut</th><th>Actions</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- A PROPOS -->
+        <section id="tab-about" class="tab-panel" style="display:none;">
+          <div class="note">
+            La description du concours, le texte de l'organisateur et les objectifs affichés en
+            haut de la page « À propos » sont les mêmes que sur l'accueil : modifiez-les depuis
+            l'onglet <b>Accueil</b>. Cet onglet gère uniquement ce qui est propre à la page À propos.
+          </div>
+
+          <div class="form-card wide">
+            <label>Le déroulement du concours</label>
+            <div id="about-steps-list"></div>
+            <button type="button" class="btn" id="add-about-step-btn">+ Ajouter une étape</button>
+          </div>
+
+          <div class="form-card wide">
+            <label>Texte « Le projet d'impact »</label>
+            <textarea id="about-project-input" rows="4"></textarea>
+            <label>Texte « Transparence des votes »</label>
+            <textarea id="about-transparency-input" rows="4"></textarea>
+            <div class="form-foot">
+              <button class="btn gold" id="save-about-btn">Enregistrer</button>
+              <p class="error-msg" id="about-msg"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- FAQ & CONTACT -->
+        <section id="tab-faq-contact" class="tab-panel" style="display:none;">
+          <div class="form-card wide">
+            <h3>Coordonnées de contact</h3>
+            <label>Numéro WhatsApp (format international, sans +)</label>
+            <input type="text" id="contact-whatsapp-input" placeholder="ex : 22900000000" />
+            <label>Adresse e-mail</label>
+            <input type="email" id="contact-email-input" placeholder="ex : contact@..." />
+            <label>Adresse / lieu</label>
+            <input type="text" id="contact-address-input" placeholder="ex : Campus d'Adjarra" />
+
+            <label>Sujets proposés dans le formulaire</label>
+            <div id="contact-subjects-list"></div>
+            <button type="button" class="btn" id="add-subject-btn">+ Ajouter un sujet</button>
+
+            <div class="form-foot">
+              <button class="btn gold" id="save-contact-btn">Enregistrer les coordonnées</button>
+              <p class="error-msg" id="contact-settings-msg"></p>
+            </div>
+          </div>
+
+          <div class="form-card wide">
+            <h3>FAQ publique</h3>
+            <p class="help">
+              Organisée en sections (ex. « Les votes », « Le concours »). Chaque section contient
+              des questions/réponses affichées sur la page FAQ du site.
+            </p>
+            <div id="faq-sections-list"></div>
+            <button type="button" class="btn" id="add-faq-section-btn">+ Ajouter une section</button>
+            <div class="form-foot">
+              <button class="btn gold" id="save-faq-btn">Enregistrer la FAQ</button>
+              <p class="error-msg" id="faq-msg"></p>
+            </div>
+          </div>
+        </section>
+
+        <!-- REGLAGES -->
+        <section id="tab-settings" class="tab-panel" style="display:none;">
+          <div class="adm-cols">
+            <div class="form-card">
+              <h3>Prix d'un vote</h3>
+              <label>Prix d'un vote (FCFA)</label>
+              <input type="number" id="price-input" min="1" />
+              <div class="form-foot">
+                <button class="btn gold" id="save-price-btn">Enregistrer</button>
+                <p class="error-msg" id="price-msg"></p>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <h3>Compte à rebours</h3>
+              <label>Libellé (accueil)</label>
+              <input type="text" id="countdown-label-input" placeholder="ex : Clôture des votes" />
+              <label>Date et heure de l'échéance</label>
+              <input type="datetime-local" id="countdown-date-input" />
+              <p class="help">Laissez la date vide pour masquer le compte à rebours sur l'accueil.</p>
+              <div class="form-foot">
+                <button class="btn gold" id="save-countdown-btn">Enregistrer</button>
+                <p class="error-msg" id="countdown-msg"></p>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <h3>Affichage public</h3>
+              <p class="help">
+                Décochez pour masquer ces informations sur les fiches candidats, la liste et la page
+                Résultats. Les votes continuent d'être enregistrés normalement.
+              </p>
+              <label class="check"><input type="checkbox" id="show-votes-input" /> Afficher le nombre de votes</label>
+              <label class="check"><input type="checkbox" id="show-ranking-input" /> Afficher le classement (rang et page Résultats)</label>
+              <div class="form-foot">
+                <button class="btn gold" id="save-display-btn">Enregistrer</button>
+                <p class="error-msg" id="display-msg"></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
-    <table class="admin-table" id="results-table">
-      <thead><tr><th>#</th><th>Candidat</th><th>Catégorie</th><th>Votes</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </section>
-
-  <section id="tab-home" class="tab-panel" style="display:none;">
-    <div class="form-card">
-      <h3 style="margin-top:0;">Présentation</h3>
-      <label>Édition (ex : Édition 2027)</label>
-      <input type="text" id="h-edition" />
-      <label>Titre principal</label>
-      <input type="text" id="h-title" />
-      <label>Slogan</label>
-      <input type="text" id="h-slogan" />
-      <label>Texte de présentation</label>
-      <textarea id="h-description" rows="4" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
-      <label>Affiche / visuel principal</label>
-      <img id="h-poster-preview" style="display:block; max-width:160px; border-radius:10px; margin:6px 0 10px;" />
-      <input type="file" id="h-poster" accept="image/*" />
-
-      <h3>Organisateur</h3>
-      <label>Texte de la bannière organisateur (le gras <code>&lt;b&gt;</code> est autorisé)</label>
-      <textarea id="h-organizer" rows="2" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
-
-      <h3>Objectifs du concours</h3>
-      <div id="h-objectives-list"></div>
-      <button class="btn" type="button" id="h-add-objective">+ Ajouter un objectif</button>
-
-      <h3>Boutons de l'accueil</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin:-4px 0 8px;">
-        Le premier bouton est mis en avant (doré). Les destinations acceptent une page du site
-        (ex : <code>/candidats.html</code>), une ancre (ex : <code>#objectifs</code>) ou un lien complet.
-      </p>
-      <div id="h-buttons-list"></div>
-      <button class="btn" type="button" id="h-add-button">+ Ajouter un bouton</button>
-
-      <button class="btn gold" id="save-homepage-btn" style="margin-top:20px;">Enregistrer l'accueil</button>
-      <p class="error-msg" id="homepage-msg"></p>
-    </div>
-  </section>
-
-  <section id="tab-candidates" class="tab-panel" style="display:none;">
-    <button class="btn gold" id="new-candidate-btn">+ Ajouter un(e) candidat(e)</button>
-    <table class="admin-table" id="candidates-table">
-      <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Lien de vote</th><th>Fiche</th><th>Actions</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </section>
-
-  <section id="tab-transactions" class="tab-panel" style="display:none;">
-    <table class="admin-table" id="transactions-table">
-      <thead><tr><th>Date</th><th>Candidat</th><th>Votes</th><th>Montant</th><th>Téléphone</th><th>Statut</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </section>
-
-  <section id="tab-announcements" class="tab-panel" style="display:none;">
-    <button class="btn gold" id="new-announcement-btn">+ Ajouter une actualité</button>
-    <table class="admin-table" id="announcements-table">
-      <thead><tr><th>Date</th><th>Étiquette</th><th>Contenu</th><th>Statut</th><th>Actions</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </section>
-
-  <section id="tab-partners" class="tab-panel" style="display:none;">
-    <button class="btn gold" id="new-partner-btn">+ Ajouter un partenaire</button>
-    <table class="admin-table" id="partners-table">
-      <thead><tr><th>Logo</th><th>Nom</th><th>Site web</th><th>Ordre</th><th>Statut</th><th>Actions</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </section>
-
-  <section id="tab-pages" class="tab-panel" style="display:none;">
-    <div class="form-card">
-      <h3>Billetterie</h3>
-      <label>Introduction</label>
-      <textarea id="p-bill-intro" rows="2" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
-      <label>Infos pratiques (lieu, date, tarif)</label>
-      <textarea id="p-bill-infos" rows="3" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
-      <label>Message de contact</label>
-      <input type="text" id="p-bill-note" />
-
-      <h3>À propos</h3>
-      <label>Texte de présentation</label>
-      <textarea id="p-about" rows="5" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
-
-      <h3>Contact</h3>
-      <label>Téléphone</label><input type="text" id="p-phone" placeholder="+229 ..." />
-      <label>WhatsApp (avec indicatif)</label><input type="text" id="p-whatsapp" placeholder="+229 ..." />
-      <label>E-mail</label><input type="text" id="p-email" />
-      <label>Page Facebook</label><input type="text" id="p-facebook" placeholder="https://facebook.com/..." />
-      <label>Adresse</label><input type="text" id="p-address" />
-
-      <h3>FAQ</h3>
-      <div id="p-faq-list"></div>
-      <button class="btn" type="button" id="p-add-faq">+ Ajouter une question</button>
-
-      <button class="btn gold" id="save-pages-btn" style="margin-top:20px;">Enregistrer les pages</button>
-      <p class="error-msg" id="pages-msg"></p>
-    </div>
-  </section>
-
-  <section id="tab-settings" class="tab-panel" style="display:none;">
-    <div class="form-card" style="margin-bottom:20px;">
-      <label style="display:flex; gap:10px; align-items:center; margin:0;">
-        <input type="checkbox" id="show-votes-input" style="width:auto; margin:0;" />
-        Afficher publiquement le nombre de votes et le classement
-      </label>
-      <p style="font-size:12px; color:var(--text-muted); margin:6px 0 10px;">
-        Décoché : les fiches, la page Candidats et la page Résultats masquent les scores.
-      </p>
-      <button class="btn gold" id="save-visibility-btn">Enregistrer</button>
-      <p class="error-msg" id="visibility-msg"></p>
-    </div>
-
-    <div class="form-card">
-      <label>Prix d'un vote (FCFA)</label>
-      <input type="number" id="price-input" min="1" />
-      <button class="btn gold" id="save-price-btn">Enregistrer</button>
-      <p class="error-msg" id="price-msg"></p>
-    </div>
-
-    <div class="form-card" style="margin-top:20px;">
-      <label>Libellé du compte à rebours (accueil)</label>
-      <input type="text" id="countdown-label-input" placeholder="ex : Clôture des votes" />
-      <label>Date et heure de l'échéance</label>
-      <input type="datetime-local" id="countdown-date-input" />
-      <p style="font-size:12px; color:var(--text-muted); margin:6px 0 0;">
-        Laissez la date vide pour masquer le compte à rebours sur l'accueil.
-      </p>
-      <button class="btn gold" id="save-countdown-btn" style="margin-top:12px;">Enregistrer</button>
-      <p class="error-msg" id="countdown-msg"></p>
-    </div>
-  </section>
+  </div>
 </div>
 
-<!-- Modal creation/edition candidat -->
+<!-- Modal création/édition candidat -->
 <div class="overlay" id="candidate-overlay">
   <div class="modal">
     <h2 id="candidate-modal-title">Ajouter un(e) candidat(e)</h2>
     <label>Nom complet</label>
     <input type="text" id="c-name" />
     <label>Catégorie</label>
-    <select id="c-category" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px;">
+    <select id="c-category">
       <option value="Miss">Miss</option>
       <option value="Mister">Mister</option>
     </select>
@@ -214,18 +383,16 @@
     <label>Bio / présentation</label>
     <input type="text" id="c-bio" />
     <label>Projet / motivation (projet d'impact)</label>
-    <textarea id="c-project" rows="3" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
+    <textarea id="c-project" rows="3"></textarea>
     <label>Lien vidéo (YouTube, optionnel)</label>
     <input type="text" id="c-video" placeholder="https://youtube.com/..." />
     <label>Photo principale</label>
     <input type="file" id="c-photo" accept="image/*" />
     <label>Photos supplémentaires (galerie)</label>
-    <div id="c-existing-photos" style="display:flex; flex-wrap:wrap; gap:8px; margin:6px 0;"></div>
+    <div id="c-existing-photos" class="thumbs"></div>
     <input type="file" id="c-photos" accept="image/*" multiple />
-    <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0;">
-      Les nouvelles photos s'ajoutent à la galerie existante (jusqu'à 6 à la fois).
-    </p>
-    <div style="margin-top:16px; display:flex; gap:10px;">
+    <p class="help">Les nouvelles photos s'ajoutent à la galerie existante (jusqu'à 6 à la fois).</p>
+    <div class="modal-foot">
       <button class="btn gold block" id="save-candidate-btn">Enregistrer</button>
     </div>
     <p class="error-msg" id="candidate-msg"></p>
@@ -233,15 +400,15 @@
   </div>
 </div>
 
-<!-- Modal creation/edition actualite -->
+<!-- Modal création/édition actualité -->
 <div class="overlay" id="announcement-overlay">
   <div class="modal">
     <h2 id="announcement-modal-title">Ajouter une actualité</h2>
     <label>Étiquette</label>
     <input type="text" id="a-tag" placeholder="ex : À venir, Info, Important" />
     <label>Contenu</label>
-    <textarea id="a-content" rows="4" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
-    <div style="margin-top:16px; display:flex; gap:10px;">
+    <textarea id="a-content" rows="4"></textarea>
+    <div class="modal-foot">
       <button class="btn gold block" id="save-announcement-btn">Enregistrer</button>
     </div>
     <p class="error-msg" id="announcement-msg"></p>
@@ -260,7 +427,7 @@
     <input type="number" id="p-order" value="0" min="0" />
     <label>Logo</label>
     <input type="file" id="p-logo" accept="image/*" />
-    <div style="margin-top:16px; display:flex; gap:10px;">
+    <div class="modal-foot">
       <button class="btn gold block" id="save-partner-btn">Enregistrer</button>
     </div>
     <p class="error-msg" id="partner-msg"></p>
@@ -269,5 +436,7 @@
 </div>
 
 <script src="/js/admin.js"></script>
+<script src="/js/admin-registrations.js"></script>
+<script src="/js/admin-shell.js"></script>
 </body>
 </html>

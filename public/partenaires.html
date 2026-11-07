@@ -3,51 +3,51 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Nos partenaires — Miss & Mister Flash Adjarra</title>
-<link rel="icon" href="/img/logo.jpg" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="stylesheet" href="/css/profile.css" />
-<link rel="stylesheet" href="/css/content.css" />
+<title>Partenaires — Miss & Mister Flash Adjarra</title>
+<meta name="description" content="Les partenaires de Miss & Mister Flash Adjarra." />
+<link rel="icon" type="image/png" href="/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Instrument+Sans:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/css/mm.css" />
+<link rel="stylesheet" href="/css/mm-pages.css" />
 </head>
 <body>
 
-<header class="site-header glass">
-  <div class="header-top">
-    <a href="/index.html"><img class="logo" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" /></a>
-    <div class="header-titles">
-      <h1>Miss &amp; Mister</h1>
-      <p>Flash Adjarra</p>
-    </div>
-    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="site-menu">
-      <span></span>
-    </button>
-  </div>
-  <nav class="site-menu" id="site-menu" aria-label="Navigation principale">
-    <a href="/index.html" class="site-menu-link">Accueil</a>
-    <a href="/candidats.html" class="site-menu-link">Candidats</a>
-    <a href="/billetterie.html" class="site-menu-link">Billetterie</a>
-    <a href="/projets.html" class="site-menu-link">Projets d'impact</a>
-    <a href="/galerie.html" class="site-menu-link">Galerie</a>
-    <a href="/resultats.html" class="site-menu-link">Résultats</a>
-    <a href="/apropos.html" class="site-menu-link">À propos</a>
-    <a href="/partenaires.html" class="site-menu-link active">Partenaires</a>
-    <a href="/faq.html" class="site-menu-link">FAQ</a>
-    <a href="/contact.html" class="site-menu-link">Contact</a>
-  </nav>
-</header>
+<script src="/js/nav.js"></script>
 
-<main class="profile-main" style="max-width:760px;">
-  <h1 class="page-title">Nos partenaires</h1>
-  <p class="page-sub">Merci à celles et ceux qui soutiennent cette édition</p>
-  <div class="partners-grid" id="partners-grid"></div>
-  <p class="empty-note" id="partners-empty" style="display:none;">Aucun partenaire pour le moment.</p>
+<main>
+  <header class="page-head wrap">
+    <h1>Nos partenaires</h1>
+    <p class="lede">Ils soutiennent cette édition et rendent l'événement possible.</p>
+  </header>
+
+  <div class="wrap page-body">
+    <div id="partners-container">
+      <p class="loading-line">Chargement des partenaires...</p>
+    </div>
+
+    <section class="split-block">
+      <h2>Devenir partenaire</h2>
+      <div class="block-body">
+        <p>
+          Votre entreprise ou votre structure souhaite s'associer au concours ? Le partenariat
+          offre une visibilité auprès de la communauté étudiante de la FLASH Adjarra, sur la
+          plateforme de vote, sur les supports de communication et pendant la soirée de gala.
+        </p>
+        <ul>
+          <li>Logo et lien sur le site officiel du concours.</li>
+          <li>Citations lors des annonces et sur les réseaux sociaux.</li>
+          <li>Visibilité sur scène lors de la soirée de gala.</li>
+          <li>Formules adaptées aux petits commerces comme aux grandes entreprises.</li>
+        </ul>
+        <a class="btn" href="/contact.html">Nous contacter</a>
+      </div>
+    </section>
+  </div>
 </main>
 
-<footer>
-  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
-</footer>
-
-<script src="/js/menu.js"></script>
+<footer></footer>
 <script src="/js/partenaires.js"></script>
 </body>
 </html>

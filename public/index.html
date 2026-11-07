@@ -4,131 +4,171 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Miss & Mister Flash Adjarra — Édition 2027</title>
-<link rel="icon" href="/img/logo.jpg" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="stylesheet" href="/css/home.css" />
+<meta name="description" content="Plateforme officielle du concours Miss & Mister Flash Adjarra : candidats, votes, inscriptions et billetterie." />
+<link rel="icon" type="image/png" href="/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Instrument+Sans:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/css/mm.css" />
+<link rel="stylesheet" href="/css/mm-pages.css" />
 </head>
-<body>
+<body class="page-home">
 
-<header class="site-header glass">
-  <div class="header-top">
-    <a href="/index.html"><img class="logo" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" /></a>
-    <div class="header-titles">
-      <h1>Miss &amp; Mister</h1>
-      <p>Flash Adjarra</p>
-    </div>
-    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="site-menu">
-      <span></span>
-    </button>
-  </div>
-  <nav class="site-menu" id="site-menu" aria-label="Navigation principale">
-    <a href="/index.html" class="site-menu-link active">Accueil</a>
-    <a href="/candidats.html" class="site-menu-link">Candidats</a>
-    <a href="/billetterie.html" class="site-menu-link">Billetterie</a>
-    <a href="/projets.html" class="site-menu-link">Projets d'impact</a>
-    <a href="/galerie.html" class="site-menu-link">Galerie</a>
-    <a href="/resultats.html" class="site-menu-link">Résultats</a>
-    <a href="/apropos.html" class="site-menu-link">À propos</a>
-    <a href="/partenaires.html" class="site-menu-link">Partenaires</a>
-    <a href="/faq.html" class="site-menu-link">FAQ</a>
-    <a href="/contact.html" class="site-menu-link">Contact</a>
-  </nav>
-</header>
+<script src="/js/nav.js"></script>
 
-<main class="home-main">
+<main>
 
-  <!-- A. Presentation officielle (contenu charge depuis /api/homepage) -->
+  <!-- A. Ouverture : titre typographique + affiche dans une arche -->
   <section class="hero">
-    <div class="hero-content">
-      <img class="hero-logo" id="hero-poster" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" />
-      <span class="hero-edition" id="hero-edition">Édition 2027</span>
-      <h1 id="hero-title">MISS &amp; MISTER FLASH ADJARRA</h1>
-      <p class="slogan" id="hero-slogan"></p>
-      <p class="description" id="hero-description"></p>
-      <div class="hero-cta" id="hero-cta"></div>
-    </div>
-  </section>
-
-  <!-- B. Organisateur -->
-  <div class="organizer-banner">
-    <div class="organizer-card glass" id="organizer-text"></div>
-  </div>
-
-  <!-- C. Objectifs -->
-  <section class="home-section" id="objectifs">
-    <h2>Les objectifs du concours</h2>
-    <p class="section-sub">Un tremplin pour la jeunesse estudiantine de la FLASH Adjarra</p>
-    <div class="objectives-grid" id="objectives-grid"></div>
-  </section>
-
-  <!-- D. Compte a rebours -->
-  <section class="home-section">
-    <div class="countdown-section">
-      <p class="countdown-label" id="countdown-label">Chargement...</p>
-      <div id="countdown-body">
-        <div class="countdown-grid" id="countdown-grid" style="display:none;">
-          <div class="countdown-unit"><span class="num" id="cd-days">–</span><span class="unit">Jours</span></div>
-          <div class="countdown-unit"><span class="num" id="cd-hours">–</span><span class="unit">Heures</span></div>
-          <div class="countdown-unit"><span class="num" id="cd-min">–</span><span class="unit">Min</span></div>
-          <div class="countdown-unit"><span class="num" id="cd-sec">–</span><span class="unit">Sec</span></div>
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <div class="hero-tags">
+          <span class="chip" id="hero-edition">Édition 2027</span>
+          <span class="chip chip-live" id="hero-reg-chip" hidden></span>
         </div>
-        <p class="countdown-empty" id="countdown-empty" style="display:none;">
-          La date sera annoncée prochainement.
-        </p>
+        <h1 class="hero-title" id="hero-title">Miss &amp; Mister Flash Adjarra</h1>
+        <p class="hero-slogan" id="hero-slogan"></p>
+        <p class="hero-desc" id="hero-description"></p>
+        <div class="hero-cta" id="hero-cta">
+          <a href="/inscriptions.html" class="btn">Déposer ma candidature</a>
+        </div>
+        <p class="hero-note">Réservé aux étudiant(e)s de la FLASH Adjarra.</p>
+      </div>
+
+      <figure class="hero-visual" id="hero-visual">
+        <div class="arch-frame hero-arch">
+          <img id="hero-poster" src="/img/logo.png" alt="Miss &amp; Mister Flash Adjarra" />
+        </div>
+      </figure>
+    </div>
+
+    <!-- Compte à rebours : billet à talon détachable -->
+    <div class="wrap">
+      <div class="stub" id="countdown-section">
+        <p class="stub-label" id="countdown-label">Chargement...</p>
+        <div class="stub-body" id="countdown-body">
+          <div class="stub-grid" id="countdown-grid" style="display:none;">
+            <div class="stub-unit"><span class="num" id="cd-days">–</span><span class="unit">jours</span></div>
+            <div class="stub-unit"><span class="num" id="cd-hours">–</span><span class="unit">heures</span></div>
+            <div class="stub-unit"><span class="num" id="cd-min">–</span><span class="unit">minutes</span></div>
+            <div class="stub-unit"><span class="num" id="cd-sec">–</span><span class="unit">secondes</span></div>
+          </div>
+          <p class="stub-empty" id="countdown-empty" style="display:none;">La date sera annoncée prochainement.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- E. Actualites -->
-  <section class="home-section" id="actualites">
-    <h2>Actualités</h2>
-    <p class="section-sub">Les dernières informations officielles du concours</p>
-    <div class="news-grid" id="news-grid">
-      <p style="text-align:center; color:var(--text-muted); grid-column:1/-1; font-size:13px;">Chargement...</p>
+  <!-- B. Prochaines étapes (déroulement géré dans l'admin > À propos) -->
+  <section class="section" id="parcours">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Les prochaines étapes</h2>
+        <p>Du dépôt de candidature au couronnement, voici comment le concours se déroule.</p>
+      </div>
+      <ol class="path" id="steps-track">
+        <li class="path-step"><div class="sk" style="height:90px"></div></li>
+      </ol>
     </div>
   </section>
 
-  <!-- F. Navigation -->
-  <section class="home-section" style="padding-bottom:10px;">
-    <h2>Explorer</h2>
-    <p class="section-sub">Toute la plateforme en un coup d'œil</p>
-    <div class="discover-grid">
-      <a href="#objectifs" class="discover-card">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 4h10v4a5 5 0 01-10 0V4z" stroke-linejoin="round"/><path d="M7 5H4v1a3 3 0 003 3M17 5h3v1a3 3 0 01-3 3M12 13v3M9 19h6M9.5 16h5l.5 3h-6l.5-3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Découvrir le concours
+  <!-- C. Le concours : organisateur et objectifs -->
+  <section class="section section-tint" id="objectifs">
+    <div class="wrap split">
+      <div class="split-side">
+        <h2>Les objectifs du concours</h2>
+        <p class="lede">Un tremplin pour la jeunesse estudiantine de la FLASH Adjarra.</p>
+        <aside class="organizer" id="organizer-text"></aside>
+      </div>
+      <div class="objectives" id="objectives-grid"></div>
+    </div>
+  </section>
+
+  <!-- D. Candidats à la une -->
+  <section class="section" id="candidats-une" hidden>
+    <div class="wrap">
+      <div class="section-head row">
+        <div>
+          <h2>Les candidats</h2>
+          <p>Faites connaissance avec celles et ceux qui portent cette édition.</p>
+        </div>
+        <a class="btn outline" href="/candidats.html" id="all-candidates-link">Voir tous les candidats</a>
+      </div>
+    </div>
+    <div class="featured-rail">
+      <div class="featured-row" id="featured-row"></div>
+    </div>
+  </section>
+
+  <!-- E. Actualités -->
+  <section class="section" id="actualites">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Actualités</h2>
+        <p>Les dernières informations officielles du concours.</p>
+      </div>
+      <div class="news" id="news-grid">
+        <p class="muted">Chargement...</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- F. Projets d'impact (bandeau sombre) -->
+  <section class="band" id="projets-une" hidden>
+    <div class="wrap">
+      <div class="section-head row">
+        <div>
+          <h2>Des projets au service de la communauté</h2>
+          <p>Chaque candidat(e) porte un projet d'impact, présenté publiquement et pris en compte par le jury.</p>
+        </div>
+        <a class="btn outline on-dark" href="/projets.html">Découvrir tous les projets</a>
+      </div>
+      <div class="project-trio" id="home-projects"></div>
+    </div>
+  </section>
+
+  <!-- G. Soirée : billetterie et « J'y serai » -->
+  <section class="section">
+    <div class="wrap duo">
+      <a class="duo-card" href="/billetterie.html">
+        <h3>La billetterie</h3>
+        <p>Choisissez votre formule et réservez votre place pour la soirée de gala.</p>
+        <span class="duo-link">Réserver un billet</span>
       </a>
-      <a href="/candidats.html" class="discover-card">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 9l3 2 5-6 5 6 3-2-1.5 9h-13L4 9z" stroke-linejoin="round"/></svg>
-        Découvrir les candidats
-      </a>
-      <a href="/projets.html" class="discover-card">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3.5h9l3 3V20a.5.5 0 01-.5.5h-11a.5.5 0 01-.5-.5v-16a.5.5 0 01.5-.5z" stroke-linejoin="round"/><path d="M9 10h6M9 13.5h6M9 17h4" stroke-linecap="round"/></svg>
-        Découvrir leurs projets
-      </a>
-      <a href="/galerie.html" class="discover-card">
-        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3.5" y="5" width="17" height="14" rx="1.5"/><circle cx="8.5" cy="10" r="1.6"/><path d="M20.5 15.5l-4.8-4.8a1.5 1.5 0 00-2.1 0L6.5 17.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        Accéder à la galerie
+      <a class="duo-card duo-card-gold" href="/j-y-serai.html">
+        <h3>J'y serai</h3>
+        <p>Marquez la date dans votre agenda et créez votre carte à partager avec vos amis.</p>
+        <span class="duo-link">Créer ma carte</span>
       </a>
     </div>
   </section>
 
-  <!-- G. Partenaires -->
-  <section class="home-section" id="partenaires" style="display:none;">
-    <h2>Nos partenaires</h2>
-    <p class="section-sub">Ils soutiennent cette édition du concours</p>
-    <div class="partners-grid" id="partners-grid"></div>
+  <!-- H. Partenaires -->
+  <section class="section section-white" id="partenaires">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Nos partenaires</h2>
+        <p>Les institutions, entreprises et médias qui accompagnent cette édition.</p>
+      </div>
+      <div class="partners-marquee" id="partners-marquee" hidden>
+        <div class="partners-track" id="partners-track"></div>
+      </div>
+      <p class="partners-all" id="partners-all" hidden><a href="/partenaires.html">Voir tous les partenaires</a></p>
+
+      <div class="partner-cta">
+        <div>
+          <h3>Vous souhaitez devenir partenaire ?</h3>
+          <p>Écrivez au comité organisateur pour proposer votre collaboration et faire apparaître votre logo sur le site.</p>
+        </div>
+        <a class="btn" id="partner-cta-btn" href="/contact.html">Contacter l'équipe</a>
+      </div>
+    </div>
   </section>
 
 </main>
 
-<footer>
-  Un vote = <span id="price-label">...</span> FCFA · Paiement sécurisé par Mobile Money ou carte bancaire.
-  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
-</footer>
+<footer></footer>
 
-<a class="admin-link" href="/admin.html">admin</a>
-
-<script src="/js/menu.js"></script>
 <script src="/js/home.js"></script>
 </body>
 </html>

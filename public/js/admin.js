@@ -28,14 +28,16 @@ function showDashboard() {
   dashboard.style.display = "block";
   loadResults();
   loadHomepage();
-  loadPagesContent();
-  loadVisibility();
   loadCandidates();
   loadTransactions();
   loadAnnouncements();
   loadPartners();
   loadPrice();
   loadCountdown();
+  loadPublicDisplay();
+  loadContactSettings();
+  loadFaqSettings();
+  loadAboutSettings();
 }
 
 function logout() {
@@ -80,12 +82,37 @@ document.querySelectorAll(".admin-tab-btn").forEach((btn) => {
 });
 
 // --- Résultats ---
+// Barres horizontales : 5 premiers d'une categorie (largeur relative au meilleur score)
+function renderBars(elId, list) {
+  const el = document.getElementById(elId);
+  const top = [...list].sort((a, b) => Number(b.votes_count) - Number(a.votes_count)).slice(0, 5);
+  if (!top.length) {
+    el.innerHTML = '<p class="help">Aucun candidat dans cette catégorie.</p>';
+    return;
+  }
+  const max = Math.max(1, Number(top[0].votes_count) || 0);
+  el.innerHTML = top
+    .map(
+      (c) => `<div class="bar-row"><span class="bar-name">${escapeHtml(c.name)}</span>
+        <span class="bar-track"><i style="width:${Math.round(((Number(c.votes_count) || 0) / max) * 100)}%"></i></span>
+        <span class="bar-val">${Number(c.votes_count || 0).toLocaleString("fr-FR")}</span></div>`
+    )
+    .join("");
+}
+
 async function loadResults() {
   try {
     const data = await apiFetch("/results");
     document.getElementById("stat-total-fcfa").textContent =
       data.totals.total_fcfa.toLocaleString("fr-FR") + " FCFA";
     document.getElementById("stat-nb-tx").textContent = data.totals.nb_transactions_approuvees;
+
+    // Indicateurs et barres calcules cote navigateur a partir de la meme reponse
+    const totalVotes = data.candidates.reduce((n, c) => n + Number(c.votes_count || 0), 0);
+    document.getElementById("stat-total-votes").textContent = totalVotes.toLocaleString("fr-FR");
+    document.getElementById("stat-nb-cand").textContent = data.candidates.length;
+    renderBars("bars-miss", data.candidates.filter((c) => c.category === "Miss"));
+    renderBars("bars-mister", data.candidates.filter((c) => c.category === "Mister"));
 
     const tbody = document.querySelector("#results-table tbody");
     tbody.innerHTML = "";
@@ -140,7 +167,7 @@ async function loadHomepage() {
     document.getElementById("h-organizer").value = data.organizer_text || "";
 
     const posterPreview = document.getElementById("h-poster-preview");
-    posterPreview.src = data.poster_path || "/img/logo.jpg";
+    posterPreview.src = data.poster_path || "/img/logo.png";
     document.getElementById("h-poster").value = "";
 
     const objectivesList = document.getElementById("h-objectives-list");
@@ -207,7 +234,7 @@ async function loadCandidates() {
         <td>${escapeHtml(c.name)}</td>
         <td>${escapeHtml(c.category)}</td>
         <td>${c.votes_count}</td>
-        <td>${c.is_active ? "Actif" : "Masqué"}</td>
+        <td><span class="pill ${c.is_active ? "ok" : "off"}">${c.is_active ? "Actif" : "Masqué"}</span></td>
         <td><button class="copy-link-btn" data-link="${escapeHtml(link)}">Copier le lien</button></td>
         <td><a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Voir</a></td>
         <td class="row-actions">
@@ -389,10 +416,10 @@ async function loadTransactions() {
 
 function statusLabel(s) {
   const map = {
-    approved: '<span style="color:#1e7a3d;font-weight:600;">Payé</span>',
-    pending: '<span style="color:#a06a10;">En attente</span>',
-    declined: '<span style="color:#b3261e;">Refusé</span>',
-    canceled: '<span style="color:#b3261e;">Annulé</span>',
+    approved: '<span class="pill ok">Payé</span>',
+    pending: '<span class="pill wait">En attente</span>',
+    declined: '<span class="pill ko">Refusé</span>',
+    canceled: '<span class="pill ko">Annulé</span>',
   };
   return map[s] || s;
 }
@@ -468,6 +495,243 @@ document.getElementById("save-countdown-btn").addEventListener("click", async ()
   }
 });
 
+// --- A propos (deroulement, projet, transparence) ---
+function addAboutStepRow(title = "", text = "") {
+  const container = document.getElementById("about-steps-list");
+  makeRemovableRow(
+    container,
+    `<input type="text" class="about-step-title" placeholder="Titre de l'étape (ex : Candidatures)" value="${escapeHtml(title)}" />
+     <textarea class="about-step-text" placeholder="Texte de l'étape">${escapeHtml(text)}</textarea>`
+  );
+}
+document.getElementById("add-about-step-btn").addEventListener("click", () => addAboutStepRow());
+
+async function loadAboutSettings() {
+  try {
+    const data = await apiFetch("/about");
+    const list = document.getElementById("about-steps-list");
+    list.innerHTML = "";
+    (data.steps && data.steps.length ? data.steps : [{ title: "", text: "" }]).forEach((s) =>
+      addAboutStepRow(s.title, s.text)
+    );
+    document.getElementById("about-project-input").value = data.project_text || "";
+    document.getElementById("about-transparency-input").value = data.transparency_text || "";
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-about-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("about-msg");
+  msgEl.style.display = "none";
+
+  const steps = Array.from(document.querySelectorAll("#about-steps-list .repeat-row"))
+    .map((row) => ({
+      title: row.querySelector(".about-step-title").value.trim(),
+      text: row.querySelector(".about-step-text").value.trim(),
+    }))
+    .filter((s) => s.title && s.text);
+
+  if (!steps.length) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "Ajoutez au moins une étape complète (titre et texte).";
+    msgEl.style.display = "block";
+    return;
+  }
+
+  try {
+    await apiFetch("/about", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        steps,
+        project_text: document.getElementById("about-project-input").value.trim(),
+        transparency_text: document.getElementById("about-transparency-input").value.trim(),
+      }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "Page À propos mise à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// --- FAQ & Contact ---
+
+// Sujets du formulaire de contact : simple liste de champs texte retirables
+function addSubjectRow(value = "") {
+  const container = document.getElementById("contact-subjects-list");
+  makeRemovableRow(
+    container,
+    `<input type="text" class="contact-subject-input" placeholder="ex : Réservation de billets" value="${escapeHtml(value)}" />`
+  );
+}
+document.getElementById("add-subject-btn").addEventListener("click", () => addSubjectRow());
+
+async function loadContactSettings() {
+  try {
+    const data = await apiFetch("/contact");
+    document.getElementById("contact-whatsapp-input").value = data.whatsapp || "";
+    document.getElementById("contact-email-input").value = data.email || "";
+    document.getElementById("contact-address-input").value = data.address || "";
+
+    const list = document.getElementById("contact-subjects-list");
+    list.innerHTML = "";
+    (data.subjects && data.subjects.length ? data.subjects : [""]).forEach((s) => addSubjectRow(s));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-contact-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("contact-settings-msg");
+  msgEl.style.display = "none";
+
+  const subjects = Array.from(document.querySelectorAll(".contact-subject-input"))
+    .map((i) => i.value.trim())
+    .filter(Boolean);
+
+  try {
+    await apiFetch("/contact", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        whatsapp: document.getElementById("contact-whatsapp-input").value.trim(),
+        email: document.getElementById("contact-email-input").value.trim(),
+        address: document.getElementById("contact-address-input").value.trim(),
+        subjects,
+      }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "Coordonnées mises à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// FAQ : sections repliables, chacune avec ses propres questions/reponses
+function addFaqItemRow(itemsContainer, q = "", a = "") {
+  const row = document.createElement("div");
+  row.className = "faq-item-row";
+  row.innerHTML = `
+    <input type="text" class="faq-item-q" placeholder="Question" value="${escapeHtml(q)}" />
+    <textarea class="faq-item-a" placeholder="Réponse">${escapeHtml(a)}</textarea>
+    <button type="button" class="remove-row-btn">Retirer la question</button>`;
+  row.querySelector(".remove-row-btn").addEventListener("click", () => row.remove());
+  itemsContainer.appendChild(row);
+}
+
+function addFaqSectionBlock(title = "", items = []) {
+  const list = document.getElementById("faq-sections-list");
+  const block = document.createElement("div");
+  block.className = "faq-section-block";
+  block.innerHTML = `
+    <div class="faq-section-head">
+      <input type="text" class="faq-section-title" placeholder="Titre de la section (ex : Les votes)" value="${escapeHtml(title)}" />
+      <button type="button" class="remove-row-btn remove-section-btn">Retirer la section</button>
+    </div>
+    <div class="faq-items-container"></div>
+    <button type="button" class="btn add-faq-item-btn" style="margin-top:8px;">+ Ajouter une question</button>`;
+
+  const itemsContainer = block.querySelector(".faq-items-container");
+  (items.length ? items : [{ q: "", a: "" }]).forEach((it) => addFaqItemRow(itemsContainer, it.q, it.a));
+
+  block.querySelector(".remove-section-btn").addEventListener("click", () => block.remove());
+  block.querySelector(".add-faq-item-btn").addEventListener("click", () => addFaqItemRow(itemsContainer));
+
+  list.appendChild(block);
+}
+
+document.getElementById("add-faq-section-btn").addEventListener("click", () => addFaqSectionBlock());
+
+async function loadFaqSettings() {
+  try {
+    const data = await apiFetch("/faq");
+    const list = document.getElementById("faq-sections-list");
+    list.innerHTML = "";
+    const sections = Array.isArray(data.sections) && data.sections.length ? data.sections : [{ title: "", items: [] }];
+    sections.forEach((s) => addFaqSectionBlock(s.title, s.items || []));
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-faq-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("faq-msg");
+  msgEl.style.display = "none";
+
+  const sections = Array.from(document.querySelectorAll(".faq-section-block")).map((block) => ({
+    title: block.querySelector(".faq-section-title").value.trim(),
+    items: Array.from(block.querySelectorAll(".faq-item-row"))
+      .map((row) => ({
+        q: row.querySelector(".faq-item-q").value.trim(),
+        a: row.querySelector(".faq-item-a").value.trim(),
+      }))
+      .filter((it) => it.q && it.a),
+  })).filter((s) => s.title && s.items.length);
+
+  if (!sections.length) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = "Ajoutez au moins une section avec une question complète (titre, question et réponse).";
+    msgEl.style.display = "block";
+    return;
+  }
+
+  try {
+    await apiFetch("/faq", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sections }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "FAQ mise à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
+// --- Réglages : ce que le public peut voir (votes / classement) ---
+async function loadPublicDisplay() {
+  try {
+    const data = await apiFetch("/settings/public-display");
+    document.getElementById("show-votes-input").checked = data.show_votes !== false;
+    document.getElementById("show-ranking-input").checked = data.show_ranking !== false;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+document.getElementById("save-display-btn").addEventListener("click", async () => {
+  const msgEl = document.getElementById("display-msg");
+  msgEl.style.display = "none";
+  try {
+    await apiFetch("/settings/public-display", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        show_votes: document.getElementById("show-votes-input").checked,
+        show_ranking: document.getElementById("show-ranking-input").checked,
+      }),
+    });
+    msgEl.style.color = "var(--success)";
+    msgEl.textContent = "Affichage public mis à jour.";
+    msgEl.style.display = "block";
+  } catch (e) {
+    msgEl.style.color = "var(--danger)";
+    msgEl.textContent = e.message;
+    msgEl.style.display = "block";
+  }
+});
+
 // --- Partenaires ---
 let editingPartnerId = null;
 const partnerOverlay = document.getElementById("partner-overlay");
@@ -484,7 +748,7 @@ async function loadPartners() {
         <td>${escapeHtml(p.name)}</td>
         <td>${p.website_url ? `<a href="${escapeHtml(p.website_url)}" target="_blank" rel="noopener noreferrer">Lien</a>` : "—"}</td>
         <td>${p.display_order}</td>
-        <td>${p.is_active ? "Visible" : "Masqué"}</td>
+        <td><span class="pill ${p.is_active ? "ok" : "off"}">${p.is_active ? "Visible" : "Masqué"}</span></td>
         <td class="row-actions">
           <button data-id="${p.id}" class="edit-partner-btn">Modifier</button>
           <button data-id="${p.id}" class="toggle-partner-btn">${p.is_active ? "Masquer" : "Afficher"}</button>
@@ -581,8 +845,8 @@ async function loadAnnouncements() {
       tr.innerHTML = `
         <td>${new Date(a.created_at).toLocaleDateString("fr-FR")}</td>
         <td>${escapeHtml(a.tag || "—")}</td>
-        <td style="max-width:320px;">${escapeHtml(a.content)}</td>
-        <td>${a.is_active ? "Publiée" : "Masquée"}</td>
+        <td class="cell-wide">${escapeHtml(a.content)}</td>
+        <td><span class="pill ${a.is_active ? "ok" : "off"}">${a.is_active ? "Publiée" : "Masquée"}</span></td>
         <td class="row-actions">
           <button data-id="${a.id}" class="edit-announcement-btn">Modifier</button>
           <button data-id="${a.id}" class="toggle-announcement-btn">${a.is_active ? "Masquer" : "Publier"}</button>
@@ -675,73 +939,3 @@ function escapeHtml(str) {
 if (token) {
   showDashboard();
 }
-
-// --- Visibilite des votes ---
-async function loadVisibility() {
-  try {
-    const d = await apiFetch("/settings/votes-visibility");
-    document.getElementById("show-votes-input").checked = !!d.show_votes_public;
-  } catch (e) { console.error(e); }
-}
-document.getElementById("save-visibility-btn").addEventListener("click", async () => {
-  const msg = document.getElementById("visibility-msg");
-  try {
-    await apiFetch("/settings/votes-visibility", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ show_votes_public: document.getElementById("show-votes-input").checked }),
-    });
-    msg.style.color = "var(--success)"; msg.textContent = "Réglage enregistré.";
-  } catch (e) { msg.style.color = "var(--danger)"; msg.textContent = e.message; }
-  msg.style.display = "block";
-});
-
-// --- Pages secondaires (Billetterie, A propos, Contact, FAQ) ---
-function addFaqRow(question = "", answer = "") {
-  makeRemovableRow(
-    document.getElementById("p-faq-list"),
-    `<input type="text" class="p-faq-q" placeholder="Question" value="${escapeHtml(question)}" />
-     <textarea class="p-faq-a" placeholder="Réponse">${escapeHtml(answer)}</textarea>`
-  );
-}
-document.getElementById("p-add-faq").addEventListener("click", () => addFaqRow());
-
-async function loadPagesContent() {
-  try {
-    const d = await apiFetch("/pages");
-    const b = d.billetterie || {}, c = d.contact || {};
-    document.getElementById("p-bill-intro").value = b.intro || "";
-    document.getElementById("p-bill-infos").value = b.infos || "";
-    document.getElementById("p-bill-note").value = b.contact_note || "";
-    document.getElementById("p-about").value = (d.apropos && d.apropos.text) || "";
-    document.getElementById("p-phone").value = c.phone || "";
-    document.getElementById("p-whatsapp").value = c.whatsapp || "";
-    document.getElementById("p-email").value = c.email || "";
-    document.getElementById("p-facebook").value = c.facebook || "";
-    document.getElementById("p-address").value = c.address || "";
-    document.getElementById("p-faq-list").innerHTML = "";
-    (d.faq || []).forEach((i) => addFaqRow(i.question, i.answer));
-  } catch (e) { console.error(e); }
-}
-
-document.getElementById("save-pages-btn").addEventListener("click", async () => {
-  const msg = document.getElementById("pages-msg");
-  const v = (id) => document.getElementById(id).value.trim();
-  const faq = Array.from(document.querySelectorAll("#p-faq-list .repeat-row"))
-    .map((r) => ({ question: r.querySelector(".p-faq-q").value.trim(), answer: r.querySelector(".p-faq-a").value.trim() }))
-    .filter((i) => i.question && i.answer);
-  try {
-    await apiFetch("/pages", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        billetterie: { intro: v("p-bill-intro"), infos: v("p-bill-infos"), contact_note: v("p-bill-note") },
-        apropos: { text: v("p-about") },
-        contact: { phone: v("p-phone"), whatsapp: v("p-whatsapp"), email: v("p-email"), facebook: v("p-facebook"), address: v("p-address") },
-        faq,
-      }),
-    });
-    msg.style.color = "var(--success)"; msg.textContent = "Pages mises à jour.";
-  } catch (e) { msg.style.color = "var(--danger)"; msg.textContent = e.message; }
-  msg.style.display = "block";
-});

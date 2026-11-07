@@ -4,64 +4,41 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Résultats — Miss & Mister Flash Adjarra</title>
-<link rel="icon" href="/img/logo.jpg" />
-<link rel="stylesheet" href="/css/style.css" />
-<link rel="stylesheet" href="/css/profile.css" />
-<link rel="stylesheet" href="/css/resultats.css" />
+<meta name="description" content="Le classement en direct de Miss & Mister Flash Adjarra." />
+<link rel="icon" type="image/png" href="/img/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Instrument+Sans:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/css/mm.css" />
+<link rel="stylesheet" href="/css/mm-pages.css" />
 </head>
 <body>
 
-<header class="site-header glass">
-  <div class="header-top">
-    <a href="/index.html"><img class="logo" src="/img/logo.jpg" alt="Miss & Mister Flash Adjarra" /></a>
-    <div class="header-titles">
-      <h1>Miss &amp; Mister</h1>
-      <p>Flash Adjarra</p>
+<script src="/js/nav.js"></script>
+
+<main>
+  <header class="page-head wrap">
+    <h1>Classement en direct</h1>
+    <p class="lede">Mis à jour en temps réel, à chaque vote confirmé.</p>
+  </header>
+  <div class="wrap page-body">
+    <div class="results-grid">
+      <section class="results-block">
+        <h2 class="results-cat-title">Miss</h2>
+        <ol class="leaderboard" id="leaderboard-miss"></ol>
+      </section>
+      <section class="results-block">
+        <h2 class="results-cat-title">Mister</h2>
+        <ol class="leaderboard" id="leaderboard-mister"></ol>
+      </section>
     </div>
-    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="site-menu">
-      <span></span>
-    </button>
+    <p id="empty-results" class="results-note" style="display:none; text-align:center;">
+      Aucun candidat pour le moment.
+    </p>
   </div>
-  <nav class="site-menu" id="site-menu" aria-label="Navigation principale">
-    <a href="/index.html" class="site-menu-link">Accueil</a>
-    <a href="/candidats.html" class="site-menu-link">Candidats</a>
-    <a href="/billetterie.html" class="site-menu-link">Billetterie</a>
-    <a href="/projets.html" class="site-menu-link">Projets d'impact</a>
-    <a href="/galerie.html" class="site-menu-link">Galerie</a>
-    <a href="/resultats.html" class="site-menu-link active">Résultats</a>
-    <a href="/apropos.html" class="site-menu-link">À propos</a>
-    <a href="/partenaires.html" class="site-menu-link">Partenaires</a>
-    <a href="/faq.html" class="site-menu-link">FAQ</a>
-    <a href="/contact.html" class="site-menu-link">Contact</a>
-  </nav>
-</header>
-
-<main class="profile-main" style="max-width:760px;">
-  <h1 style="font-family:var(--font-display); color:var(--blue-dark); text-align:center; margin:6px 0 4px;">Classement en direct</h1>
-  <p style="text-align:center; color:var(--text-muted); font-size:13px; margin:0 0 24px;">
-    Mis à jour en temps réel, à chaque vote confirmé
-  </p>
-
-  <div class="results-block">
-    <h2 class="results-cat-title">Miss</h2>
-    <ol class="leaderboard" id="leaderboard-miss"></ol>
-  </div>
-
-  <div class="results-block">
-    <h2 class="results-cat-title">Mister</h2>
-    <ol class="leaderboard" id="leaderboard-mister"></ol>
-  </div>
-
-  <p id="empty-results" style="display:none; text-align:center; color:var(--text-muted);">
-    Aucun candidat pour le moment.
-  </p>
 </main>
 
-<footer>
-  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
-</footer>
-
-<script src="/js/menu.js"></script>
+<footer></footer>
 <script src="/js/resultats.js"></script>
 </body>
 </html>

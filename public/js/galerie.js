@@ -8,13 +8,12 @@ async function loadGallery() {
   const grid = document.getElementById("gallery-grid");
   try {
     const res = await fetch("/api/candidates");
-    const data = await res.json();
-    const candidates = data.candidates || [];
+    const candidates = await res.json();
     const withPhoto = candidates.filter((c) => c.photo_path);
 
     if (!withPhoto.length) {
       grid.innerHTML =
-        "<p style='text-align:center; color:var(--text-muted); grid-column:1/-1;'>Aucune photo disponible pour le moment.</p>";
+        "<p class='muted'>Aucune photo disponible pour le moment.</p>";
       return;
     }
 
@@ -28,7 +27,7 @@ async function loadGallery() {
       )
       .join("");
   } catch (e) {
-    grid.innerHTML = "<p style='text-align:center;'>Impossible de charger la galerie.</p>";
+    grid.innerHTML = "<p class='muted'>Impossible de charger la galerie.</p>";
   }
 }
 

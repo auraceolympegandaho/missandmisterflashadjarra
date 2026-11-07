@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const { pool, DEFAULT_HOMEPAGE, DEFAULT_PAGES } = require("../db");
+const { pool, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT, DEFAULT_ABOUT } = require("../db");
 const { requireAdmin } = require("../middleware/auth");
 
 const router = express.Router();
@@ -116,6 +116,9 @@ router.post("/login", async (req, res) => {
 
 // Tout ce qui suit necessite d'etre connecte en tant qu'admin
 router.use(requireAdmin);
+
+// Module d'inscription : gestion des candidatures (protege par requireAdmin ci-dessus)
+router.use("/registrations", require("./admin-registrations"));
 
 // GET /api/admin/candidates -> liste complete (y compris inactifs)
 router.get("/candidates", async (req, res) => {
@@ -390,6 +393,37 @@ router.put("/settings/countdown", async (req, res) => {
   }
 });
 
+// GET/PUT /api/admin/settings/public-display
+// Controle ce que le public voit sur les fiches candidats et le classement.
+router.get("/settings/public-display", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'public_display'");
+    const stored = result.rowCount ? JSON.parse(result.rows[0].value) : {};
+    res.json({ show_votes: true, show_ranking: true, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/settings/public-display", async (req, res) => {
+  try {
+    const value = {
+      show_votes: req.body.show_votes !== false,
+      show_ranking: req.body.show_ranking !== false,
+    };
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('public_display', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(value)]
+    );
+    res.json(value);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 // GET /api/admin/announcements -> liste complete (y compris masquees)
 router.get("/announcements", async (req, res) => {
   try {
@@ -532,6 +566,145 @@ router.delete("/partners/:id", async (req, res) => {
 
 // GET /api/admin/homepage -> contenu actuel (complete avec les valeurs par
 // defaut si des champs manquent, ex: apres une mise a jour du site)
+// GET/PUT /api/admin/about -> contenu propre a la page A propos
+// (steps du deroulement, texte du projet d'impact, texte de transparence).
+router.get("/about", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'about_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_ABOUT, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/about", async (req, res) => {
+  try {
+    const { steps, project_text, transparency_text } = req.body;
+    if (!Array.isArray(steps) || !steps.length) {
+      return res.status(400).json({ error: "Ajoutez au moins une étape au déroulement." });
+    }
+    for (const s of steps) {
+      if (!s || !String(s.title || "").trim() || !String(s.text || "").trim()) {
+        return res.status(400).json({ error: "Chaque étape doit avoir un titre et un texte." });
+      }
+    }
+    if (!String(project_text || "").trim()) {
+      return res.status(400).json({ error: "Le texte du projet d'impact ne peut pas être vide." });
+    }
+    if (!String(transparency_text || "").trim()) {
+      return res.status(400).json({ error: "Le texte de transparence ne peut pas être vide." });
+    }
+
+    const value = {
+      steps: steps.map((s) => ({ title: s.title.trim(), text: s.text.trim() })),
+      project_text: project_text.trim(),
+      transparency_text: transparency_text.trim(),
+    };
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('about_content', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(value)]
+    );
+    res.json(value);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// GET/PUT /api/admin/faq -> contenu de la page FAQ publique
+router.get("/faq", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'faq_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_FAQ, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/faq", async (req, res) => {
+  try {
+    const { sections } = req.body;
+    if (!Array.isArray(sections)) {
+      return res.status(400).json({ error: "Format invalide : 'sections' doit etre une liste." });
+    }
+    // Validation minimale : chaque section a un titre et une liste de questions/reponses non vides
+    for (const s of sections) {
+      if (!s || typeof s.title !== "string" || !s.title.trim()) {
+        return res.status(400).json({ error: "Chaque section doit avoir un titre." });
+      }
+      if (!Array.isArray(s.items)) {
+        return res.status(400).json({ error: "Chaque section doit avoir une liste de questions." });
+      }
+      for (const it of s.items) {
+        if (!it || !String(it.q || "").trim() || !String(it.a || "").trim()) {
+          return res.status(400).json({ error: "Chaque question doit avoir une reponse non vide." });
+        }
+      }
+    }
+    const value = { sections };
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('faq_content', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(value)]
+    );
+    res.json(value);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// GET/PUT /api/admin/contact -> coordonnees affichees sur la page Contact
+router.get("/contact", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'contact_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_CONTACT, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+router.put("/contact", async (req, res) => {
+  try {
+    const { whatsapp, email, address, subjects } = req.body;
+
+    // Le numero WhatsApp doit rester au format international sans "+" ni espaces
+    const cleanWhatsapp = String(whatsapp || "").replace(/\D/g, "");
+    if (!cleanWhatsapp || cleanWhatsapp.length < 8) {
+      return res.status(400).json({ error: "Numéro WhatsApp invalide (format international, sans +)." });
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({ error: "Adresse e-mail invalide." });
+    }
+    if (!Array.isArray(subjects) || !subjects.length) {
+      return res.status(400).json({ error: "Ajoutez au moins un sujet de contact." });
+    }
+
+    const value = {
+      whatsapp: cleanWhatsapp,
+      email: email.trim(),
+      address: (address || "").trim(),
+      subjects: subjects.map((s) => String(s).trim()).filter(Boolean),
+    };
+    await pool.query(
+      `INSERT INTO settings (key, value) VALUES ('contact_content', $1)
+       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
+      [JSON.stringify(value)]
+    );
+    res.json(value);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
 router.get("/homepage", async (req, res) => {
   try {
     const result = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
@@ -581,65 +754,6 @@ router.put("/homepage", uploadPoster, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Impossible de mettre à jour l'accueil." });
-  }
-});
-
-// --- Visibilite publique des votes / du classement ---
-router.get("/settings/votes-visibility", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT value FROM settings WHERE key = 'show_votes_public'");
-    res.json({ show_votes_public: result.rows[0] ? result.rows[0].value === "1" : true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur serveur." });
-  }
-});
-router.put("/settings/votes-visibility", async (req, res) => {
-  try {
-    const value = req.body.show_votes_public ? "1" : "0";
-    await pool.query(
-      `INSERT INTO settings (key, value) VALUES ('show_votes_public', $1)
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
-      [value]
-    );
-    res.json({ show_votes_public: value === "1" });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Impossible de mettre à jour ce réglage." });
-  }
-});
-
-// --- Pages secondaires (Billetterie, A propos, FAQ, Contact) ---
-router.get("/pages", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT value FROM settings WHERE key = 'pages_content'");
-    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
-    res.json({ ...DEFAULT_PAGES, ...stored });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Erreur serveur." });
-  }
-});
-router.put("/pages", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT value FROM settings WHERE key = 'pages_content'");
-    const current = { ...DEFAULT_PAGES, ...(result.rows[0] ? JSON.parse(result.rows[0].value) : {}) };
-    const b = req.body || {};
-    const updated = {
-      billetterie: { ...current.billetterie, ...(b.billetterie || {}) },
-      apropos: { ...current.apropos, ...(b.apropos || {}) },
-      faq: Array.isArray(b.faq) ? b.faq : current.faq,
-      contact: { ...current.contact, ...(b.contact || {}) },
-    };
-    await pool.query(
-      `INSERT INTO settings (key, value) VALUES ('pages_content', $1)
-       ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value`,
-      [JSON.stringify(updated)]
-    );
-    res.json(updated);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Impossible de mettre à jour ces pages." });
   }
 });
 

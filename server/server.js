@@ -2,13 +2,29 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_PAGES } = require("./db");
+const { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT, DEFAULT_ABOUT } = require("./db");
 
-const candidatesRoutes = require("./routes/candidates");
+const { router: candidatesRoutes, getPublicDisplay } = require("./routes/candidates");
 const votesRoutes = require("./routes/votes");
+require("./payments/fedapay").checkConfig();
 const adminRoutes = require("./routes/admin");
+const { router: registrationRoutes } = require("./routes/registration");
+const { createLimiter } = require("./registration/security");
 
 const app = express();
+
+// Derriere le proxy de Render : necessaire pour que req.ip soit la vraie IP
+// du visiteur (limitation de debit, anti-abus).
+app.set("trust proxy", 1);
+app.disable("x-powered-by");
+
+// En-tetes de securite de base
+app.use((req, res, next) => {
+  res.set("X-Content-Type-Options", "nosniff");
+  res.set("X-Frame-Options", "SAMEORIGIN");
+  res.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  next();
+});
 
 app.use(cors());
 
@@ -25,13 +41,30 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 // API
 app.use("/api/candidates", candidatesRoutes);
 app.use("/api/votes", votesRoutes);
+// Limite les tentatives de connexion admin (force brute)
+app.use(
+  "/api/admin/login",
+  createLimiter({ windowMs: 15 * 60 * 1000, max: 15, message: "Trop de tentatives de connexion. Réessayez plus tard." })
+);
 app.use("/api/admin", adminRoutes);
+app.use("/api/registration", registrationRoutes);
 
 // Prix courant du vote (public, utilise par la page de vote)
 app.get("/api/settings/price", async (req, res) => {
   try {
     const result = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");
     res.json({ price_per_vote: Number(result.rows[0].value) });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// Parametres d'affichage public (votes / classement visibles ou non).
+// Utilise par les pages publiques pour adapter ce qu'elles affichent.
+app.get("/api/settings/public", async (req, res) => {
+  try {
+    res.json(await getPublicDisplay());
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur." });
@@ -93,16 +126,47 @@ app.get("/api/homepage", async (req, res) => {
   }
 });
 
-// Contenu editable des pages secondaires (public, lecture seule)
-app.get("/api/pages", async (req, res) => {
+// FAQ publique (lecture seule ; geree depuis l'admin)
+app.get("/api/faq", async (req, res) => {
   try {
-    const result = await pool.query("SELECT value FROM settings WHERE key = 'pages_content'");
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'faq_content'");
     const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
-    res.json({ ...DEFAULT_PAGES, ...stored });
+    res.json({ ...DEFAULT_FAQ, ...stored });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur." });
   }
+});
+
+// Coordonnees de contact publiques (lecture seule ; gerees depuis l'admin)
+app.get("/api/contact", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'contact_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_CONTACT, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// Contenu propre a la page A propos (public, lecture seule ; gere depuis l'admin)
+app.get("/api/about", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT value FROM settings WHERE key = 'about_content'");
+    const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
+    res.json({ ...DEFAULT_ABOUT, ...stored });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+});
+
+// Gestionnaire d'erreurs final : aucun detail interne n'est renvoye au client
+app.use((err, req, res, next) => {
+  console.error(err);
+  if (res.headersSent) return next(err);
+  res.status(err.status && err.status < 500 ? err.status : 500).json({ error: "Requête invalide ou erreur serveur." });
 });
 
 app.get("/health", (req, res) => res.json({ ok: true }));
@@ -116,6 +180,18 @@ initSchema()
     });
   })
   .catch((err) => {
-    console.error("Impossible d'initialiser la base de donnees :", err);
-    process.exit(1);
+    // Message detaille + delai avant la sortie : garantit que la cause apparait dans les logs Render.
+    console.error(
+      "ECHEC AU DEMARRAGE - impossible d'initialiser la base de donnees :",
+      (err && (err.stack || err.message)) || err,
+      "| code:", err && err.code,
+      "| detail:", err && err.errors ? err.errors.map((e) => e.message || e.code).join(" ; ") : ""
+    );
+    setTimeout(() => process.exit(1), 1500);
   });
+
+process.on("unhandledRejection", (e) => console.error("unhandledRejection:", (e && e.stack) || e));
+process.on("uncaughtException", (e) => {
+  console.error("uncaughtException:", (e && e.stack) || e);
+  setTimeout(() => process.exit(1), 1500);
+});
