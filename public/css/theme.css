@@ -11,8 +11,8 @@
   --ivory: #f5f1e8;
   --gold-grad: linear-gradient(135deg, #B98600 0%, #FFBE10 45%, #FFD65A 100%);
 
-  --font-display: 'Times New Roman', Times, 'Liberation Serif', serif;
-  --font-body: 'Times New Roman', Times, 'Liberation Serif', serif;
+  --font-display: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
   /* anciennes variables "bleues" remappees sur la palette noir/or */
   --sky: #FFBE10; --sky-light: #2a2410; --sky-soft: #141109;

@@ -25,6 +25,9 @@
     { label: "Contact", href: "/contact.html" },
   ];
 
+  // En-tete desktop allege : 6 liens principaux, le reste dans "Plus"
+  var PRIMARY = ["/index.html", "/candidats.html", "/inscriptions.html", "/billetterie.html", "/galerie.html", "/resultats.html"];
+
   var path = window.location.pathname.replace(/\/+$/, "") || "/";
 
   function isActive(item) {
@@ -52,31 +55,43 @@
     }).join("");
   }
 
+  function desktopMenuHtml() {
+    var main = MENU.filter(function (m) { return PRIMARY.indexOf(m.href) !== -1; });
+    var more = MENU.filter(function (m) { return PRIMARY.indexOf(m.href) === -1; });
+    var moreActive = more.some(isActive);
+    function one(cls, item) {
+      var a = isActive(item);
+      return '<a class="' + cls + (a ? " active" : "") + '" href="' + item.href + '"' + (a ? ' aria-current="page"' : "") + ">" + item.label + "</a>";
+    }
+    return (
+      main.map(function (m) { return one("site-menu-link", m); }).join("") +
+      '<div class="site-menu-more">' +
+      '  <button class="site-menu-link site-menu-more-btn' + (moreActive ? " active" : "") + '" id="menu-more-btn" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="menu-more-panel">Plus' +
+      '    <svg viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M2 4.5 6 8.5 10 4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      "  </button>" +
+      '  <div class="site-menu-more-panel" id="menu-more-panel" hidden>' +
+      more.map(function (m) { return one("site-menu-more-link", m); }).join("") +
+      "  </div>" +
+      "</div>"
+    );
+  }
+
   var html =
     '<header class="site-header glass">' +
     '  <div class="header-bar">' +
-    '    <a class="header-brand" href="/index.html">' +
+    '    <a class="header-brand" href="/index.html" aria-label="Miss &amp; Mister Flash Adjarra, accueil">' +
     '      <img class="logo" src="/img/logo.png" alt="Miss & Mister Flash Adjarra" />' +
-    '      <span class="header-titles">' +
-    "        <span class=\"brand-name\">Miss &amp; Mister</span>" +
-    '        <span class="brand-sub">Flash Adjarra</span>' +
-    "      </span>" +
     "    </a>" +
+    '    <nav class="site-menu" aria-label="Menu principal">' +
+    desktopMenuHtml() +
+    "    </nav>" +
     '    <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-drawer">' +
     '      <span class="nav-toggle-bars" aria-hidden="true"><span></span><span></span><span></span></span>' +
-    '      <span class="nav-toggle-text">Menu</span>' +
     "    </button>" +
     "  </div>" +
-    '  <nav class="site-menu" aria-label="Menu principal">' +
-    linksHtml("site-menu-link", true) +
-    "  </nav>" +
     "</header>" +
     '<div class="nav-backdrop" id="nav-backdrop" hidden></div>' +
     '<nav class="nav-drawer" id="nav-drawer" aria-label="Menu mobile" hidden>' +
-    '  <div class="nav-drawer-head">' +
-    '    <span class="nav-drawer-title">Navigation</span>' +
-    '    <button class="nav-close" id="nav-close" type="button" aria-label="Fermer le menu">&times;</button>' +
-    "  </div>" +
     '  <div class="nav-drawer-links">' +
     linksHtml("nav-drawer-link", false) +
     "  </div>" +
@@ -93,7 +108,6 @@
   var toggle = document.getElementById("nav-toggle");
   var drawer = document.getElementById("nav-drawer");
   var backdrop = document.getElementById("nav-backdrop");
-  var closeBtn = document.getElementById("nav-close");
 
   function openDrawer() {
     drawer.hidden = false;
@@ -103,6 +117,7 @@
     drawer.classList.add("open");
     backdrop.classList.add("open");
     toggle.setAttribute("aria-expanded", "true");
+    toggle.setAttribute("aria-label", "Fermer le menu");
     document.body.classList.add("nav-open");
   }
 
@@ -110,6 +125,7 @@
     drawer.classList.remove("open");
     backdrop.classList.remove("open");
     toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Ouvrir le menu");
     document.body.classList.remove("nav-open");
     window.setTimeout(function () {
       if (!drawer.classList.contains("open")) {
@@ -123,10 +139,30 @@
     if (drawer.classList.contains("open")) closeDrawer();
     else openDrawer();
   });
-  closeBtn.addEventListener("click", closeDrawer);
+  // Un clic sur un lien du tiroir le referme (navigation sur ancre, retour arriere...)
+  drawer.addEventListener("click", function (e) {
+    if (e.target.closest && e.target.closest("a")) closeDrawer();
+  });
+
+  // Menu deroulant "Plus" (desktop)
+  var moreBtn = document.getElementById("menu-more-btn");
+  var morePanel = document.getElementById("menu-more-panel");
+  function setMore(open) {
+    morePanel.hidden = !open;
+    moreBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  }
+  moreBtn.addEventListener("click", function (e) {
+    e.stopPropagation();
+    setMore(morePanel.hidden);
+  });
+  document.addEventListener("click", function (e) {
+    if (!morePanel.hidden && !morePanel.contains(e.target)) setMore(false);
+  });
   backdrop.addEventListener("click", closeDrawer);
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && drawer.classList.contains("open")) closeDrawer();
+    if (e.key !== "Escape") return;
+    if (drawer.classList.contains("open")) closeDrawer();
+    if (!morePanel.hidden) { setMore(false); moreBtn.focus(); }
   });
   // Pied de page complet, identique sur toutes les pages publiques : il remplace
   // le <footer> minimal de chaque page. Les coordonnees viennent de /api/contact

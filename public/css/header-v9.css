@@ -1,0 +1,166 @@
+/* ============================================================
+   V9 — En-tete epure + typographie Inter.
+   A charger EN DERNIER sur les pages publiques.
+   Retour arriere : retirer la ligne <link> de cette feuille.
+   ============================================================ */
+
+:root {
+  --font-display: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-body: var(--font-display);
+  --header-h: 60px;
+}
+@media (min-width: 900px) { :root { --header-h: 68px; } }
+
+/* ---------- TYPOGRAPHIE (Inter uniquement) ---------- */
+html { -webkit-text-size-adjust: 100%; }
+body, p, li, dd, dt, label, input, textarea, select, button, table, th, td {
+  font-family: var(--font-body);
+}
+body { font-size: 16px; line-height: 1.6; font-weight: 400; -webkit-font-smoothing: antialiased; }
+p, li, dd, .description, .section-sub { font-weight: 400; }
+
+h1, h2, h3, h4 { font-family: var(--font-display); font-style: normal; }
+h1 { font-weight: 800; letter-spacing: -0.02em; line-height: 1.12; }
+h2 { font-weight: 700; letter-spacing: -0.015em; line-height: 1.2; }
+h3, h4 { font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; }
+
+/* Titres moins imposants que la V8 (Inter est plus large que Times) */
+.hero-pro h1 { font-size: clamp(30px, 6vw, 50px); letter-spacing: -0.02em; line-height: 1.1; }
+.hero-pro .slogan, .hero .slogan { font-family: var(--font-body); font-style: normal; font-weight: 500; font-size: clamp(16px, 3vw, 21px); letter-spacing: 0; }
+.hero-pro .description { font-size: 16.5px; line-height: 1.7; }
+.home-section h2, .page-head h1, .candidates-header h1 { font-size: clamp(24px, 4.4vw, 34px); }
+.objective-card h3 { font-size: 18px; font-weight: 600; }
+.objective-card p, .news-card p, .organizer-card { font-size: 15.5px; }
+.partner-cta h3 { font-size: 22px; }
+.countdown-unit .num { font-family: var(--font-display); font-weight: 700; font-size: clamp(30px, 6.5vw, 44px); font-variant-numeric: tabular-nums; }
+.countdown-label, .countdown-unit .unit, .partner-cta-eyebrow, .footer-col h4 { font-weight: 600; }
+
+/* Boutons et navigation : Medium (500) */
+.btn, .tabs button, .share-row .share-btn { font-family: var(--font-body); font-weight: 500; letter-spacing: .04em; font-size: 14px; }
+.hero-pro .hero-cta .btn.hero-primary { font-size: 15px; letter-spacing: .04em; }
+.site-menu-link, .nav-drawer-link, .footer-col a, .footer-links a { font-weight: 500; }
+
+/* Tableaux, statistiques, admin : 400 a 600 */
+table, th, td, .stat, .leaderboard-row { font-family: var(--font-body); }
+th { font-weight: 600; }
+td, .stat .label { font-weight: 400; }
+.stat .num, .stat strong, .leaderboard-row .votes { font-weight: 600; font-variant-numeric: tabular-nums; }
+.card h3, .profile-card h3, .ticket-name { font-family: var(--font-display); font-weight: 600; }
+
+/* ---------- EN-TETE : compact, logo a gauche ---------- */
+header.site-header,
+header.site-header.glass {
+  position: sticky; top: 0; z-index: 90;       /* au-dessus du tiroir : le hamburger reste visible */
+  min-height: var(--header-h);
+  padding: 0 clamp(14px, 3vw, 32px);
+  display: flex; align-items: center;
+  text-align: left;
+}
+
+.header-bar {
+  width: 100%; max-width: 1180px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; position: relative; padding: 0;
+  min-height: var(--header-h);
+}
+
+.header-brand { margin: 0; flex: 0 0 auto; display: flex; align-items: center; }
+header.site-header .logo {
+  height: 40px; width: auto; max-width: 150px;   /* 593x326 : ratio conserve */
+  object-fit: contain; border-radius: 0; display: block;
+}
+@media (min-width: 900px) { header.site-header .logo { height: 44px; max-width: 170px; } }
+@media (max-width: 380px) { header.site-header .logo { height: 36px; } }
+header.site-header .header-titles { display: none; }
+
+/* ---------- MENU DESKTOP : une seule ligne ---------- */
+.site-menu {
+  display: none; margin: 0; max-width: none;
+  align-items: center; justify-content: flex-end; gap: 2px; flex-wrap: nowrap;
+}
+@media (min-width: 900px) { .site-menu { display: flex; } }
+
+.site-menu-link {
+  position: relative;
+  padding: 8px 12px; border-radius: 8px;
+  font-size: 14px; font-weight: 500; letter-spacing: 0;
+  color: #e9e4d6; text-decoration: none; white-space: nowrap;
+  background: none; border: 0; font-family: var(--font-body); cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: color .15s ease, background-color .15s ease;
+}
+.site-menu-link:hover { background: rgba(255,255,255,.06); color: #fff; }
+.site-menu-link.active { background: none; box-shadow: none; color: var(--gold-light); }
+.site-menu-link.active::after {      /* simple filet or sous le lien actif */
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: 2px;
+  height: 2px; border-radius: 2px; background: var(--gold);
+}
+.site-menu-more-btn svg { transition: transform .2s ease; }
+.site-menu-more-btn[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.site-menu-more { position: relative; }
+.site-menu-more-panel {
+  position: absolute; right: 0; top: calc(100% + 10px); min-width: 190px;
+  background: #0d0d0d; border: 1px solid rgba(255,255,255,.14); border-radius: 12px;
+  box-shadow: 0 16px 40px rgba(0,0,0,.6); padding: 6px;
+  display: flex; flex-direction: column;
+  animation: menuPop .16s ease;
+}
+.site-menu-more-panel[hidden] { display: none; }
+.site-menu-more-link {
+  padding: 10px 12px; border-radius: 8px; font-size: 14px; font-weight: 500;
+  color: #e9e4d6; text-decoration: none; white-space: nowrap;
+}
+.site-menu-more-link:hover { background: rgba(255,255,255,.07); color: #fff; }
+.site-menu-more-link.active { color: var(--gold-light); background: rgba(255,190,16,.10); }
+@keyframes menuPop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+/* ---------- HAMBURGER : 3 traits fins, zone de clic 44px ---------- */
+.nav-toggle {
+  position: static; transform: none; flex: 0 0 auto;
+  display: none; align-items: center; justify-content: center;
+  width: 44px; height: 44px; padding: 0; margin-right: -10px;
+  background: none !important; border: 0 !important; border-radius: 10px;
+  cursor: pointer; color: #fff; -webkit-tap-highlight-color: transparent;
+  transition: background-color .15s ease;
+}
+.nav-toggle:hover { background: rgba(255,255,255,.07) !important; }
+.nav-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 899px) { .nav-toggle { display: inline-flex; } }
+
+.nav-toggle-bars {
+  position: relative; display: block; width: 22px; height: 16px;
+}
+.nav-toggle-bars span {
+  position: absolute; left: 0; width: 100%; height: 1.75px; border-radius: 2px;
+  background: #f5f1e8 !important;
+  transition: transform .28s cubic-bezier(.4,0,.2,1), opacity .18s ease, top .28s cubic-bezier(.4,0,.2,1);
+}
+.nav-toggle-bars span:nth-child(1) { top: 0; }
+.nav-toggle-bars span:nth-child(2) { top: 7px; }
+.nav-toggle-bars span:nth-child(3) { top: 14px; }
+.nav-toggle[aria-expanded="true"] { background: none !important; color: #fff !important; }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span { background: var(--gold) !important; }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(1) { top: 7px; transform: rotate(45deg); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(2) { opacity: 0; transform: scaleX(.2); }
+.nav-toggle[aria-expanded="true"] .nav-toggle-bars span:nth-child(3) { top: 7px; transform: rotate(-45deg); }
+
+/* ---------- TIROIR MOBILE : demarre sous l'en-tete ---------- */
+.nav-backdrop { top: var(--header-h); z-index: 70; background: rgba(0,0,0,.6); }
+.nav-drawer {
+  top: var(--header-h); z-index: 80;
+  width: min(86vw, 320px);
+  padding: 10px 14px calc(20px + env(safe-area-inset-bottom, 0px));
+  border-left: 1px solid rgba(255,255,255,.12);
+}
+.nav-drawer-head { display: none; }
+.nav-drawer-link { padding: 13px 12px; font-size: 16px; font-weight: 500; min-height: 48px; display: flex; align-items: center; }
+.nav-drawer-cta { margin-top: 18px; font-size: 14px; }
+@media (min-width: 900px) { .nav-drawer, .nav-backdrop { display: none !important; } }
+
+/* Les ancres ne passent pas sous l'en-tete collant */
+html { scroll-padding-top: calc(var(--header-h) + 12px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-toggle-bars span, .nav-drawer, .nav-backdrop, .site-menu-more-panel { transition: none; animation: none; }
+}
