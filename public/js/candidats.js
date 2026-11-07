@@ -16,13 +16,14 @@ let selectedCandidate = null;
 let currentCategory = "";
 let currentSearch = "";
 let allCandidates = [];
+let showVotes = true;
 
 async function loadPrice() {
   try {
     const res = await fetch("/api/settings/price");
     const data = await res.json();
     pricePerVote = data.price_per_vote;
-    if (priceLabel) priceLabel.textContent = pricePerVote;
+    priceLabel.textContent = pricePerVote;
     updateTotal();
   } catch (e) {
     console.error("Impossible de charger le prix du vote", e);
@@ -32,7 +33,9 @@ async function loadPrice() {
 async function loadCandidates(category) {
   const url = category ? `/api/candidates?category=${encodeURIComponent(category)}` : "/api/candidates";
   const res = await fetch(url);
-  allCandidates = await res.json();
+  const data = await res.json();
+  allCandidates = data.candidates || [];
+  showVotes = data.show_votes !== false;
   applySearchAndRender();
 }
 
@@ -65,9 +68,7 @@ function renderGrid(candidates) {
     const card = document.createElement("div");
     card.className = "card";
 
-    // Badge "En tete" seulement si le classement est public et le candidat 1er
-    const isLeader =
-      c.rank === 1 && Number(c.votes_count) > 0 && !badgedCategories.has(c.category);
+    const isLeader = showVotes && c.votes_count > 0 && !badgedCategories.has(c.category);
     if (isLeader) badgedCategories.add(c.category);
 
     card.innerHTML = `
@@ -79,7 +80,7 @@ function renderGrid(candidates) {
       <div class="info">
         <span class="category">${escapeHtml(c.category)}</span>
         <h3><a class="candidate-link" href="/candidat.html?id=${c.id}">${escapeHtml(c.name)}</a></h3>
-        ${typeof c.votes_count !== "undefined" ? `<p class="votes"><b>${Number(c.votes_count).toLocaleString("fr-FR")}</b> votes</p>` : ""}
+        ${showVotes ? `<p class="votes"><b>${c.votes_count}</b> votes</p>` : ""}
         <a class="profile-link" href="/candidat.html?id=${c.id}">Voir le profil &amp; le projet</a>
         <button class="btn block vote-btn">Voter pour ${escapeHtml(c.name.split(" ")[0])}</button>
       </div>

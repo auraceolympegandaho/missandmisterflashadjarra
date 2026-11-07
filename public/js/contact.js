@@ -1,83 +1,31 @@
-// Page Contact : coordonnees et sujets charges depuis /api/contact (geres
-// dans l'admin). Le message est prepare puis ouvert dans WhatsApp ou la
-// messagerie du visiteur ; il n'y a aucun envoi cote serveur.
-const feedbackEl = document.getElementById("contact-feedback");
-let CONTACT = { whatsapp: "", email: "", address: "", subjects: [] };
-
-function displayPhone(num) {
-  const digits = String(num || "").replace(/\D/g, "");
-  if (digits.length < 8) return num || "";
-  return "+" + digits.replace(/(\d{3})(\d{2})(\d{2})(\d{2})(\d{2,})/, "$1 $2 $3 $4 $5");
-}
-
 function escapeHtml(str) {
   const div = document.createElement("div");
   div.textContent = str || "";
   return div.innerHTML;
 }
 
-async function loadContact() {
+function safeUrl(u) { return /^https?:\/\//i.test(u) ? u : "https://" + u; }
+
+async function load() {
+  const grid = document.getElementById("contact-grid");
   try {
-    const res = await fetch("/api/contact");
-    if (!res.ok) throw new Error("http");
-    CONTACT = await res.json();
+    const pages = await fetch("/api/pages").then((r) => r.json());
+    const c = pages.contact || {};
+    const items = [];
+    if (c.phone) items.push(["Téléphone", c.phone, "tel:" + c.phone.replace(/[^\d+]/g, "")]);
+    if (c.whatsapp) items.push(["WhatsApp", c.whatsapp, "https://wa.me/" + c.whatsapp.replace(/\D/g, "")]);
+    if (c.email) items.push(["E-mail", c.email, "mailto:" + c.email]);
+    if (c.facebook) items.push(["Facebook", c.facebook, safeUrl(c.facebook)]);
+    if (c.address) items.push(["Adresse", c.address, ""]);
+    if (!items.length) { document.getElementById("contact-empty").style.display = "block"; return; }
+    grid.innerHTML = items.map(([label, value, href]) => {
+      const inner = `<span class="contact-label">${label}</span><span class="contact-value">${escapeHtml(value)}</span>`;
+      return href
+        ? `<a class="contact-item" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+        : `<div class="contact-item">${inner}</div>`;
+    }).join("");
   } catch (e) {
-    feedbackEl.textContent = "Les coordonnées n'ont pas pu être chargées. Réessayez plus tard.";
-    feedbackEl.style.color = "var(--danger)";
-    return;
+    grid.innerHTML = "<p class='empty-note'>Impossible de charger les coordonnées.</p>";
   }
-
-  document.getElementById("contact-whatsapp").href = `https://wa.me/${CONTACT.whatsapp}`;
-  document.getElementById("contact-whatsapp-label").textContent = displayPhone(CONTACT.whatsapp);
-  document.getElementById("contact-email").href = `mailto:${CONTACT.email}`;
-  document.getElementById("contact-email-label").textContent = CONTACT.email;
-  document.getElementById("contact-address").textContent =
-    CONTACT.address || "Adresse à venir.";
-
-  const select = document.getElementById("contact-subject");
-  const subjects = Array.isArray(CONTACT.subjects) && CONTACT.subjects.length
-    ? CONTACT.subjects
-    : ["Question générale"];
-  select.innerHTML = subjects.map((s) => `<option>${escapeHtml(s)}</option>`).join("");
 }
-
-function buildMessage() {
-  const name = document.getElementById("contact-name").value.trim();
-  const subject = document.getElementById("contact-subject").value;
-  const message = document.getElementById("contact-message").value.trim();
-
-  if (!message) {
-    feedbackEl.textContent = "Écrivez d'abord votre message.";
-    feedbackEl.style.color = "var(--danger)";
-    document.getElementById("contact-message").focus();
-    return null;
-  }
-  feedbackEl.textContent = "";
-  feedbackEl.style.color = "";
-  return {
-    subject: `${subject} — Miss & Mister Flash Adjarra`,
-    body: `${message}${name ? `\n\n— ${name}` : ""}`,
-  };
-}
-
-document.getElementById("send-whatsapp").addEventListener("click", () => {
-  if (!CONTACT.whatsapp) return;
-  const m = buildMessage();
-  if (!m) return;
-  window.open(
-    `https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(`[${m.subject}]\n\n${m.body}`)}`,
-    "_blank",
-    "noopener"
-  );
-});
-
-document.getElementById("send-email").addEventListener("click", () => {
-  if (!CONTACT.email) return;
-  const m = buildMessage();
-  if (!m) return;
-  window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
-    m.subject
-  )}&body=${encodeURIComponent(m.body)}`;
-});
-
-loadContact();
+load();

@@ -8,7 +8,8 @@ async function loadProjects() {
   const list = document.getElementById("projects-list");
   try {
     const res = await fetch("/api/candidates");
-    const candidates = await res.json();
+    const data = await res.json();
+    const candidates = data.candidates || [];
     const withProject = candidates.filter((c) => c.project_desc && c.project_desc.trim());
 
     if (!withProject.length) {

@@ -87,6 +87,20 @@ async function initSchema() {
     ]);
   }
 
+  // Visibilite publique du nombre de votes / classement
+  const visRow = await pool.query("SELECT value FROM settings WHERE key = 'show_votes_public'");
+  if (visRow.rowCount === 0) {
+    await pool.query("INSERT INTO settings (key, value) VALUES ('show_votes_public', '1')");
+  }
+
+  // Contenu editable des pages secondaires (Billetterie, A propos, FAQ, Contact)
+  const pagesRow = await pool.query("SELECT value FROM settings WHERE key = 'pages_content'");
+  if (pagesRow.rowCount === 0) {
+    await pool.query("INSERT INTO settings (key, value) VALUES ('pages_content', $1)", [
+      JSON.stringify(DEFAULT_PAGES),
+    ]);
+  }
+
   // Contenu de la page d'accueil, editable depuis l'admin, stocke en JSON
   // dans la table settings (cle unique 'homepage_content').
   const homepageRow = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
@@ -95,41 +109,6 @@ async function initSchema() {
       JSON.stringify(DEFAULT_HOMEPAGE),
     ]);
   }
-
-  // Parametres d'affichage public (votes / classement) : visibles par defaut.
-  const displayRow = await pool.query("SELECT value FROM settings WHERE key = 'public_display'");
-  if (displayRow.rowCount === 0) {
-    await pool.query("INSERT INTO settings (key, value) VALUES ('public_display', $1)", [
-      JSON.stringify({ show_votes: true, show_ranking: true }),
-    ]);
-  }
-
-  // Contenu de la FAQ, editable depuis l'admin (liste de questions/reponses).
-  const faqRow = await pool.query("SELECT value FROM settings WHERE key = 'faq_content'");
-  if (faqRow.rowCount === 0) {
-    await pool.query("INSERT INTO settings (key, value) VALUES ('faq_content', $1)", [
-      JSON.stringify(DEFAULT_FAQ),
-    ]);
-  }
-
-  // Coordonnees de contact, editables depuis l'admin.
-  const contactRow = await pool.query("SELECT value FROM settings WHERE key = 'contact_content'");
-  if (contactRow.rowCount === 0) {
-    await pool.query("INSERT INTO settings (key, value) VALUES ('contact_content', $1)", [
-      JSON.stringify(DEFAULT_CONTACT),
-    ]);
-  }
-
-  // Contenu propre a la page A propos (etapes du deroulement, projet, transparence).
-  const aboutRow = await pool.query("SELECT value FROM settings WHERE key = 'about_content'");
-  if (aboutRow.rowCount === 0) {
-    await pool.query("INSERT INTO settings (key, value) VALUES ('about_content', $1)", [
-      JSON.stringify(DEFAULT_ABOUT),
-    ]);
-  }
-
-  // Module d'inscription en ligne : nouvelles tables uniquement (voir registration/schema.js).
-  await require("./registration/schema").initRegistrationSchema(pool);
 
   await ensureAdminUser();
 }
@@ -157,69 +136,6 @@ const DEFAULT_HOMEPAGE = {
   ],
 };
 
-// Contenu par defaut de la FAQ (repris du contenu redige a l'etape 3).
-const DEFAULT_FAQ = {
-  sections: [
-    {
-      title: "Les votes",
-      items: [
-        { q: "Comment voter pour un(e) candidat(e) ?", a: "Rendez-vous sur la page Candidats, ouvrez la fiche de la personne de votre choix, puis cliquez sur le bouton de vote. Indiquez le nombre de votes souhaite et votre numero de telephone, puis validez le paiement Mobile Money ou par carte." },
-        { q: "Combien coute un vote ?", a: "Le tarif en vigueur est affiche en bas de la page d'accueil et dans la fenetre de vote. Il est fixe par l'organisation et peut evoluer selon les phases du concours." },
-        { q: "Puis-je voter plusieurs fois ?", a: "Oui. Il n'y a pas de limite : vous pouvez acheter autant de votes que vous le souhaitez, en une ou plusieurs fois, pour un(e) ou plusieurs candidat(e)s." },
-        { q: "Mon paiement est passe mais mes votes n'apparaissent pas.", a: "Les votes sont ajoutes des que l'operateur confirme le paiement, ce qui peut prendre quelques minutes. Actualisez la page apres quelques instants. Si rien ne change, contactez-nous avec la date, le montant et le numero utilise pour le paiement." },
-        { q: "Les votes sont-ils remboursables ?", a: "Non. Un vote paye est definitif et ne peut etre ni rembourse, ni transfere vers un(e) autre candidat(e)." },
-        { q: "Pourquoi le nombre de votes n'est-il pas toujours affiche ?", a: "L'organisation peut masquer temporairement les compteurs et le classement, par exemple en fin de concours, pour preserver le suspense. Les votes continuent d'etre enregistres normalement pendant cette periode." },
-      ],
-    },
-    {
-      title: "Le concours",
-      items: [
-        { q: "Qui peut etre candidat(e) ?", a: "Le concours est ouvert aux etudiant(e)s regulierement inscrit(e)s a la FLASH Adjarra. Les modalites precises de depot de dossier sont communiquees par l'organisation a chaque edition." },
-        { q: "Qu'est-ce qu'un projet d'impact ?", a: "C'est l'initiative portee par chaque candidat(e) au service de la communaute : education, sante, environnement, entrepreneuriat ou culture. Elle est publiee sur sa fiche et presentee devant le jury." },
-        { q: "Le vote du public decide-t-il seul du resultat ?", a: "Non. Le vote du public est l'une des composantes du resultat final, aux cotes de l'appreciation du jury lors des prestations et de la presentation des projets." },
-        { q: "Une fiche de candidat(e) a disparu, pourquoi ?", a: "Un profil peut etre retire si la personne se desiste ou si l'organisation le decide. Le lien affiche alors un message indiquant que le profil n'est plus disponible." },
-      ],
-    },
-    {
-      title: "Les billets",
-      items: [
-        { q: "Ou acheter un billet pour la soiree ?", a: "Les formules et la procedure sont detaillees sur la page Billetterie. La reservation se fait aupres de l'equipe d'organisation, qui confirme chaque paiement par message." },
-        { q: "Mon billet est-il nominatif ?", a: "Le message de confirmation sert de billet et peut etre presente par la personne de votre choix, sauf mention contraire indiquee lors de la reservation." },
-      ],
-    },
-  ],
-};
-
-// Coordonnees de contact par defaut.
-const DEFAULT_CONTACT = {
-  whatsapp: "22900000000",
-  email: "contact@missmisterflashadjarra.bj",
-  address: "Bureau sectoriel UNEB — FLASH Adjarra, campus d'Adjarra",
-  subjects: [
-    "Question generale",
-    "Probleme de vote ou de paiement",
-    "Reservation de billets",
-    "Proposition de partenariat",
-    "Candidature",
-    "Presse et medias",
-  ],
-};
-
-// Contenu par defaut propre a la page A propos (le reste de la page reprend
-// hero_description / organizer_text / objectives de l'accueil).
-const DEFAULT_ABOUT = {
-  steps: [
-    { title: "Candidatures", text: "Les etudiant(e)s interesse(e)s deposent leur dossier aupres de l'organisation." },
-    { title: "Selection", text: "Les candidat(e)s retenu(e)s sont publie(e)s sur la page Candidats avec leur projet d'impact." },
-    { title: "Votes en ligne", text: "Le public soutient ses favori(te)s par des votes payants, a partir de la plateforme." },
-    { title: "Soiree de gala", text: "Prestations sur scene, deliberation du jury et couronnement." },
-  ],
-  project_text:
-    "Chaque candidat(e) porte un projet au service de la communaute etudiante ou locale : education, sante, environnement, entrepreneuriat, culture. Ce projet est presente publiquement et compte dans l'appreciation du jury.",
-  transparency_text:
-    "Chaque vote est payant et valide uniquement apres confirmation du paiement par l'operateur. Le compteur d'un(e) candidat(e) n'augmente jamais avant cette confirmation. L'organisation peut choisir de rendre publics ou non les compteurs de votes et le classement pendant certaines phases du concours.",
-};
-
 async function ensureAdminUser() {
   const username = process.env.ADMIN_USERNAME || "admin";
   const password = process.env.ADMIN_PASSWORD || "changeme123";
@@ -234,4 +150,24 @@ async function ensureAdminUser() {
   }
 }
 
-module.exports = { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT, DEFAULT_ABOUT };
+const DEFAULT_PAGES = {
+  billetterie: {
+    intro: "L'accès à la soirée finale du concours se fait sur place. Retrouvez ci-dessous les informations pratiques.",
+    infos: "Lieu, date et tarif communiqués prochainement. Suivez nos actualités sur la page d'accueil.",
+    contact_note: "Pour réserver ou pour toute question, contactez-nous directement.",
+  },
+  apropos: {
+    text:
+      "Miss & Mister Flash Adjarra est un concours étudiant organisé par le Bureau Sectoriel de l'UNEB – FLASH Adjarra. " +
+      "Il vise à valoriser les talents, l'engagement et la créativité de la jeunesse universitaire à travers une compétition " +
+      "conviviale, des votes en ligne et des projets à impact portés par les candidat(e)s.",
+  },
+  faq: [
+    { question: "Comment voter ?", answer: "Rendez-vous sur la page Candidats, choisissez votre candidat(e) préféré(e) et suivez les étapes de paiement sécurisé par Mobile Money ou carte." },
+    { question: "Combien coûte un vote ?", answer: "Le prix d'un vote est indiqué sur la page Candidats. Il est fixé par les organisateurs." },
+    { question: "Puis-je voter plusieurs fois ?", answer: "Oui, vous pouvez acheter autant de votes que vous le souhaitez pour votre candidat(e) favori(te)." },
+  ],
+  contact: { phone: "", whatsapp: "", email: "", address: "", facebook: "" },
+};
+
+module.exports = { pool, initSchema, DEFAULT_HOMEPAGE, DEFAULT_PAGES };

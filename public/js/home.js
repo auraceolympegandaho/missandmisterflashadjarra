@@ -13,31 +13,13 @@ async function loadHomepage() {
     const data = await res.json();
 
     document.getElementById("hero-edition").textContent = data.hero_edition || "";
-    // Titre sur deux lignes : « MISS & MISTER » puis le reste en or (texte inséré sans HTML).
-    const titleEl = document.getElementById("hero-title");
-    const fullTitle = data.hero_title || "";
-    const m = fullTitle.match(/^(miss\s*&\s*mister)\s+(.+)$/i);
-    titleEl.textContent = "";
-    if (m) {
-      const l1 = document.createElement("span");
-      l1.className = "l1";
-      l1.textContent = m[1];
-      const l2 = document.createElement("span");
-      l2.className = "l2";
-      l2.textContent = m[2];
-      titleEl.append(l1, l2);
-    } else {
-      titleEl.textContent = fullTitle;
-    }
+    document.getElementById("hero-title").textContent = data.hero_title || "";
     document.getElementById("hero-slogan").textContent = data.hero_slogan || "";
     document.getElementById("hero-description").textContent = data.hero_description || "";
     document.title = `${data.hero_title || "Miss & Mister Flash Adjarra"} — ${data.hero_edition || ""}`;
 
     const poster = document.getElementById("hero-poster");
-    if (data.poster_path) {
-      poster.src = data.poster_path;
-      document.getElementById("hero-visual").classList.add("has-poster");
-    }
+    if (data.poster_path) poster.src = data.poster_path;
 
     // organizer_text contient volontairement une petite mise en forme (ex: <b>),
     // saisie par l'admin dans un champ dedie de la page d'accueil.
@@ -56,17 +38,14 @@ async function loadHomepage() {
       )
       .join("");
 
-    // Bouton principal « Déposer ma candidature » (déjà dans le HTML) + boutons éditables de l'admin
     const ctaEl = document.getElementById("hero-cta");
-    const buttons = (Array.isArray(data.buttons) ? data.buttons : []).filter(
-      (b) => !/inscription/i.test(b.url || "")
-    );
-    ctaEl.insertAdjacentHTML(
-      "beforeend",
-      buttons
-        .map((b) => `<a href="${escapeHtml(b.url)}" class="btn outline">${escapeHtml(b.label)}</a>`)
-        .join("")
-    );
+    const buttons = Array.isArray(data.buttons) ? data.buttons : [];
+    ctaEl.innerHTML = buttons
+      .map(
+        (b, i) =>
+          `<a href="${escapeHtml(b.url)}" class="btn ${i === 0 ? "gold" : "outline"}">${escapeHtml(b.label)}</a>`
+      )
+      .join("");
   } catch (e) {
     console.error("Impossible de charger le contenu de l'accueil", e);
   }
@@ -76,7 +55,7 @@ async function loadPrice() {
   try {
     const res = await fetch("/api/settings/price");
     const data = await res.json();
-    const pl = document.getElementById("price-label"); if (pl) pl.textContent = data.price_per_vote;
+    document.getElementById("price-label").textContent = data.price_per_vote;
   } catch (e) {
     console.error("Impossible de charger le prix du vote", e);
   }
@@ -152,45 +131,24 @@ function escapeHtml(str) {
 }
 
 async function loadPartners() {
-  const marquee = document.getElementById("partners-marquee");
-  const track = document.getElementById("partners-track");
-  const all = document.getElementById("partners-all");
-  const cta = document.getElementById("partner-cta-btn");
-
-  // Bouton "Contacter l'equipe" : WhatsApp du comite (gere dans l'admin > Contact)
-  try {
-    const c = await (await fetch("/api/contact")).json();
-    const num = String((c && c.whatsapp) || "").replace(/\D/g, "");
-    if (num.length >= 8) {
-      cta.href = `https://wa.me/${num}?text=${encodeURIComponent("Bonjour, nous souhaitons devenir partenaire de Miss & Mister Flash Adjarra.")}`;
-      cta.target = "_blank";
-      cta.rel = "noopener noreferrer";
-    }
-  } catch (e) {}
-
+  const section = document.getElementById("partenaires");
+  const grid = document.getElementById("partners-grid");
   try {
     const res = await fetch("/api/partners");
     const partners = await res.json();
-    if (!partners.length) return; // pas de carrousel, seule l'invitation reste
+    if (!partners.length) return; // section reste masquee
 
-    const item = (p, hidden) => {
-      const logo = p.logo_path
-        ? `<span class="pm-logo"><img src="${escapeHtml(p.logo_path)}" alt="${hidden ? "" : escapeHtml(p.name)}" loading="lazy" /></span>`
-        : `<span class="pm-logo pm-fallback">${escapeHtml(p.name)}</span>`;
-      const inner = `${logo}<span class="pm-name">${escapeHtml(p.name)}</span>`;
-      const attrs = hidden ? ' aria-hidden="true" tabindex="-1"' : "";
-      return p.website_url
-        ? `<a class="partner-card"${attrs} href="${escapeHtml(p.website_url)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
-        : `<div class="partner-card"${attrs}>${inner}</div>`;
-    };
-    const base = partners.map((p) => item(p, false)).join("");
-    // Defilement continu seulement s'il y a assez de logos pour remplir la ligne
-    const scroll = partners.length > 4;
-    track.innerHTML = scroll ? base + partners.map((p) => item(p, true)).join("") : base;
-    marquee.classList.toggle("is-scrolling", scroll);
-    track.style.setProperty("--pm-duration", Math.max(20, partners.length * 5) + "s");
-    marquee.hidden = false;
-    all.hidden = false;
+    grid.innerHTML = partners
+      .map((p) => {
+        const logo = p.logo_path
+          ? `<img src="${p.logo_path}" alt="${escapeHtml(p.name)}" loading="lazy" />`
+          : `<span class="partner-fallback">${escapeHtml(p.name)}</span>`;
+        return p.website_url
+          ? `<a class="partner-card" href="${escapeHtml(p.website_url)}" target="_blank" rel="noopener noreferrer">${logo}</a>`
+          : `<div class="partner-card">${logo}</div>`;
+      })
+      .join("");
+    section.style.display = "block";
   } catch (e) {
     console.error("Impossible de charger les partenaires", e);
   }
@@ -203,9 +161,8 @@ async function loadAnnouncements() {
     const items = await res.json();
 
     if (!items.length) {
-      // Pas d'actualité : on masque toute la section (elle réapparaît dès qu'une actualité est publiée)
-      const section = document.getElementById("actualites");
-      if (section) section.style.display = "none";
+      grid.innerHTML =
+        "<p style='text-align:center; color:var(--text-muted); grid-column:1/-1; font-size:13px;'>Aucune actualité pour le moment.</p>";
       return;
     }
 
@@ -225,22 +182,7 @@ async function loadAnnouncements() {
   }
 }
 
-async function loadRegistrationChip() {
-  try {
-    const res = await fetch("/api/registration/config");
-    const c = await res.json();
-    if (c.phase !== "open") return; // rien n'est annoncé tant que l'admin n'a pas ouvert
-    const chip = document.getElementById("hero-reg-chip");
-    chip.textContent = "Inscriptions ouvertes";
-    if (c.ends_at) {
-      chip.textContent += " · jusqu'au " + new Date(c.ends_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
-    }
-    chip.hidden = false;
-  } catch (e) {}
-}
-
 loadHomepage();
-loadRegistrationChip();
 loadPrice();
 loadCountdown();
 loadAnnouncements();

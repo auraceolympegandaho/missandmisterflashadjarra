@@ -4,34 +4,6 @@ const fedapay = require("../payments/fedapay");
 
 const router = express.Router();
 
-// Applique le statut FedaPay a une transaction locale. Idempotent : les votes ne sont
-// credites qu'une seule fois, meme si webhook et verification arrivent en meme temps.
-async function applyStatus(localTx, fedapayStatus) {
-  const newStatus = ["approved", "declined", "canceled"].includes(fedapayStatus) ? fedapayStatus : "pending";
-  if (localTx.status === "approved" || newStatus === localTx.status) return localTx.status;
-  const client = await pool.connect();
-  try {
-    await client.query("BEGIN");
-    const upd = await client.query(
-      "UPDATE transactions SET status = $1, updated_at = NOW() WHERE id = $2 AND status <> 'approved' RETURNING id",
-      [newStatus, localTx.id]
-    );
-    if (newStatus === "approved" && upd.rowCount === 1) {
-      await client.query("UPDATE candidates SET votes_count = votes_count + $1 WHERE id = $2", [
-        localTx.votes_bought,
-        localTx.candidate_id,
-      ]);
-    }
-    await client.query("COMMIT");
-  } catch (e) {
-    await client.query("ROLLBACK").catch(() => {});
-    throw e;
-  } finally {
-    client.release();
-  }
-  return newStatus;
-}
-
 // POST /api/votes/init
 // body: { candidateId, votesCount, phone }
 // -> cree une transaction "pending" + une transaction FedaPay, renvoie l'URL de paiement
@@ -88,17 +60,7 @@ router.get("/status/:id", async (req, res) => {
     const result = await pool.query("SELECT * FROM transactions WHERE id = $1", [req.params.id]);
     const tx = result.rows[0];
     if (!tx) return res.status(404).json({ error: "Transaction introuvable." });
-    let status = tx.status;
-    // Si le webhook n'est pas encore arrive, on interroge directement FedaPay (verification serveur).
-    if (status === "pending" && tx.fedapay_transaction_id) {
-      try {
-        const remote = await fedapay.getTransaction(tx.fedapay_transaction_id);
-        status = await applyStatus(tx, remote.status);
-      } catch (e) {
-        console.error("[fedapay] verification impossible :", e.message);
-      }
-    }
-    res.json({ status, votes_bought: tx.votes_bought, candidate_id: tx.candidate_id });
+    res.json({ status: tx.status, votes_bought: tx.votes_bought, candidate_id: tx.candidate_id });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Impossible de verifier le statut." });
@@ -139,7 +101,32 @@ router.post(
       const localTx = localRes.rows[0];
       if (!localTx) return res.status(200).send("ok");
 
-      await applyStatus(localTx, status);
+      // Idempotence : si deja approuve, ne pas re-crediter les votes
+      if (localTx.status === "approved") return res.status(200).send("ok");
+
+      const newStatus = ["approved", "declined", "canceled"].includes(status) ? status : "pending";
+
+      const client = await pool.connect();
+      try {
+        await client.query("BEGIN");
+        await client.query(
+          "UPDATE transactions SET status = $1, updated_at = NOW() WHERE id = $2",
+          [newStatus, localTx.id]
+        );
+        if (newStatus === "approved") {
+          await client.query(
+            "UPDATE candidates SET votes_count = votes_count + $1 WHERE id = $2",
+            [localTx.votes_bought, localTx.candidate_id]
+          );
+        }
+        await client.query("COMMIT");
+      } catch (e) {
+        await client.query("ROLLBACK");
+        throw e;
+      } finally {
+        client.release();
+      }
+
       res.status(200).send("ok");
     } catch (err) {
       console.error(err);

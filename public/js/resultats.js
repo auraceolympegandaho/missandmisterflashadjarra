@@ -20,7 +20,7 @@ function renderLeaderboard(elId, candidates) {
         <div class="name">${escapeHtml(c.name)}</div>
         ${c.candidacy_number ? `<div class="number">N° ${escapeHtml(c.candidacy_number)}</div>` : ""}
       </div>
-      ${typeof c.votes_count !== "undefined" ? `<div class="leaderboard-votes">${Number(c.votes_count).toLocaleString("fr-FR")} <small>votes</small></div>` : ""}
+      <div class="leaderboard-votes">${c.votes_count} <small>votes</small></div>
     </li>`
     )
     .join("");
@@ -28,19 +28,17 @@ function renderLeaderboard(elId, candidates) {
 
 async function loadResults() {
   try {
-    // Le classement public peut etre desactive depuis l'administration
-    const settings = await fetch("/api/settings/public").then((r) => r.json());
-    if (settings.show_ranking === false) {
-      document.querySelectorAll(".results-block").forEach((b) => (b.style.display = "none"));
-      const empty = document.getElementById("empty-results");
-      empty.textContent =
-        "Le classement n'est pas public pour le moment. Il sera affiché dès que l'organisation l'autorisera.";
-      empty.style.display = "block";
+    const res = await fetch("/api/candidates");
+    const data = await res.json();
+    const candidates = data.candidates || [];
+
+    if (!data.show_votes) {
+      document.querySelectorAll(".results-block").forEach((el) => (el.style.display = "none"));
+      const hidden = document.getElementById("empty-results");
+      hidden.textContent = "Le classement n'est pas public pour le moment. Les résultats seront dévoilés par l'organisation.";
+      hidden.style.display = "block";
       return;
     }
-
-    const res = await fetch("/api/candidates");
-    const candidates = await res.json();
 
     if (!candidates.length) {
       document.getElementById("empty-results").style.display = "block";

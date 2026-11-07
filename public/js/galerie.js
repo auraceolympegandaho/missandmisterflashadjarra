@@ -8,7 +8,8 @@ async function loadGallery() {
   const grid = document.getElementById("gallery-grid");
   try {
     const res = await fetch("/api/candidates");
-    const candidates = await res.json();
+    const data = await res.json();
+    const candidates = data.candidates || [];
     const withPhoto = candidates.filter((c) => c.photo_path);
 
     if (!withPhoto.length) {
