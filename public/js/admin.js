@@ -210,11 +210,13 @@ async function loadCandidates() {
         <td>${escapeHtml(c.category)}</td>
         <td>${c.votes_count}</td>
         <td>${c.is_active ? "Actif" : "Masqué"}</td>
+        <td>${c.is_published ? "Publié" : "Non publié"}</td>
         <td><button class="copy-link-btn" data-link="${escapeHtml(link)}">Copier le lien</button></td>
         <td><a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Voir</a></td>
         <td class="row-actions">
           <button data-id="${c.id}" class="edit-btn">Modifier</button>
           <button data-id="${c.id}" class="toggle-btn">${c.is_active ? "Masquer" : "Activer"}</button>
+          <button data-id="${c.id}" class="publish-btn">${c.is_published ? "Retirer de la vitrine" : "Publier"}</button>
           <button data-id="${c.id}" class="danger delete-btn">Supprimer</button>
         </td>
       `;
@@ -224,6 +226,7 @@ async function loadCandidates() {
 
       tr.querySelector(".edit-btn").addEventListener("click", () => openCandidateModal(c));
       tr.querySelector(".toggle-btn").addEventListener("click", () => toggleActive(c));
+      tr.querySelector(".publish-btn").addEventListener("click", () => togglePublished(c));
       tr.querySelector(".delete-btn").addEventListener("click", () => deleteCandidate(c.id));
     });
   } catch (e) {
@@ -257,6 +260,13 @@ async function copyCandidateLink(btn, link) {
 async function toggleActive(c) {
   const form = new FormData();
   form.append("is_active", c.is_active ? "0" : "1");
+  await apiFetch(`/candidates/${c.id}`, { method: "PUT", body: form });
+  loadCandidates();
+}
+
+async function togglePublished(c) {
+  const form = new FormData();
+  form.append("is_published", c.is_published ? "0" : "1");
   await apiFetch(`/candidates/${c.id}`, { method: "PUT", body: form });
   loadCandidates();
 }
@@ -307,6 +317,11 @@ function openCandidateModal(candidate) {
   document.getElementById("c-bio").value = candidate ? candidate.bio : "";
   document.getElementById("c-project").value = candidate ? candidate.project_desc || "" : "";
   document.getElementById("c-video").value = candidate ? candidate.video_url || "" : "";
+  document.getElementById("c-academic").value = candidate ? candidate.academic_path || "" : "";
+  document.getElementById("c-interests").value = candidate ? candidate.interests || "" : "";
+  document.getElementById("c-talent").value = candidate ? candidate.talent || "" : "";
+  document.getElementById("c-motivation").value = candidate ? candidate.motivation || "" : "";
+  document.getElementById("c-published").checked = candidate ? !!candidate.is_published : false;
   document.getElementById("c-photo").value = "";
   document.getElementById("c-photos").value = "";
   renderExistingPhotos(candidate ? candidate.id : null, candidate ? candidate.photos : []);
@@ -330,6 +345,11 @@ document.getElementById("save-candidate-btn").addEventListener("click", async ()
   const bio = document.getElementById("c-bio").value.trim();
   const projectDesc = document.getElementById("c-project").value.trim();
   const videoUrl = document.getElementById("c-video").value.trim();
+  const academicPath = document.getElementById("c-academic").value.trim();
+  const interests = document.getElementById("c-interests").value.trim();
+  const talent = document.getElementById("c-talent").value.trim();
+  const motivation = document.getElementById("c-motivation").value.trim();
+  const isPublished = document.getElementById("c-published").checked;
   const photoFile = document.getElementById("c-photo").files[0];
   const galleryFiles = document.getElementById("c-photos").files;
 
@@ -348,6 +368,11 @@ document.getElementById("save-candidate-btn").addEventListener("click", async ()
   form.append("bio", bio);
   form.append("project_desc", projectDesc);
   form.append("video_url", videoUrl);
+  form.append("academic_path", academicPath);
+  form.append("interests", interests);
+  form.append("talent", talent);
+  form.append("motivation", motivation);
+  form.append("is_published", isPublished ? "1" : "0");
   if (photoFile) form.append("photo", photoFile);
   Array.from(galleryFiles).forEach((f) => form.append("photos", f));
 

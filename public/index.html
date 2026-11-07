@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="/css/theme.css" />
 <link rel="stylesheet" href="/css/premium.css" />
 <link rel="stylesheet" href="/css/header-v9.css" />
+<link rel="stylesheet" href="/css/showcase.css" />
 </head>
 <body>
 
@@ -22,6 +23,7 @@
   <section class="hero hero-pro">
     <div class="hero-inner">
       <div class="hero-content">
+        <div class="hero-crown" aria-hidden="true"></div>
         <span class="hero-edition" id="hero-edition">Édition 2027</span>
         <span class="hero-reg-chip" id="hero-reg-chip" hidden></span>
         <h1 id="hero-title">MISS &amp; MISTER FLASH ADJARRA</h1>
@@ -50,6 +52,15 @@
     <h2>Les objectifs du concours</h2>
     <p class="section-sub">Un tremplin pour la jeunesse estudiantine de la FLASH Adjarra</p>
     <div class="objectives-grid" id="objectives-grid"></div>
+  </section>
+
+  <!-- C2. Presentation des candidats (lecture seule, aucun vote) -->
+  <section class="home-section showcase" id="presentation-candidats" aria-labelledby="showcase-title">
+    <h2 id="showcase-title">Les candidat(e)s de l'édition 2027</h2>
+    <p class="section-sub">Faites connaissance avec celles et ceux qui portent les couleurs de la FLASH Adjarra</p>
+    <div id="showcase-body">
+      <p class="showcase-loading">Chargement des profils…</p>
+    </div>
   </section>
 
   <!-- D. Compte a rebours -->
@@ -131,8 +142,7 @@
   <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
 </footer>
 
-<a class="admin-link" href="/admin.html">admin</a>
-
 <script src="/js/home.js"></script>
+<script src="/js/showcase.js"></script>
 </body>
 </html>

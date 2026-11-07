@@ -78,6 +78,13 @@ async function initSchema() {
     ALTER TABLE candidates ADD COLUMN IF NOT EXISTS field_of_study TEXT DEFAULT '';
     ALTER TABLE candidates ADD COLUMN IF NOT EXISTS video_url TEXT DEFAULT '';
     ALTER TABLE candidates ADD COLUMN IF NOT EXISTS photos JSONB NOT NULL DEFAULT '[]';
+    -- Vitrine "Presentation des candidats" (accueil) : champs propres + publication distincte du vote.
+    -- is_published = 0 par defaut : un profil n'est public qu'apres validation par l'administration.
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS academic_path TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS interests TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS talent TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS motivation TEXT DEFAULT '';
+    ALTER TABLE candidates ADD COLUMN IF NOT EXISTS is_published INTEGER NOT NULL DEFAULT 0;
   `);
 
   const priceRow = await pool.query("SELECT value FROM settings WHERE key = 'price_per_vote'");

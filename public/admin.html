@@ -105,7 +105,7 @@
   <section id="tab-candidates" class="tab-panel" style="display:none;">
     <button class="btn gold" id="new-candidate-btn">+ Ajouter un(e) candidat(e)</button>
     <table class="admin-table" id="candidates-table">
-      <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Lien de vote</th><th>Fiche</th><th>Actions</th></tr></thead>
+      <thead><tr><th>Photo</th><th>N°</th><th>Nom</th><th>Catégorie</th><th>Votes</th><th>Statut</th><th>Vitrine</th><th>Lien de vote</th><th>Fiche</th><th>Actions</th></tr></thead>
       <tbody></tbody>
     </table>
   </section>
@@ -299,14 +299,28 @@
     <input type="text" id="c-study-year" placeholder="ex : Licence 2" />
     <label>Filière</label>
     <input type="text" id="c-field" placeholder="ex : Sciences de l'Éducation" />
-    <label>Bio / présentation</label>
-    <input type="text" id="c-bio" />
-    <label>Projet / motivation (projet d'impact)</label>
+    <label>Bio / présentation personnelle</label>
+    <textarea id="c-bio" rows="3" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
+    <label>Parcours universitaire</label>
+    <textarea id="c-academic" rows="2" placeholder="ex : Licence 1 en Lettres Modernes, Licence 2 en Sciences de l'Éducation" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
+    <label>Centres d'intérêt</label>
+    <input type="text" id="c-interests" placeholder="ex : lecture, théâtre, bénévolat" />
+    <label>Talent ou aptitude particulière</label>
+    <input type="text" id="c-talent" placeholder="ex : slam, danse traditionnelle" />
+    <label>Motivation à participer au concours</label>
+    <textarea id="c-motivation" rows="3" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
+    <label>Projet / ambition (projet d'impact)</label>
     <textarea id="c-project" rows="3" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid var(--border); font-size:15px; font-family:inherit; resize:vertical;"></textarea>
     <label>Lien vidéo (YouTube, optionnel)</label>
     <input type="text" id="c-video" placeholder="https://youtube.com/..." />
-    <label>Photo principale</label>
+    <label>Photo principale (portrait officiel)</label>
     <input type="file" id="c-photo" accept="image/*" />
+    <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0;">Ajouter une nouvelle photo remplace la précédente. Format portrait recommandé (4:5).</p>
+    <label style="display:flex; align-items:center; gap:10px; margin-top:16px; cursor:pointer;">
+      <input type="checkbox" id="c-published" style="width:auto; margin:0;" />
+      <span>Publier ce profil dans la présentation publique (accueil)</span>
+    </label>
+    <p style="font-size:12px; color:var(--text-muted); margin:4px 0 0;">Tant que la case n'est pas cochée, le profil reste invisible du public. Seules les informations renseignées sont affichées.</p>
     <label>Photos supplémentaires (galerie)</label>
     <div id="c-existing-photos" style="display:flex; flex-wrap:wrap; gap:8px; margin:6px 0;"></div>
     <input type="file" id="c-photos" accept="image/*" multiple />

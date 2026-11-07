@@ -143,6 +143,11 @@ router.post("/candidates", uploadCandidate, async (req, res) => {
       study_year,
       field_of_study,
       video_url,
+      academic_path,
+      interests,
+      talent,
+      motivation,
+      is_published,
     } = req.body;
     if (!name || !["Miss", "Mister"].includes(category)) {
       return res.status(400).json({ error: "Nom et categorie (Miss/Mister) requis." });
@@ -155,8 +160,9 @@ router.post("/candidates", uploadCandidate, async (req, res) => {
     const result = await pool.query(
       `INSERT INTO candidates
          (name, category, candidacy_number, bio, project_desc, photo_path, photos,
-          study_year, field_of_study, video_url)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *`,
+          study_year, field_of_study, video_url,
+          academic_path, interests, talent, motivation, is_published)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15) RETURNING *`,
       [
         name,
         category,
@@ -168,6 +174,11 @@ router.post("/candidates", uploadCandidate, async (req, res) => {
         study_year || "",
         field_of_study || "",
         video_url || "",
+        academic_path || "",
+        interests || "",
+        talent || "",
+        motivation || "",
+        Number(is_published) === 1 ? 1 : 0,
       ]
     );
     res.status(201).json(result.rows[0]);
@@ -198,6 +209,14 @@ router.put("/candidates/:id", uploadCandidate, async (req, res) => {
     const videoUrl = req.body.video_url ?? existing.video_url;
     const isActive =
       req.body.is_active !== undefined ? Number(req.body.is_active) : existing.is_active;
+    const academicPath = req.body.academic_path ?? existing.academic_path;
+    const interests = req.body.interests ?? existing.interests;
+    const talent = req.body.talent ?? existing.talent;
+    const motivation = req.body.motivation ?? existing.motivation;
+    const isPublished =
+      req.body.is_published !== undefined
+        ? (Number(req.body.is_published) === 1 ? 1 : 0)
+        : existing.is_published;
 
     const photoFile = req.files && req.files.photo ? req.files.photo[0] : null;
     const galleryFiles = req.files && req.files.photos ? req.files.photos : [];
@@ -211,8 +230,9 @@ router.put("/candidates/:id", uploadCandidate, async (req, res) => {
       `UPDATE candidates
        SET name = $1, category = $2, candidacy_number = $3, bio = $4, project_desc = $5,
            photo_path = $6, photos = $7, study_year = $8, field_of_study = $9,
-           video_url = $10, is_active = $11
-       WHERE id = $12 RETURNING *`,
+           video_url = $10, is_active = $11, academic_path = $12, interests = $13,
+           talent = $14, motivation = $15, is_published = $16
+       WHERE id = $17 RETURNING *`,
       [
         name,
         category,
@@ -225,6 +245,11 @@ router.put("/candidates/:id", uploadCandidate, async (req, res) => {
         fieldOfStudy,
         videoUrl,
         isActive,
+        academicPath,
+        interests,
+        talent,
+        motivation,
+        isPublished,
         req.params.id,
       ]
     );

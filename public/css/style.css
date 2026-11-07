@@ -350,13 +350,3 @@ footer b { color: var(--blue-dark); }
   color: var(--text-muted);
   opacity: 0.85;
 }
-
-.admin-link {
-  position: fixed;
-  bottom: 14px;
-  right: 14px;
-  font-size: 11px;
-  color: var(--text-muted);
-  text-decoration: none;
-  opacity: 0.5;
-}

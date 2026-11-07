@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#8a6200"/>
+      <stop offset=".28" stop-color="#FFD65A"/>
+      <stop offset=".5" stop-color="#FFBE10"/>
+      <stop offset=".78" stop-color="#FFE9A8"/>
+      <stop offset="1" stop-color="#9a6e00"/>
+    </linearGradient>
+    <linearGradient id="gv" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFE9A8"/>
+      <stop offset=".45" stop-color="#FFBE10"/>
+      <stop offset="1" stop-color="#8a6200"/>
+    </linearGradient>
+    <radialGradient id="pearl" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#fffbe8"/>
+      <stop offset=".5" stop-color="#FFD65A"/>
+      <stop offset="1" stop-color="#a87800"/>
+    </radialGradient>
+    <radialGradient id="gem" cx=".35" cy=".3" r=".8">
+      <stop offset="0" stop-color="#ffffff" stop-opacity=".9"/>
+      <stop offset=".4" stop-color="#FFE08A"/>
+      <stop offset="1" stop-color="#b98600"/>
+    </radialGradient>
+  </defs>
+
+  <!-- corps de la couronne : 5 pointes -->
+  <path d="M46 226 L34 96 C34 90 41 88 45 93 L108 156 L138 74 C140 68 148 68 150 74 L172 148 L190 66 C193 58 207 58 210 66 L228 148 L262 74 C264 68 272 68 274 74 L302 156 L355 93 C359 88 366 90 366 96 L354 226 Z"
+        fill="url(#g)" stroke="#FFE9A8" stroke-opacity=".55" stroke-width="1.5" stroke-linejoin="round"/>
+  <!-- reflets internes -->
+  <path d="M60 214 L50 112 L108 168 L140 92 L176 168 L200 80 L224 168 L260 92 L292 168 L350 112 L340 214 Z" fill="url(#gv)" fill-opacity=".38"/>
+  <path d="M108 156 L138 74 M176 146 L196 64 M224 146 L262 74 M302 156 L355 93" stroke="#fff4cc" stroke-opacity=".55" stroke-width="1.2" stroke-linecap="round"/>
+  <!-- filigrane -->
+  <g stroke="#7a5600" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round" fill="none">
+    <path d="M82 206 C96 182 112 182 126 206"/>
+    <path d="M146 206 C162 176 178 176 194 206"/>
+    <path d="M206 206 C222 176 238 176 254 206"/>
+    <path d="M274 206 C288 182 304 182 318 206"/>
+  </g>
+
+  <!-- bandeau -->
+  <rect x="38" y="224" width="324" height="40" rx="9" fill="url(#g)" stroke="#FFE9A8" stroke-opacity=".6" stroke-width="1.5"/>
+  <rect x="44" y="230" width="312" height="6" rx="3" fill="#fff4cc" fill-opacity=".45"/>
+  <rect x="38" y="258" width="324" height="8" rx="4" fill="#7a5600" fill-opacity=".45"/>
+  <!-- gemmes du bandeau -->
+  <g stroke="#7a5600" stroke-opacity=".6" stroke-width="1.2">
+    <ellipse cx="200" cy="246" rx="15" ry="10" fill="url(#gem)"/>
+    <circle cx="140" cy="246" r="7.5" fill="url(#gem)"/>
+    <circle cx="260" cy="246" r="7.5" fill="url(#gem)"/>
+    <circle cx="88" cy="246" r="6" fill="url(#gem)"/>
+    <circle cx="312" cy="246" r="6" fill="url(#gem)"/>
+  </g>
+
+  <!-- perles au sommet des pointes -->
+  <g stroke="#7a5600" stroke-opacity=".5" stroke-width="1">
+    <circle cx="200" cy="48" r="13" fill="url(#pearl)"/>
+    <circle cx="144" cy="62" r="10" fill="url(#pearl)"/>
+    <circle cx="266" cy="62" r="10" fill="url(#pearl)"/>
+    <circle cx="38" cy="84" r="9" fill="url(#pearl)"/>
+    <circle cx="362" cy="84" r="9" fill="url(#pearl)"/>
+  </g>
+</svg>

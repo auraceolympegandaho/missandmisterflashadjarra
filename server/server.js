@@ -40,6 +40,8 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 
 // API
 app.use("/api/candidates", candidatesRoutes);
+// Vitrine publique des candidats (accueil) : lecture seule, sans aucune donnee de vote
+app.use("/api/showcase", require("./routes/showcase"));
 app.use("/api/votes", votesRoutes);
 // Limite les tentatives de connexion admin (force brute)
 app.use(
