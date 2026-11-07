@@ -33,7 +33,7 @@
     document.title = "Profil introuvable — Miss & Mister Flash Adjarra";
     root.innerHTML =
       '<div class="pf-state"><h1>Profil indisponible</h1><p>' + esc(msg) + '</p>' +
-      '<a class="btn gold pf-back-cta" href="/index.html#presentation-candidats">Voir les candidat(e)s</a></div>';
+      '<a class="btn gold pf-back-cta" href="/#presentation-candidats">Voir les candidat(e)s</a></div>';
   }
 
   var id = new URLSearchParams(location.search).get("id");
@@ -75,7 +75,7 @@
         section("Motivation à participer", text(c.motivation)) +
         "  </div>" +
         "</div>" +
-        '<div class="pf-foot"><a class="back-link" href="/index.html#presentation-candidats">&larr; Retour aux candidat(e)s</a></div>';
+        '<div class="pf-foot"><a class="back-link" href="/#presentation-candidats">&larr; Retour aux candidat(e)s</a></div>';
     })
     .catch(function (e) { notFound(e.message); });
 })();

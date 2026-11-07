@@ -27,7 +27,7 @@ async function loadProjects() {
             ${escapeHtml(c.name)} <span style="font-size:11px; color:var(--blue); font-weight:400;">— ${escapeHtml(c.category)}${c.candidacy_number ? " · N° " + escapeHtml(c.candidacy_number) : ""}</span>
           </h2>
           <p style="margin:0 0 8px;">${escapeHtml(c.project_desc)}</p>
-          <a href="/candidat.html?id=${c.id}" style="font-size:12px; color:var(--blue-dark); text-decoration:underline;">Voir le profil complet</a>
+          <a href="/candidat?id=${c.id}" style="font-size:12px; color:var(--blue-dark); text-decoration:underline;">Voir le profil complet</a>
         </div>
       </div>`
       )

@@ -159,7 +159,7 @@ const DEFAULT_HOMEPAGE = {
     { title: "Engagement des jeunes", text: "Fédérer les étudiant(e)s autour de projets porteurs de sens pour leur communauté." },
   ],
   buttons: [
-    { label: "Découvrir les candidats", url: "/candidats.html" },
+    { label: "Découvrir les candidats", url: "/candidats" },
     { label: "Découvrir le concours", url: "#objectifs" },
   ],
 };

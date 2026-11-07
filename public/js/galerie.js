@@ -20,7 +20,7 @@ async function loadGallery() {
     grid.innerHTML = withPhoto
       .map(
         (c) => `
-      <a class="gallery-item" href="/candidat.html?id=${c.id}">
+      <a class="gallery-item" href="/candidat?id=${c.id}">
         <img src="${c.photo_path}" alt="${escapeHtml(c.name)}" loading="lazy" />
         <span class="gallery-caption">${escapeHtml(c.name)}${c.candidacy_number ? " · N° " + escapeHtml(c.candidacy_number) : ""}</span>
       </a>`

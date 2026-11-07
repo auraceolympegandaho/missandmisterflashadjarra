@@ -73,14 +73,14 @@ function renderGrid(candidates) {
     card.innerHTML = `
       ${isLeader ? '<span class="leader-badge"><svg class="leader-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6L12 3z"/></svg> En tête</span>' : ""}
       ${c.candidacy_number ? `<span class="number-badge">N° ${escapeHtml(c.candidacy_number)}</span>` : ""}
-      <a class="photo-wrap" href="/candidat.html?id=${c.id}">
+      <a class="photo-wrap" href="/candidat?id=${c.id}">
         <img class="photo" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" onerror="this.style.background='#eef1f6'; this.src='';" />
       </a>
       <div class="info">
         <span class="category">${escapeHtml(c.category)}</span>
-        <h3><a class="candidate-link" href="/candidat.html?id=${c.id}">${escapeHtml(c.name)}</a></h3>
+        <h3><a class="candidate-link" href="/candidat?id=${c.id}">${escapeHtml(c.name)}</a></h3>
         ${typeof c.votes_count !== "undefined" ? `<p class="votes"><b>${Number(c.votes_count).toLocaleString("fr-FR")}</b> votes</p>` : ""}
-        <a class="profile-link" href="/candidat.html?id=${c.id}">Voir le profil &amp; le projet</a>
+        <a class="profile-link" href="/candidat?id=${c.id}">Voir le profil &amp; le projet</a>
         <button class="btn block vote-btn">Voter pour ${escapeHtml(c.name.split(" ")[0])}</button>
       </div>
     `;

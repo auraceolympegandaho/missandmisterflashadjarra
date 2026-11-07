@@ -43,7 +43,7 @@
       '    <h4 class="sc-name">' + esc(c.name) + "</h4>" +
       (study ? '    <p class="sc-study">' + esc(study) + "</p>" : "") +
       (c.bio ? '    <p class="sc-bio">' + esc(c.bio) + "</p>" : "") +
-      '    <a class="sc-btn" href="/profil.html?id=' + encodeURIComponent(c.id) + '" aria-label="Découvrir le profil de ' + esc(c.name) + '">Découvrir le profil ' + ARROW + "</a>" +
+      '    <a class="sc-btn" href="/profil?id=' + encodeURIComponent(c.id) + '" aria-label="Découvrir le profil de ' + esc(c.name) + '">Découvrir le profil ' + ARROW + "</a>" +
       "  </div>" +
       "</article>"
     );

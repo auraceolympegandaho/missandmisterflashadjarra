@@ -125,7 +125,7 @@ function addButtonRow(label = "", url = "") {
   makeRemovableRow(
     container,
     `<input type="text" class="h-btn-label" placeholder="Libellé du bouton" value="${escapeHtml(label)}" />
-     <input type="text" class="h-btn-url" placeholder="Destination (/page.html ou #ancre)" value="${escapeHtml(url)}" />`
+     <input type="text" class="h-btn-url" placeholder="Destination (/page ou #ancre)" value="${escapeHtml(url)}" />`
   );
 }
 
@@ -202,7 +202,7 @@ async function loadCandidates() {
     tbody.innerHTML = "";
     candidates.forEach((c) => {
       const tr = document.createElement("tr");
-      const link = `${window.location.origin}/candidat.html?id=${c.id}`;
+      const link = `${window.location.origin}/candidat?id=${c.id}`;
       tr.innerHTML = `
         <td><img class="thumb" src="${c.photo_path || ""}" onerror="this.src=''"/></td>
         <td>${escapeHtml(c.candidacy_number || "—")}</td>

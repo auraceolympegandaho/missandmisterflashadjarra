@@ -6,6 +6,7 @@ const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const { pool, DEFAULT_HOMEPAGE, DEFAULT_FAQ, DEFAULT_CONTACT, DEFAULT_ABOUT } = require("../db");
 const { requireAdmin } = require("../middleware/auth");
+const { cleanInternalUrl } = require("../urls");
 
 const router = express.Router();
 
@@ -734,7 +735,11 @@ router.get("/homepage", async (req, res) => {
   try {
     const result = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
     const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
-    res.json({ ...DEFAULT_HOMEPAGE, ...stored });
+    const content = { ...DEFAULT_HOMEPAGE, ...stored };
+    if (Array.isArray(content.buttons)) {
+      content.buttons = content.buttons.map((b) => (b && typeof b === "object" ? { ...b, url: cleanInternalUrl(b.url) } : b));
+    }
+    res.json(content);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur." });

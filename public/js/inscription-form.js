@@ -23,7 +23,7 @@
     banner.textContent = c.message;
     if (c.phase !== "open") {
       var back = el("a", "reg-btn ghost", "Retour aux inscriptions");
-      back.href = "/inscriptions.html";
+      back.href = "/inscriptions";
       back.style.marginTop = "12px";
       banner.appendChild(document.createElement("br"));
       banner.appendChild(back);
@@ -264,11 +264,11 @@
     c.appendChild(el("p", "reg-notice", "Attention : le dépôt de candidature ne signifie pas que tu es automatiquement retenu(e). Ton dossier devra être examiné par le comité d'organisation."));
     var dl = el("button", "reg-btn ghost", "Enregistrer ces informations (.txt)"); dl.type = "button"; dl.style.margin = "8px auto"; dl.style.maxWidth = "340px";
     dl.addEventListener("click", function () {
-      var txt = "MISS & MISTER FLASH ADJARRA " + cfg.edition + "\r\nRéférence : " + d.reference + "\r\n" + "\r\nSuivi : " + location.origin + "/inscription-suivi.html\r\n";
+      var txt = "MISS & MISTER FLASH ADJARRA " + cfg.edition + "\r\nRéférence : " + d.reference + "\r\n" + "\r\nSuivi : " + location.origin + "/inscription-suivi\r\n";
       var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([txt], { type: "text/plain" })); a.download = "ma-candidature-" + d.reference + ".txt"; a.click();
     });
     c.appendChild(dl);
-    var t = el("a", "reg-btn", "Suivre ma candidature"); t.href = "/inscription-suivi.html"; t.style.maxWidth = "340px"; t.style.margin = "8px auto";
+    var t = el("a", "reg-btn", "Suivre ma candidature"); t.href = "/inscription-suivi"; t.style.maxWidth = "340px"; t.style.margin = "8px auto";
     c.appendChild(t);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }

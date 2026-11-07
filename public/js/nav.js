@@ -8,25 +8,25 @@
    ============================================================ */
 (function () {
   var MENU = [
-    { label: "Accueil", href: "/index.html", match: ["/", "/index.html"] },
-    { label: "Candidats", href: "/candidats.html", match: ["/candidats.html", "/candidat.html"] },
+    { label: "Accueil", href: "/", match: ["/"] },
+    { label: "Candidats", href: "/candidats", match: ["/candidats", "/candidat"] },
     {
       label: "Inscriptions",
-      href: "/inscriptions.html",
-      match: ["/inscriptions.html", "/inscription-formulaire.html", "/inscription-conditions.html", "/inscription-suivi.html"],
+      href: "/inscriptions",
+      match: ["/inscriptions", "/inscription-formulaire", "/inscription-conditions", "/inscription-suivi"],
     },
-    { label: "Billetterie", href: "/billetterie.html" },
-    { label: "Projets d'impact", href: "/projets.html", short: "Projets" },
-    { label: "Galerie", href: "/galerie.html" },
-    { label: "Résultats", href: "/resultats.html" },
-    { label: "À propos", href: "/a-propos.html" },
-    { label: "Partenaires", href: "/partenaires.html" },
-    { label: "FAQ", href: "/faq.html" },
-    { label: "Contact", href: "/contact.html" },
+    { label: "Billetterie", href: "/billetterie" },
+    { label: "Projets d'impact", href: "/projets", short: "Projets" },
+    { label: "Galerie", href: "/galerie" },
+    { label: "Résultats", href: "/resultats" },
+    { label: "À propos", href: "/a-propos" },
+    { label: "Partenaires", href: "/partenaires" },
+    { label: "FAQ", href: "/faq" },
+    { label: "Contact", href: "/contact" },
   ];
 
   // En-tete desktop allege : 6 liens principaux, le reste dans "Plus"
-  var PRIMARY = ["/index.html", "/candidats.html", "/inscriptions.html", "/billetterie.html", "/galerie.html", "/resultats.html"];
+  var PRIMARY = ["/", "/candidats", "/inscriptions", "/billetterie", "/galerie", "/resultats"];
 
   var path = window.location.pathname.replace(/\/+$/, "") || "/";
 
@@ -79,7 +79,7 @@
   var html =
     '<header class="site-header glass">' +
     '  <div class="header-bar">' +
-    '    <a class="header-brand" href="/index.html" aria-label="Miss &amp; Mister Flash Adjarra, accueil">' +
+    '    <a class="header-brand" href="/" aria-label="Miss &amp; Mister Flash Adjarra, accueil">' +
     '      <img class="logo" src="/img/logo.png" alt="Miss & Mister Flash Adjarra" />' +
     "    </a>" +
     '    <nav class="site-menu" aria-label="Menu principal">' +
@@ -95,7 +95,7 @@
     '  <div class="nav-drawer-links">' +
     linksHtml("nav-drawer-link", false) +
     "  </div>" +
-    '  <a class="btn gold block nav-drawer-cta" href="/candidats.html">Voter pour un(e) candidat(e)</a>' +
+    '  <a class="btn gold block nav-drawer-cta" href="/candidats">Voter pour un(e) candidat(e)</a>' +
     "</nav>";
 
   var script = document.currentScript;
@@ -193,14 +193,14 @@
     var footer = document.querySelector("footer");
     if (!footer || footer.classList.contains("site-footer")) return;
     footer.classList.add("site-footer");
-    var navLinks = colLinks(byHref(["/index.html", "/candidats.html", "/inscriptions.html", "/billetterie.html", "/galerie.html", "/projets.html"]));
-    var supportLinks = colLinks(byHref(["/resultats.html", "/a-propos.html", "/partenaires.html", "/faq.html", "/contact.html"])) +
-      '<a href="/inscription-conditions.html">Conditions d\'inscription</a>';
+    var navLinks = colLinks(byHref(["/", "/candidats", "/inscriptions", "/billetterie", "/galerie", "/projets"]));
+    var supportLinks = colLinks(byHref(["/resultats", "/a-propos", "/partenaires", "/faq", "/contact"])) +
+      '<a href="/inscription-conditions">Conditions d\'inscription</a>';
     footer.innerHTML =
       '<div class="footer-inner">' +
       '  <div class="footer-grid">' +
       '    <div class="footer-brand">' +
-      '      <a href="/index.html" class="footer-logo"><img src="/img/logo.png" alt="Miss &amp; Mister Flash Adjarra" /></a>' +
+      '      <a href="/" class="footer-logo"><img src="/img/logo.png" alt="Miss &amp; Mister Flash Adjarra" /></a>' +
       '      <p>La plateforme officielle du concours Miss &amp; Mister Flash Adjarra, réservé aux étudiant(e)s de la FLASH Adjarra.</p>' +
       '      <div class="footer-social" id="footer-social"></div>' +
       "    </div>" +

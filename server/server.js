@@ -10,6 +10,7 @@ require("./payments/fedapay").checkConfig();
 const adminRoutes = require("./routes/admin");
 const { router: registrationRoutes } = require("./routes/registration");
 const { createLimiter } = require("./registration/security");
+const { cleanUrls, cleanInternalUrl } = require("./urls");
 
 const app = express();
 
@@ -35,8 +36,13 @@ app.use((req, res, next) => {
   express.json({ limit: "2mb" })(req, res, next);
 });
 
-// Fichiers statiques (site public + photos uploadees)
-app.use(express.static(path.join(__dirname, "..", "public")));
+// URL propres : /candidats au lieu de /candidats.html, "/" pour l'accueil.
+// Les anciennes adresses (/index.html, /x.html, /x/) sont redirigees en 301 avec leur
+// query string. Doit rester AVANT express.static pour intercepter les anciennes URL.
+app.use(cleanUrls());
+
+// Fichiers statiques (css, js, img, photos). "index: false" : l'accueil est servi par cleanUrls().
+app.use(express.static(path.join(__dirname, "..", "public"), { index: false }));
 
 // API
 app.use("/api/candidates", candidatesRoutes);
@@ -121,7 +127,12 @@ app.get("/api/homepage", async (req, res) => {
   try {
     const result = await pool.query("SELECT value FROM settings WHERE key = 'homepage_content'");
     const stored = result.rows[0] ? JSON.parse(result.rows[0].value) : {};
-    res.json({ ...DEFAULT_HOMEPAGE, ...stored });
+    const content = { ...DEFAULT_HOMEPAGE, ...stored };
+    // Les boutons enregistres avant le passage aux URL propres (/candidats.html) sont convertis a la volee.
+    if (Array.isArray(content.buttons)) {
+      content.buttons = content.buttons.map((b) => (b && typeof b === "object" ? { ...b, url: cleanInternalUrl(b.url) } : b));
+    }
+    res.json(content);
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Erreur serveur." });

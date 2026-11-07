@@ -66,7 +66,7 @@ router.post("/init", async (req, res) => {
       amount,
       description: `${nb} vote(s) pour ${candidate.name} - Miss & Mister Flash Adjarra`,
       customerPhone: phone,
-      callbackUrl: `${process.env.PUBLIC_URL}/merci.html?tx=${txId}`,
+      callbackUrl: `${process.env.PUBLIC_URL}/merci?tx=${txId}`,
       metadata: { local_transaction_id: txId, candidate_id: candidateId },
     });
 

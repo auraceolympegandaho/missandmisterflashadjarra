@@ -36,7 +36,7 @@ function formatNumber(n) {
 // Lien de partage construit a partir du domaine reellement utilise :
 // fonctionne en local comme en production, sans adresse figee.
 function getShareLink(id) {
-  return `${window.location.origin}/candidat.html?id=${id}`;
+  return `${window.location.origin}/candidat?id=${id}`;
 }
 
 // Lecteur integre pour YouTube ; sinon simple lien externe
@@ -73,8 +73,8 @@ function showMessage(title, text) {
     <div class="profile-card profile-message">
       <h1>${escapeHtml(title)}</h1>
       <p>${escapeHtml(text)}</p>
-      <a href="/candidats.html" class="btn block">Voir tous les candidats</a>
-      <a href="/index.html" class="profile-message-link">Retour à l'accueil</a>
+      <a href="/candidats" class="btn block">Voir tous les candidats</a>
+      <a href="/" class="profile-message-link">Retour à l'accueil</a>
     </div>`;
 }
 
@@ -99,7 +99,7 @@ function showNetworkError() {
       <h1>Connexion impossible</h1>
       <p>Le profil n'a pas pu être chargé. Vérifiez votre connexion internet puis réessayez.</p>
       <button class="btn block" type="button" id="retry-btn">Réessayer</button>
-      <a href="/candidats.html" class="profile-message-link">Voir tous les candidats</a>
+      <a href="/candidats" class="profile-message-link">Voir tous les candidats</a>
     </div>`;
   document.getElementById("retry-btn").addEventListener("click", loadProfile);
 }
@@ -213,7 +213,7 @@ function render(c) {
         ${factsHtml}
         ${statsHtml}
 
-        <a class="btn gold block profile-vote-btn" href="/candidats.html?vote=${c.id}">
+        <a class="btn gold block profile-vote-btn" href="/candidats?vote=${c.id}">
           Voter pour ${escapeHtml(firstName)}
         </a>
 
@@ -255,7 +255,7 @@ function render(c) {
   document.getElementById("vote-bar-sub").textContent =
     (c.candidacy_number ? `N° ${c.candidacy_number} · ` : "") + c.category;
   const barBtn = document.getElementById("vote-bar-btn");
-  barBtn.href = `/candidats.html?vote=${c.id}`;
+  barBtn.href = `/candidats?vote=${c.id}`;
   barBtn.textContent = `Voter pour ${firstName}`;
   voteBar.hidden = false;
   document.body.classList.add("has-vote-bar");
