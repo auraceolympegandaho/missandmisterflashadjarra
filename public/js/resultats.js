@@ -7,16 +7,15 @@ function escapeHtml(str) {
 function renderLeaderboard(elId, candidates) {
   const el = document.getElementById(elId);
   if (!candidates.length) {
-    el.innerHTML = "<p class='muted'>Aucun candidat dans cette catégorie.</p>";
+    el.innerHTML = "<p style='color:var(--text-muted); font-size:13px;'>Aucun candidat dans cette catégorie.</p>";
     return;
   }
-  const max = Math.max(0, ...candidates.map((c) => Number(c.votes_count) || 0));
   el.innerHTML = candidates
     .map(
       (c, i) => `
-    <li class="leaderboard-row ${i === 0 ? "rank-1" : ""}"${max > 0 && typeof c.votes_count !== "undefined" ? ` style="--pct:${Math.round(((Number(c.votes_count) || 0) / max) * 100)}%"` : ""}>
+    <li class="leaderboard-row ${i === 0 ? "rank-1" : ""}">
       <span class="leaderboard-rank">${i + 1}</span>
-      <img class="leaderboard-photo" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" onerror="this.removeAttribute('src');" />
+      <img class="leaderboard-photo" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" onerror="this.style.background='#eef1f6'; this.src='';" />
       <div class="leaderboard-info">
         <div class="name">${escapeHtml(c.name)}</div>
         ${c.candidacy_number ? `<div class="number">N° ${escapeHtml(c.candidacy_number)}</div>` : ""}

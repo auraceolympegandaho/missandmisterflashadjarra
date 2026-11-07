@@ -13,7 +13,7 @@ async function loadGallery() {
 
     if (!withPhoto.length) {
       grid.innerHTML =
-        "<p class='muted'>Aucune photo disponible pour le moment.</p>";
+        "<p style='text-align:center; color:var(--text-muted); grid-column:1/-1;'>Aucune photo disponible pour le moment.</p>";
       return;
     }
 
@@ -27,7 +27,7 @@ async function loadGallery() {
       )
       .join("");
   } catch (e) {
-    grid.innerHTML = "<p class='muted'>Impossible de charger la galerie.</p>";
+    grid.innerHTML = "<p style='text-align:center;'>Impossible de charger la galerie.</p>";
   }
 }
 

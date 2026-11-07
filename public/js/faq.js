@@ -23,9 +23,9 @@ async function loadFaq() {
     container.innerHTML = sections
       .map(
         (section) => `
-      <section class="split-block">
+      <div class="panel">
         <h2>${escapeHtml(section.title)}</h2>
-        <div class="block-body">${(section.items || [])
+        ${(section.items || [])
           .map(
             (item) => `
           <details class="faq-item">
@@ -33,8 +33,8 @@ async function loadFaq() {
             <p class="faq-answer">${escapeHtml(item.a)}</p>
           </details>`
           )
-          .join("")}</div>
-      </section>`
+          .join("")}
+      </div>`
       )
       .join("");
   } catch (e) {

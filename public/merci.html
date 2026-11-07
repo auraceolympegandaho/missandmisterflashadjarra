@@ -4,59 +4,51 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Merci — Miss & Mister Flash Adjarra</title>
-<link rel="icon" type="image/png" href="/img/favicon.png" />
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Instrument+Sans:wght@400;500;600;700&display=swap" />
-<link rel="stylesheet" href="/css/mm.css" />
-<link rel="stylesheet" href="/css/mm-pages.css" />
+<link rel="stylesheet" href="/css/style.css" />
+<link rel="stylesheet" href="/css/nav.css" />
+<link rel="stylesheet" href="/css/theme.css" />
+<link rel="stylesheet" href="/css/premium.css" />
+<link rel="stylesheet" href="/css/light.css" />
 </head>
 <body>
-
 <script src="/js/nav.js"></script>
-
-<main class="wrap status-page">
-  <div class="status-box">
-    <div class="status-arch" aria-hidden="true">M</div>
-    <div id="status-box" role="status">
-      <p class="status-msg">Vérification de votre paiement...</p>
-    </div>
-    <a class="btn" href="/">Retour au site</a>
+<main style="text-align:center; padding-top:60px;">
+  <div id="status-box">
+    <p>Vérification de votre paiement...</p>
   </div>
+  <a class="btn" href="/">Retour au site</a>
 </main>
 
-<footer></footer>
+<footer>
+  <p class="rights-line">Tous droits réservés Miss &amp; Mister FLASH ADJARRA.</p>
+</footer>
+
 <script>
 const params = new URLSearchParams(window.location.search);
 const txId = params.get("tx");
 const box = document.getElementById("status-box");
 
-function say(text, cls) {
-  box.innerHTML = '<p class="status-msg' + (cls ? " " + cls : "") + '"></p>';
-  box.firstChild.textContent = text;
-}
-
 async function checkStatus(attempt = 0) {
   if (!txId) {
-    say("Référence de transaction manquante.");
+    box.innerHTML = "<p>Référence de transaction manquante.</p>";
     return;
   }
   try {
-    const res = await fetch(`/api/votes/status/${encodeURIComponent(txId)}`);
+    const res = await fetch(`/api/votes/status/${txId}`);
     const data = await res.json();
 
     if (data.status === "approved") {
-      say(`Paiement confirmé ! Merci, vos ${data.votes_bought} vote(s) ont été comptabilisés.`, "ok");
+      box.innerHTML = `<p style="color:#1e7a3d; font-size:18px;">Paiement confirmé ! Merci, vos ${data.votes_bought} vote(s) ont été comptabilisés.</p>`;
     } else if (data.status === "declined" || data.status === "canceled") {
-      say("Le paiement n'a pas abouti. Vous pouvez réessayer depuis la page Candidats.", "ko");
+      box.innerHTML = `<p style="color:#b3261e;">Le paiement n'a pas abouti. Vous pouvez réessayer depuis la page d'accueil.</p>`;
     } else if (attempt < 8) {
       // Le webhook FedaPay peut mettre quelques secondes à arriver : on réessaie.
       setTimeout(() => checkStatus(attempt + 1), 2000);
     } else {
-      say("Paiement en cours de vérification. Si vos votes n'apparaissent pas d'ici quelques minutes, contactez l'organisateur.");
+      box.innerHTML = `<p>Paiement en cours de vérification. Si vos votes n'apparaissent pas d'ici quelques minutes, contactez l'organisateur.</p>`;
     }
   } catch (e) {
-    say("Impossible de vérifier le statut du paiement.");
+    box.innerHTML = "<p>Impossible de vérifier le statut du paiement.</p>";
   }
 }
 checkStatus();

@@ -194,7 +194,6 @@ function render(c) {
 
   content.innerHTML = `
     <article class="profile-card">
-      <div class="profile-visual"><div class="arch-frame">
       <div class="profile-photo-wrap">
         ${
           c.photo_path
@@ -208,21 +207,20 @@ function render(c) {
           ${c.candidacy_number ? `<span class="badge badge-num">N° ${escapeHtml(c.candidacy_number)}</span>` : ""}
         </div>
       </div>
-      </div></div>
 
       <div class="profile-body">
         <h1>${escapeHtml(c.name)}</h1>
         ${factsHtml}
         ${statsHtml}
 
-        <a class="btn block profile-vote-btn" href="/candidats.html?vote=${c.id}">
+        <a class="btn gold block profile-vote-btn" href="/candidats.html?vote=${c.id}">
           Voter pour ${escapeHtml(firstName)}
         </a>
 
         <div class="share-row">
-          <button class="btn outline share-btn" id="copy-link-btn" type="button">Copier le lien</button>
-          <button class="btn outline share-btn" id="share-btn" type="button">Partager</button>
-          <button class="btn outline share-btn whatsapp" id="share-whatsapp-btn" type="button">WhatsApp</button>
+          <button class="btn share-btn" id="copy-link-btn" type="button">Copier le lien</button>
+          <button class="btn share-btn" id="share-btn" type="button">Partager</button>
+          <button class="btn share-btn whatsapp" id="share-whatsapp-btn" type="button">WhatsApp</button>
         </div>
         <p class="share-feedback" id="share-feedback" role="status"></p>
 

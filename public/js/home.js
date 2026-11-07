@@ -1,10 +1,5 @@
-/* ============================================================
-   Page d'accueil : tout le contenu vient des memes API qu'avant
-   (/api/homepage, /api/settings/countdown, /api/announcements,
-   /api/partners, /api/registration/config) ; s'y ajoutent deux
-   lectures publiques deja existantes : /api/about (etapes du
-   deroulement) et /api/candidates (candidats et projets a la une).
-   ============================================================ */
+// Icones tournantes utilisees pour illustrer chaque objectif (le contenu
+// texte, editable depuis l'admin, ne porte pas d'icone propre).
 const OBJECTIVE_ICONS = [
   '<path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6L12 3z" stroke-linejoin="round"/>',
   '<circle cx="12" cy="7.5" r="3.25"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5" stroke-linecap="round"/>',
@@ -12,33 +7,13 @@ const OBJECTIVE_ICONS = [
   '<circle cx="9" cy="9" r="3.5"/><circle cx="16" cy="12" r="2.75"/><path d="M3.5 19c.4-3 2.7-5 5.5-5s5 1.9 5.6 4.6M14 15.3c2.2.1 3.9 1.7 4.5 4" stroke-linecap="round"/>',
 ];
 
-const DEFAULT_STEPS = [
-  { title: "Candidatures", text: "Les étudiant(e)s intéressé(e)s déposent leur dossier auprès de l'organisation." },
-  { title: "Sélection", text: "Les candidat(e)s retenu(e)s sont publié(e)s avec leur projet d'impact." },
-  { title: "Votes en ligne", text: "Le public soutient ses favori(te)s depuis la plateforme." },
-  { title: "Soirée de gala", text: "Prestations sur scène, délibération du jury et couronnement." },
-];
-
-function escapeHtml(str) {
-  const div = document.createElement("div");
-  div.textContent = str || "";
-  return div.innerHTML.replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-}
-
-// « MISS & MISTER » -> « Miss & Mister » (affichage uniquement)
-function titleCase(s) {
-  return String(s || "")
-    .toLowerCase()
-    .replace(/(^|[\s'’-])([a-zà-ÿ])/g, (m, a, b) => a + b.toUpperCase());
-}
-
 async function loadHomepage() {
   try {
     const res = await fetch("/api/homepage");
     const data = await res.json();
 
     document.getElementById("hero-edition").textContent = data.hero_edition || "";
-    // Titre sur deux niveaux : « Miss & Mister » (grand) puis le reste (texte insere sans HTML).
+    // Titre sur deux lignes : « MISS & MISTER » puis le reste en or (texte inséré sans HTML).
     const titleEl = document.getElementById("hero-title");
     const fullTitle = data.hero_title || "";
     const m = fullTitle.match(/^(miss\s*&\s*mister)\s+(.+)$/i);
@@ -46,10 +21,10 @@ async function loadHomepage() {
     if (m) {
       const l1 = document.createElement("span");
       l1.className = "l1";
-      l1.textContent = titleCase(m[1]);
+      l1.textContent = m[1];
       const l2 = document.createElement("span");
       l2.className = "l2";
-      l2.textContent = titleCase(m[2]);
+      l2.textContent = m[2];
       titleEl.append(l1, l2);
     } else {
       titleEl.textContent = fullTitle;
@@ -68,21 +43,20 @@ async function loadHomepage() {
     // saisie par l'admin dans un champ dedie de la page d'accueil.
     document.getElementById("organizer-text").innerHTML = data.organizer_text || "";
 
+    const objectivesGrid = document.getElementById("objectives-grid");
     const objectives = Array.isArray(data.objectives) ? data.objectives : [];
-    document.getElementById("objectives-grid").innerHTML = objectives
+    objectivesGrid.innerHTML = objectives
       .map(
         (o, i) => `
-      <article class="objective">
-        <span class="objective-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">${OBJECTIVE_ICONS[i % OBJECTIVE_ICONS.length]}</svg></span>
-        <div>
-          <h3>${escapeHtml(o.title)}</h3>
-          <p>${escapeHtml(o.text)}</p>
-        </div>
-      </article>`
+      <div class="objective-card">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">${OBJECTIVE_ICONS[i % OBJECTIVE_ICONS.length]}</svg>
+        <h3>${escapeHtml(o.title)}</h3>
+        <p>${escapeHtml(o.text)}</p>
+      </div>`
       )
       .join("");
 
-    // Bouton principal « Deposer ma candidature » (deja dans le HTML) + boutons editables de l'admin
+    // Bouton principal « Déposer ma candidature » (déjà dans le HTML) + boutons éditables de l'admin
     const ctaEl = document.getElementById("hero-cta");
     const buttons = (Array.isArray(data.buttons) ? data.buttons : []).filter(
       (b) => !/inscription/i.test(b.url || "")
@@ -102,8 +76,7 @@ async function loadPrice() {
   try {
     const res = await fetch("/api/settings/price");
     const data = await res.json();
-    const pl = document.getElementById("price-label");
-    if (pl) pl.textContent = data.price_per_vote;
+    const pl = document.getElementById("price-label"); if (pl) pl.textContent = data.price_per_vote;
   } catch (e) {
     console.error("Impossible de charger le prix du vote", e);
   }
@@ -172,28 +145,10 @@ function tickCountdown() {
   }
 }
 
-async function loadSteps() {
-  const track = document.getElementById("steps-track");
-  let steps = DEFAULT_STEPS;
-  try {
-    const res = await fetch("/api/about");
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data.steps) && data.steps.length) steps = data.steps;
-    }
-  } catch (e) {
-    /* on garde les etapes par defaut */
-  }
-  track.innerHTML = steps
-    .map(
-      (s, i) => `
-    <li class="path-step">
-      <span class="path-n">${i + 1}</span>
-      <h3>${escapeHtml(s.title)}</h3>
-      <p>${escapeHtml(s.text)}</p>
-    </li>`
-    )
-    .join("");
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str || "";
+  return div.innerHTML;
 }
 
 async function loadPartners() {
@@ -248,92 +203,25 @@ async function loadAnnouncements() {
     const items = await res.json();
 
     if (!items.length) {
-      // Pas d'actualite : on masque toute la section (elle reapparait des qu'une actualite est publiee)
+      // Pas d'actualité : on masque toute la section (elle réapparaît dès qu'une actualité est publiée)
       const section = document.getElementById("actualites");
       if (section) section.style.display = "none";
       return;
     }
 
-    const fmt = (iso) => {
-      try {
-        return new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
-      } catch (e) {
-        return "";
-      }
-    };
-    const [first, ...rest] = items;
-    const tag = (a) => (a.tag ? `<span class="news-tag">${escapeHtml(a.tag)}</span>` : "");
-    grid.className = "news" + (rest.length ? "" : " news-solo");
-    grid.innerHTML =
-      `<article class="news-main">${tag(first)}<p>${escapeHtml(first.content)}</p><time>${fmt(first.created_at)}</time></article>` +
-      (rest.length
-        ? `<div class="news-list">${rest
-            .map(
-              (a) =>
-                `<article class="news-item">${tag(a)}<p>${escapeHtml(a.content)}</p><time>${fmt(a.created_at)}</time></article>`
-            )
-            .join("")}</div>`
-        : "");
+    grid.innerHTML = items
+      .map(
+        (a) => `
+      <div class="news-card">
+        ${a.tag ? `<span class="news-tag">${escapeHtml(a.tag)}</span>` : ""}
+        <p>${escapeHtml(a.content)}</p>
+      </div>`
+      )
+      .join("");
   } catch (e) {
     console.error("Impossible de charger les actualités", e);
-    grid.innerHTML = "<p class='muted'>Impossible de charger les actualités.</p>";
-  }
-}
-
-// Candidats et projets mis en avant : meme API publique que la page Candidats.
-async function loadCandidatesAndProjects() {
-  try {
-    const res = await fetch("/api/candidates");
-    const all = await res.json();
-    if (!Array.isArray(all) || !all.length) return;
-
-    // --- Candidats a la une : jusqu'a 3 Miss et 3 Mister ayant une photo ---
-    const withPhoto = all.filter((c) => c.photo_path);
-    const miss = withPhoto.filter((c) => c.category === "Miss").slice(0, 3);
-    const mister = withPhoto.filter((c) => c.category === "Mister").slice(0, 3);
-    let picks = [];
-    for (let i = 0; i < 3; i++) {
-      if (miss[i]) picks.push(miss[i]);
-      if (mister[i]) picks.push(mister[i]);
-    }
-    if (!picks.length) picks = withPhoto.slice(0, 6);
-    if (picks.length) {
-      document.getElementById("featured-row").innerHTML = picks
-        .map(
-          (c) => `
-        <a class="feat" href="/candidat.html?id=${c.id}">
-          <span class="feat-photo arch"><img src="${escapeHtml(c.photo_path)}" alt="${escapeHtml(c.name)}" loading="lazy" /></span>
-          <span class="feat-meta">
-            <strong>${escapeHtml(c.name)}</strong>
-            <small>${escapeHtml(c.category)}${c.candidacy_number ? " n° " + escapeHtml(c.candidacy_number) : ""}</small>
-          </span>
-        </a>`
-        )
-        .join("");
-      const link = document.getElementById("all-candidates-link");
-      if (link) link.textContent = `Voir les ${all.length} candidat${all.length > 1 ? "s" : ""}`;
-      document.getElementById("candidats-une").hidden = false;
-    }
-
-    // --- Projets d'impact : trois extraits ---
-    const withProject = all.filter((c) => c.project_desc && c.project_desc.trim()).slice(0, 3);
-    if (withProject.length) {
-      document.getElementById("home-projects").innerHTML = withProject
-        .map(
-          (c) => `
-        <article class="project-quote">
-          <p class="project-text">${escapeHtml(c.project_desc)}</p>
-          <footer>
-            <strong>${escapeHtml(c.name)}</strong>
-            <a href="/candidat.html?id=${c.id}">Voir le profil</a>
-          </footer>
-        </article>`
-        )
-        .join("");
-      document.getElementById("projets-une").hidden = false;
-    }
-  } catch (e) {
-    console.error("Impossible de charger les candidats à la une", e);
+    grid.innerHTML =
+      "<p style='text-align:center; color:var(--text-muted); grid-column:1/-1; font-size:13px;'>Impossible de charger les actualités.</p>";
   }
 }
 
@@ -341,11 +229,11 @@ async function loadRegistrationChip() {
   try {
     const res = await fetch("/api/registration/config");
     const c = await res.json();
-    if (c.phase !== "open") return; // rien n'est annonce tant que l'admin n'a pas ouvert
+    if (c.phase !== "open") return; // rien n'est annoncé tant que l'admin n'a pas ouvert
     const chip = document.getElementById("hero-reg-chip");
     chip.textContent = "Inscriptions ouvertes";
     if (c.ends_at) {
-      chip.textContent += " jusqu'au " + new Date(c.ends_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
+      chip.textContent += " · jusqu'au " + new Date(c.ends_at).toLocaleDateString("fr-FR", { day: "numeric", month: "long" });
     }
     chip.hidden = false;
   } catch (e) {}
@@ -355,7 +243,5 @@ loadHomepage();
 loadRegistrationChip();
 loadPrice();
 loadCountdown();
-loadSteps();
 loadAnnouncements();
-loadCandidatesAndProjects();
 loadPartners();

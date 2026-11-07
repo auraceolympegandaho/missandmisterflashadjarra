@@ -82,37 +82,12 @@ document.querySelectorAll(".admin-tab-btn").forEach((btn) => {
 });
 
 // --- Résultats ---
-// Barres horizontales : 5 premiers d'une categorie (largeur relative au meilleur score)
-function renderBars(elId, list) {
-  const el = document.getElementById(elId);
-  const top = [...list].sort((a, b) => Number(b.votes_count) - Number(a.votes_count)).slice(0, 5);
-  if (!top.length) {
-    el.innerHTML = '<p class="help">Aucun candidat dans cette catégorie.</p>';
-    return;
-  }
-  const max = Math.max(1, Number(top[0].votes_count) || 0);
-  el.innerHTML = top
-    .map(
-      (c) => `<div class="bar-row"><span class="bar-name">${escapeHtml(c.name)}</span>
-        <span class="bar-track"><i style="width:${Math.round(((Number(c.votes_count) || 0) / max) * 100)}%"></i></span>
-        <span class="bar-val">${Number(c.votes_count || 0).toLocaleString("fr-FR")}</span></div>`
-    )
-    .join("");
-}
-
 async function loadResults() {
   try {
     const data = await apiFetch("/results");
     document.getElementById("stat-total-fcfa").textContent =
       data.totals.total_fcfa.toLocaleString("fr-FR") + " FCFA";
     document.getElementById("stat-nb-tx").textContent = data.totals.nb_transactions_approuvees;
-
-    // Indicateurs et barres calcules cote navigateur a partir de la meme reponse
-    const totalVotes = data.candidates.reduce((n, c) => n + Number(c.votes_count || 0), 0);
-    document.getElementById("stat-total-votes").textContent = totalVotes.toLocaleString("fr-FR");
-    document.getElementById("stat-nb-cand").textContent = data.candidates.length;
-    renderBars("bars-miss", data.candidates.filter((c) => c.category === "Miss"));
-    renderBars("bars-mister", data.candidates.filter((c) => c.category === "Mister"));
 
     const tbody = document.querySelector("#results-table tbody");
     tbody.innerHTML = "";
@@ -234,7 +209,7 @@ async function loadCandidates() {
         <td>${escapeHtml(c.name)}</td>
         <td>${escapeHtml(c.category)}</td>
         <td>${c.votes_count}</td>
-        <td><span class="pill ${c.is_active ? "ok" : "off"}">${c.is_active ? "Actif" : "Masqué"}</span></td>
+        <td>${c.is_active ? "Actif" : "Masqué"}</td>
         <td><button class="copy-link-btn" data-link="${escapeHtml(link)}">Copier le lien</button></td>
         <td><a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer">Voir</a></td>
         <td class="row-actions">
@@ -416,10 +391,10 @@ async function loadTransactions() {
 
 function statusLabel(s) {
   const map = {
-    approved: '<span class="pill ok">Payé</span>',
-    pending: '<span class="pill wait">En attente</span>',
-    declined: '<span class="pill ko">Refusé</span>',
-    canceled: '<span class="pill ko">Annulé</span>',
+    approved: '<span style="color:#1e7a3d;font-weight:600;">Payé</span>',
+    pending: '<span style="color:#a06a10;">En attente</span>',
+    declined: '<span style="color:#b3261e;">Refusé</span>',
+    canceled: '<span style="color:#b3261e;">Annulé</span>',
   };
   return map[s] || s;
 }
@@ -748,7 +723,7 @@ async function loadPartners() {
         <td>${escapeHtml(p.name)}</td>
         <td>${p.website_url ? `<a href="${escapeHtml(p.website_url)}" target="_blank" rel="noopener noreferrer">Lien</a>` : "—"}</td>
         <td>${p.display_order}</td>
-        <td><span class="pill ${p.is_active ? "ok" : "off"}">${p.is_active ? "Visible" : "Masqué"}</span></td>
+        <td>${p.is_active ? "Visible" : "Masqué"}</td>
         <td class="row-actions">
           <button data-id="${p.id}" class="edit-partner-btn">Modifier</button>
           <button data-id="${p.id}" class="toggle-partner-btn">${p.is_active ? "Masquer" : "Afficher"}</button>
@@ -845,8 +820,8 @@ async function loadAnnouncements() {
       tr.innerHTML = `
         <td>${new Date(a.created_at).toLocaleDateString("fr-FR")}</td>
         <td>${escapeHtml(a.tag || "—")}</td>
-        <td class="cell-wide">${escapeHtml(a.content)}</td>
-        <td><span class="pill ${a.is_active ? "ok" : "off"}">${a.is_active ? "Publiée" : "Masquée"}</span></td>
+        <td style="max-width:320px;">${escapeHtml(a.content)}</td>
+        <td>${a.is_active ? "Publiée" : "Masquée"}</td>
         <td class="row-actions">
           <button data-id="${a.id}" class="edit-announcement-btn">Modifier</button>
           <button data-id="${a.id}" class="toggle-announcement-btn">${a.is_active ? "Masquer" : "Publier"}</button>

@@ -177,3 +177,40 @@
   background: var(--danger); color: #fff; border: none;
   font-size: 12px; line-height: 20px; text-align: center; padding: 0; cursor: pointer;
 }
+
+/* --- Editeur FAQ (onglet FAQ & Contact) --- */
+.faq-section-block {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  margin-bottom: 14px;
+  background: #fafcfe;
+}
+.faq-section-head {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.faq-section-head input {
+  flex: 1;
+  margin-bottom: 0;
+  font-weight: 700;
+}
+.faq-item-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+.faq-item-row input, .faq-item-row textarea {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  font-size: 13.5px;
+  font-family: inherit;
+}
+.faq-item-row textarea { min-height: 50px; resize: vertical; }
+.faq-item-row .remove-row-btn { align-self: flex-end; }

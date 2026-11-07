@@ -63,7 +63,7 @@ function renderGrid(candidates) {
 
   for (const c of candidates) {
     const card = document.createElement("div");
-    card.className = "cand";
+    card.className = "card";
 
     // Badge "En tete" seulement si le classement est public et le candidat 1er
     const isLeader =
@@ -72,18 +72,16 @@ function renderGrid(candidates) {
 
     card.innerHTML = `
       ${isLeader ? '<span class="leader-badge"><svg class="leader-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.6 5.6 6.1.6-4.6 4.1 1.3 6-5.4-3.1-5.4 3.1 1.3-6-4.6-4.1 6.1-.6L12 3z"/></svg> En tête</span>' : ""}
-      <div class="cand-frame">
-        <a class="photo-wrap" href="/candidat.html?id=${c.id}" aria-label="Voir le profil de ${escapeHtml(c.name)}">
-          <img class="photo" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" loading="lazy" onerror="this.style.background='#efe4c8'; this.removeAttribute('src');" />
-        </a>
-        ${c.candidacy_number ? `<span class="number-badge">N° ${escapeHtml(c.candidacy_number)}</span>` : ""}
-      </div>
+      ${c.candidacy_number ? `<span class="number-badge">N° ${escapeHtml(c.candidacy_number)}</span>` : ""}
+      <a class="photo-wrap" href="/candidat.html?id=${c.id}">
+        <img class="photo" src="${c.photo_path || ""}" alt="${escapeHtml(c.name)}" onerror="this.style.background='#eef1f6'; this.src='';" />
+      </a>
       <div class="info">
         <span class="category">${escapeHtml(c.category)}</span>
         <h3><a class="candidate-link" href="/candidat.html?id=${c.id}">${escapeHtml(c.name)}</a></h3>
         ${typeof c.votes_count !== "undefined" ? `<p class="votes"><b>${Number(c.votes_count).toLocaleString("fr-FR")}</b> votes</p>` : ""}
-        <a class="profile-link" href="/candidat.html?id=${c.id}">Voir le profil et le projet</a>
-        <button class="btn block small vote-btn">Voter pour ${escapeHtml(c.name.split(" ")[0])}</button>
+        <a class="profile-link" href="/candidat.html?id=${c.id}">Voir le profil &amp; le projet</a>
+        <button class="btn block vote-btn">Voter pour ${escapeHtml(c.name.split(" ")[0])}</button>
       </div>
     `;
     card.querySelector(".vote-btn").addEventListener("click", () => openVoteModal(c));
